@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Partida - Venture Gotchi</title>
+</head>
+<body>
+    <header style="background-color: #f8f8f8; padding: 15px; border-bottom: 1px solid #eee;">
+        <nav>
+            <a href="{% url 'dashboard' %}" style="text-decoration: none; font-weight: bold; margin-right: 15px;">Dashboard</a> 
+            |
+            <span>Olá, {{ user.username }}!</span>
+            |
+            <a href="{% url 'logout' %}" style="margin-left: 10px;">Sair (Logout)</a>
+        </nav>
+    </header>
+
+    <main style="padding: 30px; max-width: 600px; margin: 0 auto;">
+        
+        <h1>Defina Sua Startup</h1>
+        
+        <form method="POST" action="{% url 'nova_partida' %}" style="border: 1px solid #ccc; padding: 20px; border-radius: 5px;">
+            
+            {% csrf_token %} <p style="margin-bottom: 20px;">
+                Para começar, informe o nome da sua empresa.
+            </p>
+
+            <label for="nome_empresa" style="display: block; margin-bottom: 5px; font-weight: bold;">Nome da Startup:</label>
+            <input type="text" id="nome_empresa" name="nome_empresa" required 
+                   placeholder="Ex: Panthe Games"
+                   style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 4px;"><br>
+            
+            <button type="submit" style="padding: 10px 20px; background-color: green; 
+                                        color: white; border: none; border-radius: 5px; 
+                                        cursor: pointer;">
+                Iniciar Simulação
+            </button>
+            
+        </form>
+    </main>
+
+    <footer style="text-align: center; padding: 10px; background-color: #f8f8f8; border-top: 1px solid #eee; position: fixed; bottom: 0; width: 100%;">
+        <p>© 2025 - Venture Gotchi</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogando: {{ partida.nome_empresa }} - Venture Gotchi</title>
+    <style>
+        /* Estilos básicos para simular a interface do jogo */
+        body { font-family: sans-serif; margin: 0; background-color: #f4f4f9; }
+        header { background-color: #343a40; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        header a { color: #ccc; text-decoration: none; margin-left: 15px; }
+        .game-container { display: flex; max-width: 1200px; margin: 20px auto; gap: 20px; }
+        .main-content { flex: 3; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .sidebar { flex: 1; padding: 20px; background-color: #e9ecef; border-radius: 8px; }
+        .metric-box { border-bottom: 1px solid #ddd; padding: 10px 0; }
+        .metric-box strong { display: block; font-size: 1.2em; color: #007bff; }
+        .historico-log { max-height: 400px; overflow-y: auto; background-color: #fff; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        .historico-item { margin-bottom: 5px; padding: 5px; border-left: 3px solid #6c757d; }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="font-size: 1.5em;">Venture Gotchi: {{ partida.nome_empresa }}</div>
+        <nav>
+            <span>Turno Atual: {{ estado_startup.turno_atual }}</span>
+            <a href="{% url 'dashboard' %}">Voltar ao Dashboard</a>
+            <span style="margin-left: 15px;">| Olá, {{ user.username }}!</span>
+        </nav>
+    </header>
+
+    <div class="game-container">
+        
+        <aside class="sidebar">
+            <h3>Métricas Atuais</h3>
+            
+            <div class="metric-box">
+                Caixa (R$): <strong>R$ {{ estado_startup.saldo_caixa|floatformat:2 }}</strong>
+            </div>
+            
+            <div class="metric-box">
+                Receita Mensal: <strong>R$ {{ estado_startup.receita_mensal|floatformat:2 }}</strong>
+            </div>
+            
+            <div class="metric-box">
+                Valuation: <strong>R$ {{ estado_startup.valuation|floatformat:2 }}</strong>
+            </div>
+            
+            <div class="metric-box">
+                Funcionários: <strong>{{ estado_startup.funcionarios }}</strong>
+            </div>
+            
+            <h3 style="margin-top: 20px;">Histórico de Decisões</h3>
+            <div class="historico-log">
+                {% if historico_decisoes %}
+                    {% for decisao in historico_decisoes %}
+                        <p class="historico-item">
+                            T{{ decisao.turno }}: {{ decisao.decisao_tomada }} 
+                            <small>({{ decisao.timestamp|date:"H:i" }})</small>
+                        </p>
+                    {% endfor %}
+                {% else %}
+                    <p>Nenhuma decisão registrada ainda.</p>
+                {% endif %}
+            </div>
+
+        </aside>
+
+        <section class="main-content">
+            <h2>Próxima Decisão (Turno {{ estado_startup.turno_atual|add:1 }})</h2>
+            
+            <p style="border: 1px dashed #007bff; padding: 15px; background-color: #e6f7ff;">
+                Atual cenário: Sua startup precisa decidir se investe em marketing agressivo ou contrata um novo engenheiro sênior. O que você faz?
+            </p>
+
+            <form method="POST" action="{% url 'salvar_jogo' partida.id %}" style="margin-top: 30px;">
+                {% csrf_token %}
+                
+                <h3>Ação e Salvamento</h3>
+                
+                <p>
+                    <label for="decisao">Sua Decisão:</label>
+                    <textarea id="decisao" name="decisao" rows="3" required 
+                              style="width: 100%; padding: 10px; border: 1px solid #ccc;"></textarea>
+                </p>
+                
+                <input type="hidden" name="saldo_atual" value="{{ estado_startup.saldo_caixa }}">
+                <button type="submit" 
+                        style="padding: 10px 20px; background-color: #28a745; color: white; 
+                               border: none; border-radius: 5px; cursor: pointer;">
+                    Salvar e Avançar Turno
+                </button>
+            </form>
+            
+        </section>
+    </div>
+    
+    <footer>
+        <p style="text-align: center; margin-top: 20px;">Venture Gotchi - Aprendendo Empreendedorismo</p>
+    </footer>
+</body>
+</html>

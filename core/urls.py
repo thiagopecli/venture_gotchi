@@ -1,7 +1,11 @@
 from django.urls import path
 from . import views
+from views import LoginView
 
 urlpatterns = [
+
+    path('login/', LoginView.as_view(), name='login'),
+
     # 1. Dashboard de Partidas
     # Rota principal para listar partidas salvas e iniciar uma nova.
     path('', views.dashboard, name='dashboard'), 

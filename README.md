@@ -48,6 +48,144 @@
     Profissionais Corporativos (30–45 anos): Interessados em intraempreendedorismo e gestão.
     Educadores de Negócios (30–50 anos): Utilizam a ferramenta como apoio didático e avaliação.
 
+---
+
+## 🚀 Como Executar o Projeto
+
+### Pré-requisitos
+- Python 3.8+
+- pip (gerenciador de pacotes)
+- Virtualenv (recomendado)
+
+### Instalação
+
+1. **Clone o repositório:**
+   ```bash
+   git clone https://github.com/thiagopecli/venture_gotchi.git
+   cd venture_gotchi
+   ```
+
+2. **Crie um ambiente virtual:**
+   ```bash
+   python -m venv venv
+   venv\Scripts\activate  # Windows
+   source venv/bin/activate  # Linux/Mac
+   ```
+
+3. **Instale as dependências:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Configure o arquivo `.env` (copie do `.env.example`):**
+   ```bash
+   copy .env.example .env  # Windows
+   cp .env.example .env    # Linux/Mac
+   ```
+
+5. **Execute as migrações do banco de dados:**
+   ```bash
+   python manage.py migrate
+   ```
+
+6. **Crie um superusuário (admin):**
+   ```bash
+   python manage.py createsuperuser
+   ```
+
+7. **Inicie o servidor de desenvolvimento:**
+   ```bash
+   python manage.py runserver
+   ```
+
+8. **Acesse a aplicação:**
+   - Aplicação: http://localhost:8000
+   - Painel Admin: http://localhost:8000/admin
+
+---
+
+## 📁 Estrutura do Projeto
+
+```
+venture_gotchi/
+├── config/              # Configurações do Django
+│   ├── settings.py     # Configurações principais
+│   ├── urls.py         # Roteamento de URLs
+│   ├── wsgi.py         # Configuração WSGI
+│   └── asgi.py         # Configuração ASGI
+├── core/                # Aplicação principal
+│   ├── models.py       # Modelos de dados
+│   ├── views.py        # Views/Lógica
+│   ├── urls.py         # Rotas da aplicação
+│   └── admin.py        # Configuração admin
+├── templates/           # Templates HTML
+├── static/              # Arquivos estáticos (CSS, JS)
+├── manage.py            # Script de gerenciamento
+├── requirements.txt     # Dependências Python
+└── README.md           # Este arquivo
+```
+
+---
+
+## 🗄️ Modelos de Dados
+
+### Partida
+- ID da partida
+- Usuário (FK)
+- Nome da empresa
+- Data de início
+
+### Startup
+- ID da startup
+- Partida (OneToOne)
+- Saldo em caixa
+- Turno atual
+- Nome
+- Receita mensal
+- Valuation
+- Funcionários
+
+### HistoricoDecisao
+- ID
+- Partida (FK)
+- Decisão tomada
+- Turno
+- Data da decisão
+
+---
+
+## ⚙️ Melhorias Implementadas
+
+✅ Removido import duplicado em models.py
+✅ Mudança de FloatField para DecimalField (valores monetários)
+✅ Adicionadas meta classes em modelos
+✅ Validação melhorada em views.py
+✅ Arquivo `.env.example` para variáveis de ambiente
+✅ Arquivo `.gitignore` para versionamento
+✅ Documentação completa no README
+
+---
+
+## 🔒 Segurança
+
+- [ ] Mover SECRET_KEY para arquivo .env
+- [ ] Separar configurações de desenvolvimento e produção
+- [ ] Adicionar validação de formulários com Django Forms
+- [ ] Implementar CSRF token em todos os formulários
+- [ ] Usar environment variables para dados sensíveis
+
+---
+
+## 📝 Licença
+
+Este projeto é de código aberto. Veja LICENSE para detalhes.
+
+---
+
+## 👨‍💻 Desenvolvedor
+
+Thiago Pereira - [GitHub](https://github.com/thiagopecli)
+
 
 Criando branch: git checkout -b thiago_pereira
 

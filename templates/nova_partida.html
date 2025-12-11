@@ -4,45 +4,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Criar nova partida no Venture Gotchi">
+    <meta name="keywords" content="nova partida, startup, simulação">
     <title>Nova Partida - Venture Gotchi</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <header style="background-color: #f8f8f8; padding: 15px; border-bottom: 1px solid #eee;">
+    <header class="dashboard-header">
         <nav>
-            <a href="{% url 'dashboard' %}" style="text-decoration: none; font-weight: bold; margin-right: 15px;">Dashboard</a> 
+            <a href="{% url 'dashboard' %}" class="nav-link nav-link-primary">Dashboard</a> 
             |
-            <span>Olá, {{ user.username }}!</span>
+            <span class="user-name">Olá, {{ user.username }}!</span>
             |
-            <a href="{% url 'logout' %}" style="margin-left: 10px;">Sair (Logout)</a>
+            <a href="{% url 'logout' %}" class="logout-link">Sair (Logout)</a>
         </nav>
     </header>
 
-    <main style="padding: 30px; max-width: 600px; margin: 0 auto;">
+    <main class="container-sm">
         
         <h1>Defina Sua Startup</h1>
         
-        <form method="POST" action="{% url 'nova_partida' %}" style="border: 1px solid #ccc; padding: 20px; border-radius: 5px;">
+        <form method="post" action="{% url 'nova_partida' %}" class="form-card">
             
-            {% csrf_token %} <p style="margin-bottom: 20px;">
+            {% csrf_token %}
+            <p class="form-intro">
                 Para começar, informe o nome da sua empresa.
             </p>
 
-            <label for="nome_empresa" style="display: block; margin-bottom: 5px; font-weight: bold;">Nome da Startup:</label>
+            <label for="nome_empresa" class="form-label">Nome da Startup:</label>
             <input type="text" id="nome_empresa" name="nome_empresa" required 
                    placeholder="Ex: Panthe Games"
-                   style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 4px;"><br>
+                   class="form-input">
             
-            <button type="submit" style="padding: 10px 20px; background-color: green; 
-                                        color: white; border: none; border-radius: 5px; 
-                                        cursor: pointer;">
+            <button type="submit" class="btn btn-success">
                 Iniciar Simulação
             </button>
             
         </form>
     </main>
 
-    <footer style="text-align: center; padding: 10px; background-color: #f8f8f8; border-top: 1px solid #eee; position: fixed; bottom: 0; width: 100%;">
-        <p>© 2025 - Venture Gotchi</p>
+    <footer>
+        <p class="text-center">© 2025 - Venture Gotchi</p>
     </footer>
 </body>
 </html>

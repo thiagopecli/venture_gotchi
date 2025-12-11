@@ -5,13 +5,12 @@
 {% block content %}
 <h2>Login</h2>
 
-<form method="POST" action="{% url 'login' %}">
+<form method="post" action="{% url 'login' %}">
     {% csrf_token %}
     {{ form.as_p }}
 
     <button type="submit">Entrar</button>
 </form>
 
-<p><a href="{% url 'register' %}">Não tem uma conta? Cadastre-se</a></p>
-<p><a href="{% url 'esqueci_senha' %}">Esqueci minha senha</a></p>
+<p><a href="{% url 'nova_partida' %}">Não tem uma conta? Cadastre-se aqui</a></p>
 {% endblock %}

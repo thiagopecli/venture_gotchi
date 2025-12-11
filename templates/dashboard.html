@@ -4,31 +4,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard de partidas do Venture Gotchi">
+    <meta name="keywords" content="partidas, simulação, startup, dashboard">
     <title>Dashboard - Venture Gotchi</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <header style="background-color: #f8f8f8; padding: 15px; border-bottom: 1px solid #eee;">
+    <header class="dashboard-header">
         <nav>
-            <a href="{% url 'dashboard' %}" style="text-decoration: none; font-weight: bold; margin-right: 15px;">Dashboard</a> 
+            <a href="{% url 'dashboard' %}" class="nav-link nav-link-primary">Dashboard</a> 
             |
             {% if user.is_authenticated %}
-                <span style="margin: 0 10px;">Olá, {{ user.username }}!</span>
+                <span class="user-name">Olá, {{ user.username }}!</span>
                 |
-                <a href="{% url 'logout' %}" style="margin-left: 10px;">Sair (Logout)</a>
+                <a href="{% url 'logout' %}" class="logout-link">Sair (Logout)</a>
             {% else %}
                 <a href="{% url 'login' %}">Entrar (Login)</a>
             {% endif %}
         </nav>
     </header>
 
-    <main style="padding: 30px; max-width: 900px; margin: 0 auto;">
+    <main class="container">
         
         <h1>Minhas Simulações</h1>
         
-        <div style="margin-bottom: 30px;">
-            <a href="{% url 'nova_partida' %}" 
-               style="padding: 10px 20px; background-color: green; color: white; 
-                      text-decoration: none; border-radius: 5px;">
+        <div class="mb-30">
+            <a href="{% url 'nova_partida' %}" class="btn btn-primary">
                 Iniciar Nova Simulação
             </a>
         </div>
@@ -36,35 +37,32 @@
         <h2>Partidas Salvas</h2>
         
         {% if partidas %}
-            <ul style="list-style: none; padding: 0;">
+            <ul class="list-unstyled">
                 {% for partida in partidas %}
-                <li style="border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; 
-                           display: flex; justify-content: space-between; align-items: center;">
+                <li class="card">
                     
                     <div>
                         <strong>{{ partida.nome_empresa }}</strong>
-                        <span style="margin-left: 10px; color: #6c757d;">
+                        <span class="text-muted">
                             (Início: {{ partida.data_inicio|date:"d/m/Y" }})
                         </span>
                     </div>
 
-                    <a href="{% url 'carregar_jogo' partida.id %}" 
-                       style="padding: 8px 15px; background-color: blue; color: white; 
-                              text-decoration: none; border-radius: 5px;">
+                    <a href="{% url 'carregar_jogo' partida.id %}" class="btn btn-primary">
                         Continuar Jogo
                     </a>
                 </li>
                 {% endfor %}
             </ul>
         {% else %}
-            <p style="padding: 15px; background-color: #ffe0b2; border-left: 5px solid orange;">
+            <p class="alert alert-warning">
                 Você ainda não possui nenhuma partida salva.
             </p>
         {% endif %}
     </main>
 
-    <footer style="text-align: center; padding: 10px; background-color: #f8f8f8; border-top: 1px solid #eee; position: fixed; bottom: 0; width: 100%;">
-        <p>© 2025 - Venture Gotchi</p>
+    <footer>
+        <p class="text-center">© 2025 - Venture Gotchi</p>
     </footer>
 </body>
 </html>

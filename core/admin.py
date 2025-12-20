@@ -1,0 +1,75 @@
+from django.contrib import admin
+
+from .models import (
+    Conquista,
+    ConquistaDesbloqueada,
+    Evento,
+    EventoPartida,
+    Fundador,
+    HistoricoDecisao,
+    Partida,
+    Startup,
+)
+
+
+@admin.register(Partida)
+class PartidaAdmin(admin.ModelAdmin):
+    list_display = ("id", "nome_empresa", "usuario", "data_inicio")
+    list_filter = ("data_inicio",)
+    search_fields = ("nome_empresa", "usuario__username")
+
+
+@admin.register(Startup)
+class StartupAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "partida",
+        "saldo_caixa",
+        "receita_mensal",
+        "valuation",
+        "funcionarios",
+        "turno_atual",
+    )
+    search_fields = ("partida__nome_empresa",)
+
+
+@admin.register(HistoricoDecisao)
+class HistoricoDecisaoAdmin(admin.ModelAdmin):
+    list_display = ("id", "partida", "turno", "data_decisao")
+    list_filter = ("turno", "data_decisao")
+    search_fields = ("partida__nome_empresa", "decisao_tomada")
+
+
+@admin.register(Fundador)
+class FundadorAdmin(admin.ModelAdmin):
+    list_display = ("id", "nome", "partida", "experiencia", "anos_experiencia")
+    list_filter = ("experiencia",)
+    search_fields = ("nome", "partida__nome_empresa")
+
+
+@admin.register(Evento)
+class EventoAdmin(admin.ModelAdmin):
+    list_display = ("id", "titulo", "categoria", "chance_base", "ativo")
+    list_filter = ("categoria", "ativo")
+    search_fields = ("titulo", "descricao")
+
+
+@admin.register(EventoPartida)
+class EventoPartidaAdmin(admin.ModelAdmin):
+    list_display = ("id", "partida", "evento", "turno", "resolvido", "criado_em")
+    list_filter = ("turno", "resolvido")
+    search_fields = ("partida__nome_empresa", "evento__titulo")
+
+
+@admin.register(Conquista)
+class ConquistaAdmin(admin.ModelAdmin):
+    list_display = ("id", "titulo", "tipo", "valor_objetivo", "pontos", "ativo")
+    list_filter = ("tipo", "ativo")
+    search_fields = ("titulo", "descricao")
+
+
+@admin.register(ConquistaDesbloqueada)
+class ConquistaDesbloqueadaAdmin(admin.ModelAdmin):
+    list_display = ("id", "partida", "conquista", "turno", "desbloqueada_em")
+    list_filter = ("turno",)
+    search_fields = ("partida__nome_empresa", "conquista__titulo")

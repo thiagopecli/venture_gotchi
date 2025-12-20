@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 
 
 class Partida(models.Model):
@@ -174,3 +174,56 @@ class ConquistaDesbloqueada(models.Model):
 
     def __str__(self):
         return f"{self.conquista.titulo} - {self.partida.nome_empresa}"
+    
+class TipoUsuario(models.TextChoices):
+    ESTUDANTE = 'ESTUDANTE', 'Estudante'
+    PROFESSOR = 'PROFESSOR', 'Professor'
+    STARTUP = 'STARTUP', 'Startup'
+    EMPRESA = 'EMPRESA', 'Empresa'
+
+class PerfilUsuario(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
+    tipo_usuario = models.CharField(max_length=20, choices=TipoUsuario.choices)
+    
+    cpf = models.CharField(
+        max_length=14,
+        blank=True,
+        null=True,
+        unique=True,
+        validators=[RegexValidator(r'^\d{3}\.\d{3}\.\d{3}-\d{2}$')]
+    )
+    
+    cnpj = models.CharField(
+        max_length=18,
+        blank=True,
+        null=True,
+        unique=True,
+        validators=[RegexValidator(r'^\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}$')]
+    )
+    
+    nome_completo = models.CharField(max_length=255)
+    razao_social = models.CharField(max_length=255, blank=True, null=True)
+    telefone = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Perfil de Usuário'
+        verbose_name_plural = 'Perfis de Usuários'
+        permissions = [
+            ('visualizar_dashboard_estudante', 'Pode visualizar dashboard de estudante'),
+            ('visualizar_dashboard_professor', 'Pode visualizar dashboard de professor'),
+            ('visualizar_dashboard_startup', 'Pode visualizar dashboard de startup'),
+            ('visualizar_dashboard_empresa', 'Pode visualizar dashboard de empresa'),
+            ('gerenciar_usuarios', 'Pode gerenciar usuários'),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.get_tipo_usuario_display()}"
+    
+    def save(self, *args, **kwargs):
+        if self.tipo_usuario in [TipoUsuario.ESTUDANTE, TipoUsuario.PROFESSOR]:
+            self.cnpj = None
+        else:
+            self.cpf = None
+        super().save(*args, **kwargs)

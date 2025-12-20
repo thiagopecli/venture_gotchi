@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Venture Gotchi - Bem-vindo</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div style="text-align: center; margin-top: 100px;">
+        <h1>Bem-vindo ao Venture Gotchi</h1>
+        <p>Aprenda empreendedorismo na prática simulando sua própria startup.</p>
+        <div style="margin-top: 20px;">
+            <a href="{% url 'login' %}" style="padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;">Entrar</a>
+            <a href="{% url 'registrar' %}" style="padding: 10px 20px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; margin-left: 10px;">Criar Conta</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -58,6 +58,20 @@ header a {
     transition: color 0.3s ease;
 }
 
+header nav {
+    margin-top: 10px;
+}
+
+
+header nav form {
+    background: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    display: inline;
+}
+
+
 header a:hover {
     color: var(--primary-color);
 }
@@ -315,7 +329,7 @@ footer {
 }
 
 .nav-link-primary {
-    color: white;
+    color: var(--dark-color);
 }
 
 .nav-link-primary:hover {
@@ -331,6 +345,16 @@ footer {
     padding: 15px;
     border-bottom: 1px solid #eee;
 }
+
+.dashboard-header a,
+.dashboard-header span {
+    color: var(--dark-color);
+}
+
+.dashboard-header a:hover {
+    color: var(--primary-color);
+}
+
 
 .form-card {
     border: 1px solid #ccc;
@@ -415,4 +439,18 @@ footer {
         flex-direction: column;
         gap: 10px;
     }
+}
+
+.logout-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-weight: bold;
+    cursor: pointer;
+    color: var(--dark-color);
+}
+
+.logout-btn:hover {
+    color: var(--danger-color);
+    text-decoration: underline;
 }

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title%} Métricas {% endblock %}
+
+{% block content %}
+<h2> Métricas da Startup </h2>
+
+<p>Empresa: {{ partida.nome_empresa }}</p>
+<p>Turno Atual: {{ partida.turno_atual }}</p>
+<p>Saldo em Caixa: {{ partida.saldo_caixa }}</p>
+<p>Receita Mensal: {{ partida.receita_mensal }}</p>
+<p>Valuation: R$ {{ partida.valuation }}</p>
+<p>Funcionários: {{ partida.funcionarios}}</p>
+
+<a href="{% url 'dashboard' %}">Voltar</a>
+{% endblock %}

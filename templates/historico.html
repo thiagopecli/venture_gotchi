@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title%} Histórico {% endblock %}
+
+{% block content %}
+<h2> Histórico de Decisões </h2>
+
+{% if decisoes %}
+    <ul>
+        {% for decisao in decisoes %}
+            <li>
+                Turno {{ decisao.turno }} -
+                {{ decisao.decisao_tomada }}
+                ({{ decisao.data_decisao|date:"d/m/Y H:i" }})
+            </li>
+        {% endfor %}
+    </ul>
+
+{% else %}
+    <p>Nenhuma decisão registrada.</p>
+{% endif %}
+
+<a href="{% url 'dashboard' %}">Voltar</a>
+{% endblock %}

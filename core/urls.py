@@ -10,4 +10,7 @@ urlpatterns = [
     path('nova/', views.nova_partida, name='nova_partida'), 
     path('salvar/<int:partida_id>/', views.salvar_jogo, name='salvar_jogo'), 
     path('carregar/<int:partida_id>/', views.carregar_jogo, name='carregar_jogo'),
+    path('perfil/', views.perfil, name='perfil'),
+    path('historico/', views.historico, name='historico'),
+    path('metricas/<int:partida_id>/', views.metricas, name='metricas'),
 ]

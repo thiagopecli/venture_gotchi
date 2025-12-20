@@ -1,16 +1,24 @@
 {% extends 'base.html' %}
 
-{% block title%} Métricas {% endblock %}
-
 {% block content %}
-<h2> Métricas da Startup </h2>
+<h2>Métricas da Startup: {{ startup.nome }}</h2>
 
-<p>Empresa: {{ partida.nome_empresa }}</p>
-<p>Turno Atual: {{ partida.turno_atual }}</p>
-<p>Saldo em Caixa: {{ partida.saldo_caixa }}</p>
-<p>Receita Mensal: {{ partida.receita_mensal }}</p>
-<p>Valuation: R$ {{ partida.valuation }}</p>
-<p>Funcionários: {{ partida.funcionarios}}</p>
+<div class="metrics-grid">
+    <p><strong>Turno Atual:</strong> {{ startup.turno_atual }}</p>
+    <p><strong>Saldo em Caixa:</strong> R$ {{ startup.saldo_caixa }}</p>
+    <p><strong>Receita Mensal:</strong> R$ {{ startup.receita_mensal }}</p>
+    <p><strong>Valuation:</strong> R$ {{ startup.valuation }}</p>
+    <p><strong>Funcionários:</strong> {{ startup.funcionarios }}</p>
+</div>
+
+<hr>
+<h3>Perfil do Fundador</h3>
+{% if partida.fundador %}
+    <p><strong>Nome:</strong> {{ partida.fundador.nome }}</p>
+    <p><strong>Experiência:</strong> {{ partida.fundador.get_experiencia_display }}</p>
+{% else %}
+    <p>Nenhum fundador registrado para esta partida.</p>
+{% endif %}
 
 <a href="{% url 'dashboard' %}">Voltar</a>
 {% endblock %}

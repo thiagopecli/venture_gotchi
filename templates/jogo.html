@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Jogo de simulação de startup no Venture Gotchi">
+    <meta name="keywords" content="jogo, startup, simulação, decisões">
+    <title>Jogando: {{ partida.nome_empresa }} - Venture Gotchi</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="header-title">Venture Gotchi: {{ partida.nome_empresa }}</div>
+        <nav>
+            <span>Turno Atual: {{ estado_startup.turno_atual }}</span>
+            <a href="{% url 'dashboard' %}">Voltar ao Dashboard</a>
+            <span class="user-greeting">| Olá, {{ user.username }}!</span>
+        </nav>
+    </header>
+
+    <div class="game-container">
+        
+        <aside class="sidebar">
+            <h3>Métricas Atuais</h3>
+            
+            <div class="metric-box">
+                Caixa (R$): <strong>R$ {{ estado_startup.saldo_caixa|floatformat:2 }}</strong>
+            </div>
+            
+            <div class="metric-box">
+                Receita Mensal: <strong>R$ {{ estado_startup.receita_mensal|floatformat:2 }}</strong>
+            </div>
+            
+            <div class="metric-box">
+                Valuation: <strong>R$ {{ estado_startup.valuation|floatformat:2 }}</strong>
+            </div>
+            
+            <div class="metric-box">
+                Funcionários: <strong>{{ estado_startup.funcionarios }}</strong>
+            </div>
+            
+            <h3 class="mt-20">Histórico de Decisões</h3>
+            <div class="historico-log">
+                {% if historico_decisoes %}
+                    {% for decisao in historico_decisoes %}
+                        <p class="historico-item">
+                            T{{ decisao.turno }}: {{ decisao.decisao_tomada }} 
+                            <small>({{ decisao.data_decisao|date:"H:i" }})</small>
+                        </p>
+                    {% endfor %}
+                {% else %}
+                    <p>Nenhuma decisão registrada ainda.</p>
+                {% endif %}
+            </div>
+
+        </aside>
+
+        <section class="main-content">
+            <h2>Próxima Decisão (Turno {{ estado_startup.turno_atual|add:1 }})</h2>
+            
+            <p class="alert alert-info">
+                Atual cenário: Sua startup precisa decidir se investe em marketing agressivo ou contrata um novo engenheiro sênior. O que você faz?
+            </p>
+
+            <form method="post" action="{% url 'salvar_jogo' partida.id %}" class="mt-20">
+                {% csrf_token %}
+                
+                <h3>Ação e Salvamento</h3>
+                
+                <p>
+                    <label for="decisao">Sua Decisão:</label>
+                    <textarea id="decisao" name="decisao" rows="3" required 
+                              style="width: 100%; padding: 10px; border: 1px solid #ccc;"></textarea>
+                </p>
+                
+                <input type="hidden" name="saldo_atual" value="{{ estado_startup.saldo_caixa }}">
+                <button type="submit" class="btn btn-success">
+                    Salvar e Avançar Turno
+                </button>
+            </form>
+            
+        </section>
+    </div>
+    
+    <footer>
+        <p class="text-center mt-20">Venture Gotchi - Aprendendo Empreendedorismo</p>
+    </footer>
+</body>
+</html>

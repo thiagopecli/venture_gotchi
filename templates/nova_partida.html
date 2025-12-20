@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Criar nova partida no Venture Gotchi">
+    <meta name="keywords" content="nova partida, startup, simulação">
+    <title>Nova Partida - Venture Gotchi</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header class="dashboard-header">
+        <nav>
+            <a href="{% url 'dashboard' %}" class="nav-link nav-link-primary">Dashboard</a> 
+            |
+            <span class="user-name">Olá, {{ user.username }}!</span>
+            |
+            <a href="{% url 'logout' %}" class="logout-link">Sair (Logout)</a>
+        </nav>
+    </header>
+
+    <main class="container-sm">
+        
+        <h1>Defina Sua Startup</h1>
+        
+        <form method="post" action="{% url 'nova_partida' %}" class="form-card">
+            
+            {% csrf_token %}
+            <p class="form-intro">
+                Para começar, informe o nome da sua empresa.
+            </p>
+
+            <label for="nome_empresa" class="form-label">Nome da Startup:</label>
+            <input type="text" id="nome_empresa" name="nome_empresa" required 
+                   placeholder="Ex: Panthe Games"
+                   class="form-input">
+            
+            <button type="submit" class="btn btn-success">
+                Iniciar Simulação
+            </button>
+            
+        </form>
+    </main>
+
+    <footer>
+        <p class="text-center">© 2025 - Venture Gotchi</p>
+    </footer>
+</body>
+</html>

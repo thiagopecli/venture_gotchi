@@ -88,3 +88,35 @@ def carregar_jogo(request, partida_id):
     }
     
     return render(request, 'jogo.html', context)
+
+@login_required
+def perfil(request):
+    partidas_count = Partida.objects.filter(usuario=request.user).count()
+
+    return render(request, 'perfil.html',{
+        'usuario': request.user,
+        'total_partidas': partidas_count,
+    })
+
+@login_required
+def historico(request):
+    decisoes = HistoricoDecisao.objects.filter(
+        partida_usuario = request.user
+    ).order_by('-data_decisao')
+
+    return render(request, 'historico.html',{
+        'decisoes': decisoes
+    })
+
+@login_required
+def metricas(request, partida_id):
+    partida = get_object_or_404(
+        Partida, id=partida_id, usuario=request.user
+    )
+
+    startup = partida.startup
+
+    return render(request, 'metricas.html', {
+        'partida': partida,
+        'startup': startup
+    })

@@ -1,0 +1,67 @@
+{% load auth_extras %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Acesso{% endblock %}</title>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            
+            {% if user.is_authenticated %}
+                <li>Olá, {{ user.username }}</li>
+                
+                {% if perms.myapp.visualizar_dashboard_estudante %}
+                    <li><a href="{% url 'dashboard_estudante' %}">Dashboard Estudante</a></li>
+                {% endif %}
+                
+                {% if perms.myapp.visualizar_dashboard_professor %}
+                    <li><a href="{% url 'dashboard_professor' %}">Dashboard Professor</a></li>
+                {% endif %}
+                
+                {% if perms.myapp.visualizar_dashboard_startup %}
+                    <li><a href="{% url 'dashboard_startup' %}">Dashboard Startup</a></li>
+                {% endif %}
+                
+                {% if perms.myapp.visualizar_dashboard_empresa %}
+                    <li><a href="{% url 'dashboard_empresa' %}">Dashboard Empresa</a></li>
+                {% endif %}
+                
+                {% if perms.myapp.gerenciar_usuarios %}
+                    <li><a href="{% url 'gerenciar_usuarios' %}">Gerenciar Usuários</a></li>
+                {% endif %}
+                
+                {% if user|has_group:"Administradores" %}
+                    <li><a href="{% url 'painel_admin' %}">Painel Admin</a></li>
+                {% endif %}
+                
+                <li><a href="{% url 'logout' %}">Sair</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'registro_estudante' %}">Cadastro Estudante</a></li>
+                <li><a href="{% url 'registro_professor' %}">Cadastro Professor</a></li>
+                <li><a href="{% url 'registro_startup' %}">Cadastro Startup</a></li>
+                <li><a href="{% url 'registro_empresa' %}">Cadastro Empresa</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>

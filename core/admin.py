@@ -1,5 +1,7 @@
 from django.contrib import admin
-
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
+from .models import PerfilUsuario
 from .models import (
     Conquista,
     ConquistaDesbloqueada,
@@ -73,3 +75,56 @@ class ConquistaDesbloqueadaAdmin(admin.ModelAdmin):
     list_display = ("id", "partida", "conquista", "turno", "desbloqueada_em")
     list_filter = ("turno",)
     search_fields = ("partida__nome_empresa", "conquista__titulo")
+
+class PerfilUsuarioInline(admin.StackedInline):
+    model = PerfilUsuario
+    can_delete = False
+    verbose_name_plural = 'Perfil'
+    fk_name = 'user'
+
+class UserAdmin(BaseUserAdmin):
+    inlines = (PerfilUsuarioInline,)
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'get_tipo_usuario')
+    list_select_related = ('perfil',)
+    
+    def get_tipo_usuario(self, instance):
+        if hasattr(instance, 'perfil'):
+            return instance.perfil.get_tipo_usuario_display()
+        return '-'
+    get_tipo_usuario.short_description = 'Tipo de Usuário'
+    
+    def get_inline_instances(self, request, obj=None):
+        if not obj:
+            return list()
+        return super(UserAdmin, self).get_inline_instances(request, obj)
+
+@admin.register(PerfilUsuario)
+class PerfilUsuarioAdmin(admin.ModelAdmin):
+    list_display = ('user', 'tipo_usuario', 'cpf', 'cnpj', 'nome_completo', 'created_at')
+    list_filter = ('tipo_usuario', 'created_at')
+    search_fields = ('user__username', 'nome_completo', 'cpf', 'cnpj', 'razao_social')
+    readonly_fields = ('created_at', 'updated_at')
+    
+    fieldsets = (
+        ('Usuário', {
+            'fields': ('user', 'tipo_usuario')
+        }),
+        ('Dados Pessoais (CPF)', {
+            'fields': ('cpf', 'nome_completo'),
+            'classes': ('collapse',),
+        }),
+        ('Dados Empresariais (CNPJ)', {
+            'fields': ('cnpj', 'razao_social'),
+            'classes': ('collapse',),
+        }),
+        ('Contato', {
+            'fields': ('telefone',)
+        }),
+        ('Datas', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',),
+        }),
+    )
+
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)

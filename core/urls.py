@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
 
@@ -13,4 +14,24 @@ urlpatterns = [
     path('perfil/', views.perfil, name='perfil'),
     path('historico/', views.historico, name='historico'),
     path('metricas/<int:partida_id>/', views.metricas, name='metricas'),
+]
+
+urlpatterns = [
+    path('', views.home, name='home'),
+    
+    path('registro/estudante/', views.registro_estudante, name='registro_estudante'),
+    path('registro/professor/', views.registro_professor, name='registro_professor'),
+    path('registro/startup/', views.registro_startup, name='registro_startup'),
+    path('registro/empresa/', views.registro_empresa, name='registro_empresa'),
+    
+    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
+    
+    path('dashboard/estudante/', views.dashboard_estudante, name='dashboard_estudante'),
+    path('dashboard/professor/', views.dashboard_professor, name='dashboard_professor'),
+    path('dashboard/startup/', views.dashboard_startup, name='dashboard_startup'),
+    path('dashboard/empresa/', views.dashboard_empresa, name='dashboard_empresa'),
+    
+    path('gerenciar/usuarios/', views.gerenciar_usuarios, name='gerenciar_usuarios'),
+    path('admin/painel/', views.painel_admin, name='painel_admin'),
 ]

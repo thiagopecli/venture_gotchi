@@ -1,12 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
 from django.contrib.auth.views import LoginView
+from django.contrib.auth import login
+from django.contrib.auth.models import User, Group
+from django.contrib import messages
+from .forms import RegistroEstudanteForm, RegistroProfessorForm, RegistroStartupForm, RegistroEmpresaForm
+from .models import PerfilUsuario, TipoUsuario
+from .decorators import grupo_necessario, tipo_usuario_necessario
+from .models import Partida, Startup, HistoricoDecisao 
 
 class PaginaLogin(LoginView):
     template_name = 'login.html'
-
-from .models import Partida, Startup, HistoricoDecisao 
 
 @login_required 
 def dashboard(request):
@@ -120,3 +125,143 @@ def metricas(request, partida_id):
         'partida': partida,
         'startup': startup
     })
+
+def home(request):
+    return render(request, 'home.html')
+
+def registro_estudante(request):
+    if request.method == 'POST':
+        form = RegistroEstudanteForm(request.POST)
+        if form.is_valid():
+            user = User.objects.create_user(
+                username=form.cleaned_data['username'],
+                email=form.cleaned_data['email'],
+                password=form.cleaned_data['password']
+            )
+            
+            perfil = form.save(commit=False)
+            perfil.user = user
+            perfil.tipo_usuario = TipoUsuario.ESTUDANTE
+            perfil.save()
+            
+            grupo_estudantes, created = Group.objects.get_or_create(name='Estudantes')
+            user.groups.add(grupo_estudantes)
+            
+            login(request, user)
+            messages.success(request, 'Cadastro realizado com sucesso!')
+            return redirect('dashboard_estudante')
+    else:
+        form = RegistroEstudanteForm()
+    
+    return render(request, 'registro_estudante.html', {'form': form})
+
+def registro_professor(request):
+    if request.method == 'POST':
+        form = RegistroProfessorForm(request.POST)
+        if form.is_valid():
+            user = User.objects.create_user(
+                username=form.cleaned_data['username'],
+                email=form.cleaned_data['email'],
+                password=form.cleaned_data['password']
+            )
+            
+            perfil = form.save(commit=False)
+            perfil.user = user
+            perfil.tipo_usuario = TipoUsuario.PROFESSOR
+            perfil.save()
+            
+            grupo_professores, created = Group.objects.get_or_create(name='Professores')
+            user.groups.add(grupo_professores)
+            
+            login(request, user)
+            messages.success(request, 'Cadastro realizado com sucesso!')
+            return redirect('dashboard_professor')
+    else:
+        form = RegistroProfessorForm()
+    
+    return render(request, 'registro_professor.html', {'form': form})
+
+def registro_startup(request):
+    if request.method == 'POST':
+        form = RegistroStartupForm(request.POST)
+        if form.is_valid():
+            user = User.objects.create_user(
+                username=form.cleaned_data['username'],
+                email=form.cleaned_data['email'],
+                password=form.cleaned_data['password']
+            )
+            
+            perfil = form.save(commit=False)
+            perfil.user = user
+            perfil.tipo_usuario = TipoUsuario.STARTUP
+            perfil.nome_completo = perfil.razao_social
+            perfil.save()
+            
+            grupo_startups, created = Group.objects.get_or_create(name='Startups')
+            user.groups.add(grupo_startups)
+            
+            login(request, user)
+            messages.success(request, 'Cadastro realizado com sucesso!')
+            return redirect('dashboard_startup')
+    else:
+        form = RegistroStartupForm()
+    
+    return render(request, 'registro_startup.html', {'form': form})
+
+def registro_empresa(request):
+    if request.method == 'POST':
+        form = RegistroEmpresaForm(request.POST)
+        if form.is_valid():
+            user = User.objects.create_user(
+                username=form.cleaned_data['username'],
+                email=form.cleaned_data['email'],
+                password=form.cleaned_data['password']
+            )
+            
+            perfil = form.save(commit=False)
+            perfil.user = user
+            perfil.tipo_usuario = TipoUsuario.EMPRESA
+            perfil.nome_completo = perfil.razao_social
+            perfil.save()
+            
+            grupo_empresas, created = Group.objects.get_or_create(name='Empresas')
+            user.groups.add(grupo_empresas)
+            
+            login(request, user)
+            messages.success(request, 'Cadastro realizado com sucesso!')
+            return redirect('dashboard_empresa')
+    else:
+        form = RegistroEmpresaForm()
+    
+    return render(request, 'registro_empresa.html', {'form': form})
+
+@login_required
+@permission_required('myapp.visualizar_dashboard_estudante', raise_exception=True)
+def dashboard_estudante(request):
+    return render(request, 'dashboard_estudante.html')
+
+@login_required
+@permission_required('myapp.visualizar_dashboard_professor', raise_exception=True)
+def dashboard_professor(request):
+    return render(request, 'dashboard_professor.html')
+
+@login_required
+@permission_required('myapp.visualizar_dashboard_startup', raise_exception=True)
+def dashboard_startup(request):
+    return render(request, 'dashboard_startup.html')
+
+@login_required
+@permission_required('myapp.visualizar_dashboard_empresa', raise_exception=True)
+def dashboard_empresa(request):
+    return render(request, 'dashboard_empresa.html')
+
+@login_required
+@permission_required('myapp.gerenciar_usuarios', raise_exception=True)
+def gerenciar_usuarios(request):
+    usuarios = User.objects.all().select_related('perfil')
+    return render(request, 'gerenciar_usuarios.html', {'usuarios': usuarios})
+
+@login_required
+@grupo_necessario('Administradores')
+def painel_admin(request):
+    return render(request, 'painel_admin.html')

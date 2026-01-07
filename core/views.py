@@ -7,18 +7,13 @@ class PaginaLogin(LoginView):
     template_name = 'login.html'
 
 from .models import Partida, Startup, HistoricoDecisao 
-from django.db.models import Prefetch
 
 @login_required 
 def dashboard(request):
     """
     Lista as partidas existentes do usuário, ordenadas da mais recente.
     """
-    partidas = (
-        Partida.objects
-        .filter(usuario=request.user)
-        .order_by('-data_inicio')
-    )
+    partidas = Partida.objects.filter(usuario=request.user).order_by('-data_inicio')
     context = {'partidas': partidas}
     
     return render(request, 'dashboard.html', context) 
@@ -39,7 +34,7 @@ def nova_partida(request):
         
         Startup.objects.create(partida=partida, saldo_caixa=10000.00)
         
-        return redirect('carregar_jogo', partida_id=partida.id)
+        return redirect('carregar_jogo', partida_id=partida.id)  # type: ignore
     
     return render(request, 'nova_partida.html')
 
@@ -49,14 +44,10 @@ def salvar_jogo(request, partida_id):
     Lógica crítica: Recebe os dados do jogo (POST) e persiste no BDR.
     """
     if request.method == 'POST':
-        partida = get_object_or_404(
-            Partida.objects.select_related('startup'),
-            id=partida_id,
-            usuario=request.user
-        )
+        partida = get_object_or_404(Partida, id=partida_id, usuario=request.user)
         
         try:
-            startup = partida.startup
+            startup = partida.startup  # type: ignore # Acessa a métrica via relação OneToOne
             try:
                 saldo_novo = float(request.POST.get('saldo_atual', startup.saldo_caixa))
                 startup.saldo_caixa = saldo_novo
@@ -85,19 +76,10 @@ def carregar_jogo(request, partida_id):
     """
     Busca os dados no BDR e prepara o contexto para restaurar o estado do jogo.
     """
-    partida = get_object_or_404(
-        Partida.objects.select_related('startup').prefetch_related(
-            Prefetch(
-                'decisoes',
-                queryset=HistoricoDecisao.objects.order_by('turno')
-            )
-        ),
-        id=partida_id,
-        usuario=request.user,
-    )
+    partida = get_object_or_404(Partida, id=partida_id, usuario=request.user)
 
-    startup_estado = partida.startup
-    historico_decisoes = partida.decisoes.all()
+    startup_estado = partida.startup  # type: ignore # Último estado das métricas
+    historico_decisoes = partida.decisoes.all().order_by('turno')  # type: ignore # Log de decisões
 
     context = {
         'partida': partida,
@@ -118,12 +100,9 @@ def perfil(request):
 
 @login_required
 def historico(request):
-    decisoes = (
-        HistoricoDecisao.objects
-        .select_related('partida')
-        .filter(partida__usuario=request.user)
-        .order_by('-data_decisao')
-    )
+    decisoes = HistoricoDecisao.objects.filter(
+        partida_usuario = request.user
+    ).order_by('-data_decisao')
 
     return render(request, 'historico.html',{
         'decisoes': decisoes
@@ -132,9 +111,7 @@ def historico(request):
 @login_required
 def metricas(request, partida_id):
     partida = get_object_or_404(
-        Partida.objects.select_related('startup'),
-        id=partida_id,
-        usuario=request.user
+        Partida, id=partida_id, usuario=request.user
     )
 
     startup = partida.startup

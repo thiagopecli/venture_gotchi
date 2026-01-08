@@ -17,7 +17,7 @@ class ORMOptimizationTests(TestCase):
 
 		# Partida do usuário principal
 		self.partida = Partida.objects.create(usuario=self.user, nome_empresa="ACME")
-		Startup.objects.create(partida=self.partida, saldo_caixa=10000)
+		Startup.objects.create(partida=self.partida, saldo_caixa=0000)
 
 		# Histórico da partida principal
 		HistoricoDecisao.objects.bulk_create(

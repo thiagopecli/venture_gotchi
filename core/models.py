@@ -44,11 +44,11 @@ class Startup(models.Model):
         related_name='startup',
         primary_key=True  # Garante relação 1:1 no nível do BD
     )
-    saldo_caixa = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('10000.00'))
+    saldo_caixa = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('00.00'))
     turno_atual = models.PositiveIntegerField(default=1)
     nome = models.CharField(max_length=100, default="Minha Startup")
     receita_mensal = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
-    valuation = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('10000.00'))
+    valuation = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('00.00'))
     funcionarios = models.PositiveIntegerField(default=1)
     
     class Meta:

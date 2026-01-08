@@ -37,7 +37,7 @@ def nova_partida(request):
             data_inicio=timezone.now(),
         )
         
-        Startup.objects.create(partida=partida, saldo_caixa=10000.00)
+        Startup.objects.create(partida=partida, saldo_caixa=00.00)
         
         return redirect('carregar_jogo', partida_id=partida.id)
     

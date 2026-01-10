@@ -66,17 +66,52 @@
             <form method="post" action="{% url 'salvar_jogo' partida.id %}" class="mt-20">
                 {% csrf_token %}
                 
-                <h3>Ação e Salvamento</h3>
+                <h3>Escolha uma Opção</h3>
                 
-                <p>
-                    <label for="decisao">Sua Decisão:</label>
-                    <textarea id="decisao" name="decisao" rows="3" required 
-                              style="width: 100%; padding: 10px; border: 1px solid #ccc;"></textarea>
-                </p>
+                <div class="decision-options">
+                    <label class="decision-option">
+                        <input type="radio" name="decisao" value="Investir em Marketing Agressivo" required>
+                        <div class="option-card">
+                            <h4>📢 Investir em Marketing</h4>
+                            <p>Aumenta a visibilidade da marca e atrai mais clientes.</p>
+                            <ul>
+                                <li>✅ Aumenta receita mensal</li>
+                                <li>❌ Custo: R$ 5.000</li>
+                                <li>⏱️ Impacto: Próximos 2 turnos</li>
+                            </ul>
+                        </div>
+                    </label>
+
+                    <label class="decision-option">
+                        <input type="radio" name="decisao" value="Contratar Engenheiro Sênior" required>
+                        <div class="option-card">
+                            <h4>👨‍💻 Contratar Engenheiro</h4>
+                            <p>Melhora a qualidade do produto e aumenta a produtividade.</p>
+                            <ul>
+                                <li>✅ Melhora valuation</li>
+                                <li>❌ Custo: R$ 8.000</li>
+                                <li>⏱️ Impacto: Imediato</li>
+                            </ul>
+                        </div>
+                    </label>
+
+                    <label class="decision-option">
+                        <input type="radio" name="decisao" value="Não fazer nada (Economizar)" required>
+                        <div class="option-card">
+                            <h4>💰 Economizar</h4>
+                            <p>Mantém o fluxo de caixa e acumula recursos.</p>
+                            <ul>
+                                <li>✅ Preserva caixa</li>
+                                <li>❌ Sem crescimento</li>
+                                <li>⏱️ Impacto: Nenhum</li>
+                            </ul>
+                        </div>
+                    </label>
+                </div>
                 
                 <input type="hidden" name="saldo_atual" value="{{ estado_startup.saldo_caixa }}">
-                <button type="submit" class="btn btn-success">
-                    Salvar e Avançar Turno
+                <button type="submit" class="btn btn-success" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 16px;">
+                    ✅ Confirmar Decisão e Avançar Turno
                 </button>
             </form>
             

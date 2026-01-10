@@ -1,64 +1,49 @@
+from .forms import CadastroUsuarioForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.contrib.auth.views import LoginView
-from django.contrib.auth.models import User
 from django.contrib.auth import login
 from django.contrib import messages
 from decimal import Decimal
+from .models import User, Partida, Startup, HistoricoDecisao 
+from django.db.models import Prefetch
 
 class PaginaLogin(LoginView):
     template_name = 'login.html'
 
-def registro(request):
+def registro_view(request):
     """
-    View para registro de novos usuários.
+    View unificada para registro usando CadastroUsuarioForm.
     """
     if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password1 = request.POST.get('password1')
-        password2 = request.POST.get('password2')
-        
-        # Validações
-        if not username or not email or not password1 or not password2:
-            messages.error(request, 'Todos os campos são obrigatórios.')
-            return render(request, 'registro.html')
-        
-        if password1 != password2:
-            messages.error(request, 'As senhas não coincidem.')
-            return render(request, 'registro.html')
-        
-        if len(password1) < 8:
-            messages.error(request, 'A senha deve ter pelo menos 8 caracteres.')
-            return render(request, 'registro.html')
-        
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'Este nome de usuário já está em uso.')
-            return render(request, 'registro.html')
-        
-        if User.objects.filter(email=email).exists():
-            messages.error(request, 'Este e-mail já está cadastrado.')
-            return render(request, 'registro.html')
-        
-        # Criar o usuário
-        try:
-            user = User.objects.create_user(
-                username=username,
-                email=email,
-                password=password1
-            )
+        form = CadastroUsuarioForm(request.POST)
+        if form.is_valid():
+            user = form.save()
             login(request, user)
             messages.success(request, 'Conta criada com sucesso!')
-            return redirect('dashboard')
-        except Exception as e:
-            messages.error(request, f'Erro ao criar conta: {str(e)}')
-            return render(request, 'registro.html')
+            
+            return redirect('redirect_handler') 
+        else:
+            messages.error(request, 'Erro no formulário. Verifique os dados.')
+    else:
+        form = CadastroUsuarioForm()
     
-    return render(request, 'registro.html')
+    return render(request, 'registro.html', {'form': form})
 
 from .models import Partida, Startup, HistoricoDecisao 
 from django.db.models import Prefetch
+
+def registro_view(request):
+    if request.method == 'POST':
+        form = CadastroUsuarioForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+    else:
+        form = CadastroUsuarioForm()
+    
+    return render(request, 'registro.html', {'form': form})
 
 @login_required 
 def dashboard(request):
@@ -228,3 +213,19 @@ def metricas(request, partida_id):
         'partida': partida,
         'startup': startup
     })
+
+@login_required
+def redirect_handler(request):
+    """Encaminha o usuário baseado na Categoria definida no seu Models"""
+    cat = request.user.categoria
+
+    if cat in [User.Categorias.ALUNO, User.Categorias.PROFESSOR]:
+        return redirect('dashboard_academico')
+    
+    elif cat in [User.Categorias.STARTUP_PF, User.Categorias.STARTUP_PJ]:
+        return redirect('dashboard_startup')
+    
+    elif cat in [User.Categorias.EMPRESA, User.Categorias.INSTITUICAO]:
+        return redirect('dashboard_corporativo')
+
+    return redirect('home')

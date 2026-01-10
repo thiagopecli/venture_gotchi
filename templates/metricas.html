@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 
 {% block title%} Métricas {% endblock %}
 
@@ -6,11 +7,11 @@
 <h2> Métricas da Startup </h2>
 
 <p>Empresa: {{ partida.nome_empresa }}</p>
-<p>Turno Atual: {{ partida.turno_atual }}</p>
-<p>Saldo em Caixa: {{ partida.saldo_caixa }}</p>
-<p>Receita Mensal: {{ partida.receita_mensal }}</p>
-<p>Valuation: R$ {{ partida.valuation }}</p>
-<p>Funcionários: {{ partida.funcionarios}}</p>
+<p>Turno Atual: {{ startup.turno_atual }}</p>
+<p>Saldo em Caixa: {{ startup.saldo_caixa|moeda_br }}</p>
+<p>Receita Mensal: {{ startup.receita_mensal|moeda_br }}</p>
+<p>Valuation: {{ startup.valuation|moeda_br }}</p>
+<p>Funcionários: {{ startup.funcionarios}}</p>
 
 <a href="{% url 'dashboard' %}">Voltar</a>
 {% endblock %}

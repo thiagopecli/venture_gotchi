@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -25,15 +26,15 @@
             <h3>Métricas Atuais</h3>
             
             <div class="metric-box">
-                Caixa (R$): <strong>R$ {{ estado_startup.saldo_caixa|floatformat:2 }}</strong>
+                Caixa: <strong>{{ estado_startup.saldo_caixa|moeda_br }}</strong>
             </div>
             
             <div class="metric-box">
-                Receita Mensal: <strong>R$ {{ estado_startup.receita_mensal|floatformat:2 }}</strong>
+                Receita Mensal: <strong>{{ estado_startup.receita_mensal|moeda_br }}</strong>
             </div>
             
             <div class="metric-box">
-                Valuation: <strong>R$ {{ estado_startup.valuation|floatformat:2 }}</strong>
+                Valuation: <strong>{{ estado_startup.valuation|moeda_br }}</strong>
             </div>
             
             <div class="metric-box">

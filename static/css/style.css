@@ -1,15 +1,20 @@
 
-/* Variáveis Raiz */
+/* Aplicação da Paleta Venture-Gotchi */
 :root {
-    --primary-color: #007bff;
-    --success-color: #28a745;
-    --danger-color: #dc3545;
-    --warning-color: #ffc107;
-    --dark-color: #343a40;
-    --light-color: #f8f8f8;
-    --border-color: #ddd;
-    --shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    --radius: 5px;
+    --bg-main: #1A1E2C;
+    --bg-secondary: #0D141F;
+    --accent-yellow: #F8C923;
+    --accent-blue: #2176F4;
+    --text-light: #C1C8D1;
+    --link-pink: #F44E72; /* Opcional do rodapé do jogo */
+
+    /* Compatibilidade com estilos existentes (mapeamento) */
+    --primary-color: var(--accent-blue);
+    --dark-color: var(--bg-secondary);
+    --light-color: var(--text-light);
+    --border-color: #213040;
+    --shadow: 0 0 0 rgba(0,0,0,0);
+    --radius: 0;
 }
 
 /*  Estilos Globais  */
@@ -19,11 +24,36 @@
     box-sizing: border-box;
 }
 
+html,
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f4f9;
-    color: #333;
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: 'Sua Fonte Pixel', sans-serif;
+    background-color: var(--bg-main); /* Fundo escuro */
+    color: var(--text-light);
     line-height: 1.6;
+}
+
+/* Cabeçalho (estilo jogo) */
+.header-bar {
+    background-color: var(--bg-secondary);
+    border-bottom: 3px solid var(--accent-blue);
+    color: var(--text-light);
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-title {
+    color: var(--accent-yellow);
+    font-size: 1.5em;
+    font-weight: bold;
 }
 
 /*  Estilos de Header  */
@@ -82,9 +112,11 @@ header a:hover {
 
 /*  Conteúdo Principal  */
 main {
+    flex: 1;
     padding: 30px;
     max-width: 1200px;
     margin: 0 auto;
+    width: 100%;
 }
 
 /*  Botões  */
@@ -531,4 +563,103 @@ footer {
     .decision-options {
         grid-template-columns: 1fr;
     }
+}
+
+/* ===== ESTILOS PARA A PÁGINA DE LOGIN ===== */
+.login-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 40px 20px;
+}
+
+.login-box {
+    width: 100%;
+    max-width: 380px;
+    background-color: white;
+    padding: 18px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    margin: 20px 0;
+}
+
+.login-box h2 {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.login-box button {
+    width: 100%;
+}
+
+@media (max-width: 480px) {
+    .login-page {
+        padding: 20px 10px;
+    }
+}
+
+/* ===== ESTILOS ESPECÍFICOS DO LOGIN (PALETA) ===== */
+.login-container {
+    background-color: var(--bg-secondary);
+    border: 3px solid var(--accent-blue);
+    box-shadow: 0 4px 0 var(--bg-main);
+    border-radius: 0;
+    padding: 18px;
+    max-width: 380px;
+    width: 100%;
+    margin: 20px auto;
+}
+
+.login-title {
+    color: var(--accent-yellow);
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+label {
+    color: var(--text-light);
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    background-color: var(--bg-main);
+    border: 2px solid var(--accent-blue);
+    color: var(--text-light);
+    border-radius: 0;
+    padding: 8px;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--accent-yellow);
+}
+
+.btn-login {
+    background-color: var(--accent-blue);
+    color: var(--text-light);
+    border: none;
+    border-radius: 0;
+    font-weight: bold;
+    padding: 10px 16px;
+    display: inline-block;
+    width: 100%;
+    border-bottom: 3px solid #145bc2;
+}
+
+.btn-login:hover {
+    background-color: var(--accent-yellow);
+    color: var(--bg-secondary);
+    border-bottom: 3px solid #cfa61b;
+    cursor: pointer;
+}
+
+.signup-link a {
+    color: var(--link-pink);
+    text-decoration: none;
+}
+
+footer {
+    color: var(--text-light);
 }

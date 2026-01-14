@@ -58,6 +58,14 @@
         </aside>
 
         <section class="main-content">
+            {% if messages %}
+                <div class="inline-messages">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
             <h2>Próxima Decisão (Turno {{ estado_startup.turno_atual|add:1 }})</h2>
             
             <p class="alert alert-info">
@@ -122,5 +130,18 @@
     <footer>
         <p class="text-center mt-20">Venture Gotchi - Aprendendo Empreendedorismo</p>
     </footer>
+
+    <script>
+        // Auto-dismiss para mensagens dentro do jogo
+        document.addEventListener('DOMContentLoaded', function(){
+            const inlines = document.querySelectorAll('.inline-messages .alert');
+            inlines.forEach((el) => {
+                setTimeout(()=>{
+                    el.classList.add('hide');
+                    setTimeout(()=> el.remove(), 600);
+                }, 5000);
+            });
+        });
+    </script>
 </body>
 </html>

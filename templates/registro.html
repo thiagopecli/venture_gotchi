@@ -5,13 +5,7 @@
 {% block content %}
 <h2>Criar Conta</h2>
 
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
+
 
 <form method="post" action="{% url 'registro' %}">
     {% csrf_token %}

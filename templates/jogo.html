@@ -60,6 +60,12 @@
         <section class="main-content">
             <h2>Próxima Decisão (Turno {{ estado_startup.turno_atual|add:1 }})</h2>
             
+            {% if estado_startup.receita_mensal > 0 %}
+            <p class="alert alert-success">
+                💰 No próximo turno você receberá <strong>{{ estado_startup.receita_mensal|moeda_br }}</strong> de receita mensal no seu caixa!
+            </p>
+            {% endif %}
+            
             <p class="alert alert-info">
                 Atual cenário: Sua startup precisa decidir se investe em marketing agressivo ou contrata um novo engenheiro sênior. O que você faz?
             </p>
@@ -76,9 +82,10 @@
                             <h4>📢 Investir em Marketing</h4>
                             <p>Aumenta a visibilidade da marca e atrai mais clientes.</p>
                             <ul>
-                                <li>✅ Aumenta receita mensal</li>
+                                <li>✅ Aumenta receita mensal em R$ 3.000</li>
+                                <li>✅ Receita é adicionada ao caixa a cada turno</li>
                                 <li>❌ Custo: R$ 5.000</li>
-                                <li>⏱️ Impacto: Próximos 2 turnos</li>
+                                <li>⏱️ Impacto: Permanente</li>
                             </ul>
                         </div>
                     </label>
@@ -89,9 +96,11 @@
                             <h4>👨‍💻 Contratar Engenheiro</h4>
                             <p>Melhora a qualidade do produto e aumenta a produtividade.</p>
                             <ul>
-                                <li>✅ Melhora valuation</li>
+                                <li>✅ Aumenta valuation em R$ 25.000</li>
+                                <li>✅ Aumenta receita mensal em R$ 2.000</li>
+                                <li>✅ Adiciona 1 funcionário à equipe</li>
                                 <li>❌ Custo: R$ 8.000</li>
-                                <li>⏱️ Impacto: Imediato</li>
+                                <li>⏱️ Impacto: Permanente</li>
                             </ul>
                         </div>
                     </label>

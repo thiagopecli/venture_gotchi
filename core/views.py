@@ -66,6 +66,16 @@ def nova_partida(request):
     """
     if request.method == 'POST':
         nome_empresa = request.POST.get('nome_empresa', 'Nova Startup')
+        saldo_inicial = request.POST.get('saldo_inicial', '50000')
+        
+        try:
+            saldo_inicial = Decimal(saldo_inicial)
+            if saldo_inicial < Decimal('0.01'):
+                messages.error(request, 'O saldo inicial deve ser de pelo menos R$ 0,01')
+                return render(request, 'nova_partida.html')
+        except (ValueError, TypeError):
+            messages.error(request, 'Saldo inicial inválido. Use apenas números.')
+            return render(request, 'nova_partida.html')
         
         partida = Partida.objects.create(
             usuario=request.user,
@@ -73,7 +83,7 @@ def nova_partida(request):
             data_inicio=timezone.now(),
         )
         
-        Startup.objects.create(partida=partida, saldo_caixa=Decimal('50000.00'))
+        Startup.objects.create(partida=partida, saldo_caixa=saldo_inicial)
         
         return redirect('carregar_jogo', partida_id=partida.id)
     
@@ -96,16 +106,19 @@ def salvar_jogo(request, partida_id):
             startup = partida.startup
             decisao_tomada = request.POST.get('decisao', 'Decisão não especificada.')
             
-            # Custos das decisões
+            receita_atual = Decimal(str(startup.receita_mensal))
+            saldo_atual = Decimal(str(startup.saldo_caixa)) + receita_atual
+            
+            if receita_atual > 0:
+                messages.info(request, f'💰 Receita mensal de R$ {receita_atual:.2f} adicionada ao caixa!')
+            
             custos_decisoes = {
                 'Investir em Marketing Agressivo': Decimal('5000.00'),
                 'Contratar Engenheiro Sênior': Decimal('8000.00'),
                 'Não fazer nada (Economizar)': Decimal('0.00'),
             }
             
-            # Obter custo da decisão
             custo = custos_decisoes.get(decisao_tomada, Decimal('0.00'))
-            saldo_atual = Decimal(str(startup.saldo_caixa))
             
             # Validar se tem saldo suficiente
             if saldo_atual < custo:
@@ -121,12 +134,13 @@ def salvar_jogo(request, partida_id):
             if decisao_tomada == 'Investir em Marketing Agressivo':
                 # Marketing aumenta receita mensal
                 startup.receita_mensal = startup.receita_mensal + Decimal('3000.00')
-                messages.success(request, '📢 Investimento em marketing realizado! Receita aumentada.')
+                messages.success(request, '📢 Investimento em marketing realizado! Receita mensal aumentada em R$ 3.000.')
             elif decisao_tomada == 'Contratar Engenheiro Sênior':
-                # Engenheiro aumenta valuation e funcionários
+                # Engenheiro aumenta valuation, funcionários e receita mensal
                 startup.valuation = startup.valuation + Decimal('25000.00')
+                startup.receita_mensal = startup.receita_mensal + Decimal('2000.00')
                 startup.funcionarios = startup.funcionarios + 1
-                messages.success(request, '👨‍💻 Engenheiro contratado! Valuation aumentado.')
+                messages.success(request, '👨‍💻 Engenheiro contratado! Valuation +R$ 25.000 e receita mensal +R$ 2.000.')
             elif decisao_tomada == 'Não fazer nada (Economizar)':
                 messages.info(request, '💰 Você economizou este turno.')
             

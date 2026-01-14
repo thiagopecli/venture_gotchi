@@ -5,7 +5,9 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth.models import User
 from django.contrib.auth import login
 from django.contrib import messages
+from django.contrib.messages import get_messages
 from decimal import Decimal
+from core.services.conquistas import verificar_conquistas_partida, verificar_conquistas_progesso
 
 class PaginaLogin(LoginView):
     template_name = 'login.html'
@@ -14,6 +16,10 @@ def registro(request):
     """
     View para registro de novos usuários.
     """
+   
+    if request.method == 'GET':
+        pass
+
     if request.method == 'POST':
         username = request.POST.get('username')
         email = request.POST.get('email')
@@ -57,7 +63,7 @@ def registro(request):
     
     return render(request, 'registro.html')
 
-from .models import Partida, Startup, HistoricoDecisao 
+from .models import ConquistaDesbloqueada, Partida, Startup, HistoricoDecisao 
 from django.db.models import Prefetch
 
 @login_required 
@@ -90,6 +96,9 @@ def nova_partida(request):
         
         Startup.objects.create(partida=partida, saldo_caixa=Decimal('50000.00'))
         
+        # Verifica e registra conquistas que dependem da criação da partida
+        verificar_conquistas_partida(partida)
+
         return redirect('carregar_jogo', partida_id=partida.id)
     
     return render(request, 'nova_partida.html')
@@ -152,12 +161,16 @@ def salvar_jogo(request, partida_id):
             
             turno_atual = startup.turno_atual
             
-            # Registrar decisão no histórico
+            
             HistoricoDecisao.objects.create(
                 partida=partida,
                 decisao_tomada=decisao_tomada,
                 turno=turno_atual
             )
+
+    
+            verificar_conquistas_partida(partida)
+            verificar_conquistas_progesso(request.user)
             
         except Startup.DoesNotExist:
             messages.error(request, 'Erro: Startup não encontrada.')
@@ -228,3 +241,17 @@ def metricas(request, partida_id):
         'partida': partida,
         'startup': startup
     })
+
+@login_required
+def conquistas(request):
+    
+    for partida in Partida.objects.filter(usuario=request.user):
+        verificar_conquistas_partida(partida)
+        verificar_conquistas_progesso(request.user)
+
+    conquistas = (
+        ConquistaDesbloqueada.objects
+        .select_related('conquista')
+        .filter(partida__usuario=request.user)
+    )
+    return render(request, 'conquistas.html', {'conquistas': conquistas})

@@ -119,6 +119,8 @@ main {
     width: 100%;
 }
 
+
+
 /*  Botões  */
 button,
 .btn {
@@ -734,7 +736,7 @@ textarea:focus {
     background-color: #0D141F; /* preto azulado */
     padding: 20px;
     border-radius: 8px;
-    margin-bottom: 25px;
+    margin-bottom: 40px;
 }
 
 .welcome-box h2 {
@@ -783,7 +785,7 @@ textarea:focus {
     background-color: #0D141F; /* Preto azulado */
     padding: 20px;
     border-radius: 12px;
-    margin-top: 20px;
+    margin-top: 35px;
 }
 
 /* Título da seção */
@@ -819,4 +821,8 @@ textarea:focus {
 /* Ações */
 .partida-actions .btn {
     margin-left: 8px;
+}
+
+.cta-box {
+    margin: 25px 0 40px 0;
 }

@@ -11,15 +11,34 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <header>
-    <h2>Venture Gotchi</h2>
-    <hr>
+    <header class="header-bar">
+    <h2 class="header-title">Venture Gotchi</h2>
     </header>
+
+    <div id="top-messages" class="top-messages">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
 
     <main>
         {% block content %}
         {% endblock %}
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const alerts = document.querySelectorAll('#top-messages .alert');
+            alerts.forEach((el) => {
+                setTimeout(()=>{
+                    el.classList.add('hide');
+                    setTimeout(()=> el.remove(), 600);
+                }, 5000);
+            });
+        });
+    </script>
 
     <footer>
         <p>© 2025 - Venture Gotchi</p>

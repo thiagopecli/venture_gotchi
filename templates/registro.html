@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<h2>Criar Conta</h2>
+
+
+
+<form method="post" action="{% url 'registro' %}">
+    {% csrf_token %}
 <div id="box-registro" style="max-width: 500px; margin: 40px auto; padding: 30px; border: 2px solid #007bff; border-radius: 12px; background-color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
     <h2 style="text-align: center; color: #333; margin-bottom: 25px;">Criar Nova Conta</h2>
     

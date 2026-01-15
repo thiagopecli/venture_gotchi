@@ -20,6 +20,8 @@
             |
             <a href="{% url 'conquistas' %}" class="nav-link">Conquistas</a>
             |
+                <a href="{% url 'ranking' %}" class="nav-link">🏆 Ranking</a>
+                |
             {% if user.is_authenticated %}
                 <span class="user-name">Olá, {{ user.username }}!</span>
                 |
@@ -38,21 +40,46 @@
         
         <div class="welcome-box">
             <h2>Bem-vinda, {{ user.username }} 👋</h2>
-            <p>Gerencie sua startup, tome decisões estratégicas e acompanhe o crescimento.</p>
+            <p>
+                {% if user.is_estudante %}
+                    Gerencie sua startup, tome decisões estratégicas e acompanhe o crescimento.
+                {% elif user.is_educador %}
+                    Acesse relatórios agregados e acompanhe o desempenho dos estudantes.
+                {% else %}
+                    Bem-vindo ao Venture Gotchi!
+                {% endif %}
+            </p>
+            <p><strong>Perfil:</strong> {{ user.get_categoria_display }}</p>
         </div>
-        <h1>Minhas Simulações</h1>
+        <h1>
+            {% if user.is_estudante %}
+                Minhas Simulações
+            {% elif user.is_educador %}
+                Painel do Educador
+            {% else %}
+                Dashboard
+            {% endif %}
+        </h1>
 
         <div class="game-line"></div>
-        <p class="game-hint">Cada decisão impacta o futuro da sua empresa.</p>
+        <p class="game-hint">
+            {% if user.is_estudante %}
+                Cada decisão impacta o futuro da sua empresa.
+            {% elif user.is_educador %}
+                Acompanhe dados agregados e o progresso dos estudantes.
+            {% endif %}
+        </p>
 
-        
+        {% if user.pode_salvar_carregar_partida %}
         <div class="cta-box">
             <a href="{% url 'nova_partida' %}" class="btn btn-primary">
                 🚀 Iniciar Nova Startup
                 <span class="btn-subtext">Comece uma nova simulação do zero</span>
             </a>
         </div>
+        {% endif %}
         
+        {% if user.is_estudante %}
         <div class="partidas-container">
 
             <h2 class="section-title">Partidas Salvas</h2>
@@ -94,6 +121,30 @@
         {% endif %}
 
         </div>
+        {% elif user.is_educador %}
+        <div class="partidas-container">
+            <h2 class="section-title">📊 Funcionalidades de Educador</h2>
+            <div class="card" style="display: block; padding: 20px;">
+                <p>Como Educador de Negócios, você tem acesso a:</p>
+                <ul style="list-style: none; padding: 0;">
+                    <li>✅ <strong>Relatórios Agregados:</strong> Visualize estatísticas gerais dos estudantes</li>
+                    <li>✅ <strong>Rankings:</strong> Acompanhe o desempenho comparativo</li>
+                    <li>✅ <strong>Visualização de Conquistas:</strong> Veja as conquistas desbloqueadas</li>
+                    <li>❌ <strong>Criação de Partidas:</strong> Modo somente leitura</li>
+                </ul>
+                <div style="margin-top: 20px;">
+                    <a href="#" class="btn btn-primary" style="margin-right: 10px;">📈 Ver Relatórios (Em Breve)</a>
+                    <a href="#" class="btn btn-secondary">🏆 Ver Ranking (Em Breve)</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="partidas-container">
+            <div class="card" style="display: block; padding: 20px;">
+                <p>Bem-vindo! Entre em contato com o administrador para mais informações sobre seu perfil.</p>
+            </div>
+        </div>
+        {% endif %}
     </main>
 
     <footer>

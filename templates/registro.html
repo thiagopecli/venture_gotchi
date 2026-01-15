@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
 
-{% block title %}Criar Conta{% endblock %}
-
 {% block content %}
 <h2>Criar Conta</h2>
 
@@ -9,33 +7,66 @@
 
 <form method="post" action="{% url 'registro' %}">
     {% csrf_token %}
+<div id="box-registro" style="max-width: 500px; margin: 40px auto; padding: 30px; border: 2px solid #007bff; border-radius: 12px; background-color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    <h2 style="text-align: center; color: #333; margin-bottom: 25px;">Criar Nova Conta</h2>
     
-    <div class="form-group">
-        <label for="username">Nome de usuário:</label>
-        <input type="text" id="username" name="username" required maxlength="150">
-        <small>Obrigatório. 150 caracteres ou menos. Letras, dígitos e @/./+/-/_ apenas.</small>
-    </div>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        
+        {% for field in form %}
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px; color: #555;">
+                    {{ field.label }}
+                </label>
+                {# Renderiza o campo com uma classe para estilizar via CSS se desejar #}
+                <div class="input-container">
+                    {{ field }}
+                </div>
+                {% if field.help_text %}
+                    <small style="color: #888; display: block; margin-top: 5px;">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <div style="color: #dc3545; font-size: 0.85em; margin-top: 5px;">{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endfor %}
 
-    <div class="form-group">
-        <label for="email">E-mail:</label>
-        <input type="email" id="email" name="email" required>
-    </div>
+        <button type="submit" id="btn-submit" style="width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s;">
+            Finalizar Cadastro
+        </button>
+    </form>
+</div>
 
-    <div class="form-group">
-        <label for="password1">Senha:</label>
-        <input type="password" id="password1" name="password1" required>
-        <small>Sua senha não pode ser muito semelhante às suas outras informações pessoais.</small>
-        <small>Sua senha deve conter pelo menos 8 caracteres.</small>
-    </div>
+<style>
+    /* Estilização básica para os inputs que o Django gera */
+    input, select, textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+</style>
 
-    <div class="form-group">
-        <label for="password2">Confirme a senha:</label>
-        <input type="password" id="password2" name="password2" required>
-        <small>Digite a mesma senha novamente, para verificação.</small>
-    </div>
+<script>
+    // Script para mudar as cores dinamicamente
+    const tipoSelect = document.querySelector('select[name="tipo_documento"]');
+    const box = document.getElementById('box-registro');
+    const btn = document.getElementById('btn-submit');
 
-    <button type="submit">Criar Conta</button>
-</form>
+    function atualizarCores() {
+        if (tipoSelect.value === 'CPF') {
+            box.style.borderColor = '#007bff'; // Azul
+            btn.style.backgroundColor = '#007bff';
+        } else {
+            box.style.borderColor = '#28a745'; // Verde
+            btn.style.backgroundColor = '#28a745';
+        }
+    }
 
-<p>Já tem uma conta? <a href="{% url 'login' %}">Faça login aqui</a></p>
+    if (tipoSelect) {
+        tipoSelect.addEventListener('change', atualizarCores);
+        atualizarCores(); // Executa ao carregar a página
+    }
+</script>
 {% endblock %}

@@ -1,16 +1,38 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from decimal import Decimal
+from django.conf import settings
 
+class User(AbstractUser):
+    class Categorias(models.TextChoices):
+        # Categorias para CPF
+        ALUNO = "ALUNO", "Aluno (CPF)"
+        PROFESSOR = "PROFESSOR", "Professor (CPF)"
+        STARTUP_PF = "STARTUP_PF", "Startup (CPF - Pré-formalizada)"
+        
+        # Categorias para CNPJ
+        STARTUP_PJ = "STARTUP_PJ", "Startup (CNPJ)"
+        EMPRESA = "EMPRESA", "Empresa (CNPJ)"
+        INSTITUICAO = "INSTITUICAO", "Instituição de Ensino (CNPJ)"
+
+    tipo_documento = models.CharField(
+        max_length=4, 
+        choices=[('CPF', 'CPF'), ('CNPJ', 'CNPJ')],
+        default='CPF'
+    )
+    documento = models.CharField(max_length=18, unique=True, help_text="CPF ou CNPJ")
+    categoria = models.CharField(max_length=20, choices=Categorias.choices)
+
+    def __str__(self):
+        return f"{self.username} - {self.categoria}"
 
 class Partida(models.Model):
-    """Modelo para a sessão de jogo (Partida)"""
     usuario = models.ForeignKey(
-        User, 
+        settings.AUTH_USER_MODEL,  # Sempre use esta referência
         on_delete=models.CASCADE,
         related_name='partidas',
-        db_index=True  # Índice para consultas por usuário
+        db_index=True
     )
     nome_empresa = models.CharField(max_length=100)
     data_inicio = models.DateTimeField(auto_now_add=True, db_index=True)

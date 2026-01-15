@@ -36,34 +36,54 @@
 
     <main class="container">
         
+        <div class="welcome-box">
+            <h2>Bem-vinda, {{ user.username }} 👋</h2>
+            <p>Gerencie sua startup, tome decisões estratégicas e acompanhe o crescimento.</p>
+        </div>
         <h1>Minhas Simulações</h1>
+
+        <div class="game-line"></div>
+        <p class="game-hint">Cada decisão impacta o futuro da sua empresa.</p>
+
         
         <div class="mb-30">
             <a href="{% url 'nova_partida' %}" class="btn btn-primary">
                 Iniciar Nova Simulação
+                <span class="btn-subtext">Comece uma nova simulação do zero</span>
             </a>
         </div>
         
-        <h2>Partidas Salvas</h2>
-        
-        {% if partidas %}
-            <ul class="list-unstyled">
-                {% for partida in partidas %}
-                <li class="card">
+        <div class="partidas-container">
+
+            <h2 class="section-title">Partidas Salvas</h2>
+
+            {% if partidas %}
+                {% if partidas|length == 1 %}
+                <p class="hint-text">
+                    🎯 Você tem uma startup em andamento. Continue tomando decisões para crescer sua empresa.
+                </p>
+                {% endif %}
+
+                <ul class="list-unstyled">
+                    {% for partida in partidas %}
+                    <li class="card partida-card">
                     
-                    <div>
-                        <strong>{{ partida.nome_empresa }}</strong>
-                        <span class="text-muted">
-                            (Início: {{ partida.data_inicio|date:"d/m/Y" }})
-                        </span>
+                        <div class="partida-info">
+                            <strong class="partida-nome">{{ partida.nome_empresa }}</strong>
+                            <span class="text-muted">
+                                (Início: {{ partida.data_inicio|date:"d/m/Y" }})
+                            </span>
+                        </div>
+
+                    <div class="partida-actions"></div>
+                        <a href="{% url 'carregar_jogo' partida.id %}" class="btn btn-primary">
+                            Continuar Jogo
+                        </a>
+                        <a href="{% url 'metricas' partida.id %}" class="btn btn-secondary">
+                            Ver Métricas
+                        </a>
                     </div>
 
-                    <a href="{% url 'carregar_jogo' partida.id %}" class="btn btn-primary">
-                        Continuar Jogo
-                    </a>
-                    <a href="{% url 'metricas' partida.id %}" class="btn btn-secondary">
-                        Ver Métricas
-                    </a>
                 </li>
                 {% endfor %}
             </ul>
@@ -72,6 +92,8 @@
                 Você ainda não possui nenhuma partida salva.
             </p>
         {% endif %}
+
+        </div>
     </main>
 
     <footer>

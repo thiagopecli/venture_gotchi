@@ -3,20 +3,45 @@
 {% block title%} Conquistas {% endblock %}
 
 {% block content %}
-<h2> Minhas Conquistas </h2>
+<h2> 🏆 {% if user.is_estudante %}Minhas Conquistas{% else %}Conquistas{% endif %} </h2>
+
+{% if not user.pode_visualizar_conquistas %}
+    <div class="alert alert-warning">
+        <p>Você não tem permissão para visualizar conquistas.</p>
+    </div>
+{% else %}
 
 {% if conquistas %}
     <ul>
     {% for conquista in conquistas %}
-        <li class="card">
+        <li class="card" style="background-color: #0D141F !important;">
             <strong>{{ conquista.conquista.titulo }}</strong><br>
-            <small>{{ conquista.conquista.descricao }}</small>
+            <small>{{ conquista.conquista.descricao }}</small><br><br>
+            <div style="background: rgba(33, 48, 64, 0.4); padding: 10px; margin-top: 10px; border-radius: 5px; border-left: 3px solid #2176F4;">
+                <strong>🏢 Empresa:</strong> {{ conquista.partida.nome_empresa }}<br>
+                <strong>🎯 Desbloqueada no turno:</strong> {{ conquista.turno }}<br>
+                <strong>📅 Data:</strong> {{ conquista.desbloqueada_em|date:"d/m/Y H:i" }}<br>
+                {% if conquista.partida.startup %}
+                <strong>💰 Saldo da conquista:</strong> R$ {{ conquista.partida.startup.saldo_caixa|floatformat:2 }}<br>
+                <strong>📊 Valuation:</strong> R$ {{ conquista.partida.startup.valuation|floatformat:2 }}<br>
+                <strong>👥 Funcionários:</strong> {{ conquista.partida.startup.funcionarios }}<br>
+                {% endif %}
+                <strong>🎮 Status da partida:</strong> {% if conquista.partida.ativa %}<span style="color: green;">Ativa</span>{% else %}<span style="color: gray;">Finalizada</span>{% endif %}
+            </div>
         </li>
     {% endfor %}
     </ul>
 {% else %}
 
-<p>Você ainda não desbloqueou nenhuma conquista.</p>
+<p>
+    {% if user.is_estudante %}
+        Você ainda não desbloqueou nenhuma conquista.
+    {% else %}
+        Nenhuma conquista registrada no sistema.
+    {% endif %}
+</p>
+{% endif %}
+
 {% endif %}
 
 <a href="{% url 'dashboard' %}">Voltar</a>

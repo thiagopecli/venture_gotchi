@@ -29,6 +29,51 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.username} - {self.categoria}"
+    
+    # Métodos de Permissões
+    def is_estudante(self):
+        """Verifica se é Estudante/Aspirante (Aluno, Startup PF/PJ)"""
+        return self.categoria in [
+            self.Categorias.ALUNO,
+            self.Categorias.STARTUP_PF,
+            self.Categorias.STARTUP_PJ
+        ]
+    
+    def is_educador(self):
+        """Verifica se é Educador de Negócios (Professor, Instituição)"""
+        return self.categoria in [
+            self.Categorias.PROFESSOR,
+            self.Categorias.INSTITUICAO
+        ]
+    
+    def is_empresa(self):
+        """Verifica se é Empresa"""
+        return self.categoria == self.Categorias.EMPRESA
+    
+    # Permissões específicas
+    def pode_salvar_carregar_partida(self):
+        """Estudantes podem salvar/carregar partidas"""
+        return self.is_estudante()
+    
+    def pode_visualizar_propria_partida(self):
+        """Estudantes podem visualizar suas próprias partidas"""
+        return self.is_estudante()
+    
+    def pode_acessar_relatorios_agregados(self):
+        """Educadores podem acessar relatórios agregados"""
+        return self.is_educador()
+    
+    def pode_acessar_ranking(self):
+        """Estudantes e Educadores podem acessar ranking"""
+        return self.is_estudante() or self.is_educador()
+    
+    def pode_desbloquear_conquistas(self):
+        """Estudantes podem desbloquear conquistas"""
+        return self.is_estudante()
+    
+    def pode_visualizar_conquistas(self):
+        """Todos podem visualizar conquistas"""
+        return True
 
 class Partida(models.Model):
     usuario = models.ForeignKey(

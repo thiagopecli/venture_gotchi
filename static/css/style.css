@@ -227,7 +227,7 @@ footer {
     background-color: var(--light-color);
     border-top: 1px solid var(--border-color);
     margin-top: 50px;
-    color: #666;
+    color: #0D141F;
 }
 
 /*  Notificações  */
@@ -369,7 +369,7 @@ footer {
 }
 
 .mb-30 {
-    margin-bottom: 30px;
+    margin-bottom: 15px;
 }
 
 .p-20 {
@@ -699,6 +699,124 @@ input:focus {
     text-decoration: none;
 }
 
-footer {
-    color: var(--text-light);
+
+/* Campos de formulário */
+input,
+select,
+textarea {
+    background-color: #C1C8D1; /* Cinza claro */
+    color: #0D141F;            /* Preto azulado */
+    border: 1px solid #2176F4;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Placeholder (texto dentro do campo antes de digitar) */
+input::placeholder,
+textarea::placeholder {
+    color: #0D141F;
+    opacity: 0.7;
+}
+
+/* Efeito quando clica no campo */
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #F8C923; /* Amarelo Pixel */
+    box-shadow: 0 0 0 2px rgba(248, 201, 35, 0.3);
+}
+
+.welcome-box {
+    background-color: #0D141F; /* preto azulado */
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+}
+
+.welcome-box h2 {
+    color: #F8C923; /* amarelo pixel */
+    margin-bottom: 8px;
+}
+
+.welcome-box p {
+    color: #C1C8D1;
+    font-size: 0.95rem;
+}
+
+.btn-subtext {
+    display: block;
+    font-size: 0.75rem;
+    color: #C1C8D1;
+    margin-top: 4px;
+}
+
+.hint-text {
+    color: #C1C8D1;
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+}
+
+.game-line {
+    height: 3px;
+    width: 60px;
+    background-color: #F8C923;
+    margin: 8px 0;
+}
+
+.game-hint {
+    font-size: 0.8rem;
+    color: #C1C8D1;
+    margin-bottom: 20px;
+}
+
+.card strong {
+    color: #F8C923;
+    font-size: 1.05rem;
+}
+
+/* Container das partidas */
+.partidas-container {
+    background-color: #0D141F; /* Preto azulado */
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+}
+
+/* Título da seção */
+.section-title {
+    color: #F8C923; /* Amarelo Pixel */
+    margin-bottom: 10px;
+}
+
+/* Card da partida */
+.partida-card {
+    background-color: #1A1E2C; /* Azul petróleo escuro */
+    border: 1px solid #2176F4;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Nome da startup */
+.partida-nome {
+    color: #F8C923;
+    font-size: 1.1rem;
+}
+
+/* Texto secundário */
+.text-muted {
+    color: #C1C8D1;
+    font-size: 0.85rem;
+}
+
+/* Ações */
+.partida-actions .btn {
+    margin-left: 8px;
 }

@@ -23,6 +23,9 @@ class User(AbstractUser):
     )
     documento = models.CharField(max_length=18, unique=True, help_text="CPF ou CNPJ")
     categoria = models.CharField(max_length=20, choices=Categorias.choices)
+    municipio = models.CharField(max_length=100, verbose_name="Município", blank=True, null=True)
+    estado = models.CharField(max_length=100, verbose_name="Estado", blank=True, null=True)
+    pais = models.CharField(max_length=100, verbose_name="País", default="Brasil", blank=True, null=True)
 
     def __str__(self):
         return f"{self.username} - {self.categoria}"

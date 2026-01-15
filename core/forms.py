@@ -11,7 +11,7 @@ class CadastroUsuarioForm(UserCreationForm):
 
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = UserCreationForm.Meta.fields + ('email', 'tipo_documento', 'documento', 'categoria')
+        fields = UserCreationForm.Meta.fields + ('email', 'tipo_documento', 'documento', 'categoria', 'municipio', 'estado', 'pais')
 
     def clean_documento(self):
         doc = self.cleaned_data.get('documento')

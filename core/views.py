@@ -1,4 +1,5 @@
 from .forms import CadastroUsuarioForm
+from .permissions import estudante_required, educador_required, pode_salvar_partida, pode_acessar_relatorios, pode_acessar_ranking
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -66,6 +67,7 @@ def dashboard(request):
     return render(request, 'dashboard.html', context) 
 
 @login_required
+@pode_salvar_partida
 def nova_partida(request):
     """
     Processa o formulário de criação de nova partida e inicializa a startup.
@@ -99,6 +101,7 @@ def nova_partida(request):
     return render(request, 'nova_partida.html')
 
 @login_required
+@pode_salvar_partida
 def salvar_jogo(request, partida_id):
     """
     Lógica crítica: Recebe os dados do jogo (POST) e persiste no BDR.
@@ -206,11 +209,32 @@ def carregar_jogo(request, partida_id):
 
 @login_required
 def perfil(request):
-    partidas_count = Partida.objects.filter(usuario=request.user).count()
-
+    from django.db.models import Count, Sum, Max
+    
+    partidas = Partida.objects.filter(usuario=request.user)
+    partidas_count = partidas.count()
+    partidas_ativas = partidas.filter(ativa=True).count()
+    partidas_finalizadas = partidas.filter(ativa=False).count()
+    
+    # Conquistas totais
+    conquistas_count = ConquistaDesbloqueada.objects.filter(partida__usuario=request.user).count()
+    
+    # Estatísticas das startups
+    stats = Startup.objects.filter(partida__usuario=request.user).aggregate(
+        maior_saldo=Max('saldo_caixa'),
+        maior_valuation=Max('valuation'),
+        maior_turno=Max('turno_atual')
+    )
+    
     return render(request, 'perfil.html',{
         'usuario': request.user,
         'total_partidas': partidas_count,
+        'partidas_ativas': partidas_ativas,
+        'partidas_finalizadas': partidas_finalizadas,
+        'total_conquistas': conquistas_count,
+        'maior_saldo': stats['maior_saldo'] or 0,
+        'maior_valuation': stats['maior_valuation'] or 0,
+        'maior_turno': stats['maior_turno'] or 0,
     })
 
 @login_required
@@ -250,10 +274,62 @@ def conquistas(request):
 
     conquistas = (
         ConquistaDesbloqueada.objects
-        .select_related('conquista')
+        .select_related('conquista', 'partida', 'partida__startup')
         .filter(partida__usuario=request.user)
     )
     return render(request, 'conquistas.html', {'conquistas': conquistas})
+
+@login_required
+@pode_acessar_ranking
+def ranking(request):
+    """
+    Exibe ranking das startups por diferentes critérios.
+    Disponível para Estudantes e Educadores.
+    """
+    from django.db.models import Max, Count, Q
+    
+    # Determinar critério de ordenação
+    criterio = request.GET.get('criterio', 'valuation')
+    
+    # Buscar todas as startups ativas
+    startups = (
+        Startup.objects
+        .select_related('partida', 'partida__usuario')
+        .filter(partida__ativa=True)
+    )
+    
+    # Anotar com informações adicionais
+    startups = startups.annotate(
+        total_conquistas=Count('partida__conquistas')
+    )
+    
+    # Ordenar baseado no critério
+    if criterio == 'valuation':
+        startups = startups.order_by('-valuation', '-saldo_caixa')
+        titulo = 'Ranking por Valuation'
+    elif criterio == 'saldo':
+        startups = startups.order_by('-saldo_caixa', '-valuation')
+        titulo = 'Ranking por Saldo em Caixa'
+    elif criterio == 'turno':
+        startups = startups.order_by('-turno_atual', '-valuation')
+        titulo = 'Ranking por Turno Alcançado'
+    elif criterio == 'conquistas':
+        startups = startups.order_by('-total_conquistas', '-valuation')
+        titulo = 'Ranking por Conquistas'
+    else:
+        startups = startups.order_by('-valuation')
+        titulo = 'Ranking Geral'
+    
+    # Limitar aos top 50
+    startups = startups[:50]
+    
+    context = {
+        'startups': startups,
+        'criterio': criterio,
+        'titulo': titulo,
+    }
+    
+    return render(request, 'ranking.html', context)
 def redirect_handler(request):
     """Encaminha o usuário baseado na Categoria definida no seu Models"""
     cat = request.user.categoria

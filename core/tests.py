@@ -79,3 +79,63 @@ class ORMOptimizationTests(TestCase):
 				Partida.objects.filter(usuario=self.user).order_by("-data_inicio")
 			)
 			self.assertTrue(len(rows) >= 1)
+
+	def test_mensagem_ao_contratar_engenheiro_e_exibida_imediatamente(self):
+		from decimal import Decimal
+		from django.urls import reverse
+		# Preparar partida e startup com caixa suficiente
+		partida = Partida.objects.create(usuario=self.user, nome_empresa="HireTest")
+		Startup.objects.create(partida=partida, saldo_caixa=Decimal('100000.00'), receita_mensal=Decimal('0.00'), valuation=Decimal('0.00'), funcionarios=0)
+
+		# Login e ação
+		self.client.login(username="tester", password="pass1234")
+		response = self.client.post(reverse('salvar_jogo', args=[partida.id]), data={'decisao': 'Contratar Engenheiro Sênior'}, follow=True)
+
+		# A mensagem deve aparecer no conteúdo renderizado da página final
+		self.assertContains(response, '👨‍💻 Engenheiro contratado! Valuation aumentado.')
+
+	def test_registro_exibe_mensagem_de_sucesso(self):
+		from django.urls import reverse
+		# Submeter formulário de registro
+		response = self.client.post(reverse('registro'), data={
+			'username': 'newuser',
+			'email': 'newuser@example.com',
+			'password1': 'novaSenha123',
+			'password2': 'novaSenha123'
+		}, follow=True)
+
+		self.assertContains(response, 'Conta criada com sucesso!')
+
+	def test_persistente_desbloqueada_apos_5_turnos(self):
+		from core.services.conquistas import verificar_conquistas_progesso
+		from core.models import ConquistaDesbloqueada
+		from decimal import Decimal
+
+		# Preparar partida com 5 turnos
+		partida = Partida.objects.create(usuario=self.user, nome_empresa="PersistTest")
+		Startup.objects.create(partida=partida, saldo_caixa=Decimal('1000.00'), turno_atual=5)
+
+		# Executar verificação de conquistas de progresso
+		verificar_conquistas_progesso(self.user)
+
+		# A conquista Persistente! deve existir para esta partida
+		self.assertTrue(
+			ConquistaDesbloqueada.objects.filter(partida=partida, conquista__titulo='Persistente!').exists()
+		)
+
+	def test_persistente_nao_desbloqueia_antes_de_5_turnos(self):
+		from core.services.conquistas import verificar_conquistas_progesso
+		from core.models import ConquistaDesbloqueada
+		from decimal import Decimal
+
+		# Preparar partida com 4 turnos
+		partida = Partida.objects.create(usuario=self.user, nome_empresa="PersistTest2")
+		Startup.objects.create(partida=partida, saldo_caixa=Decimal('1000.00'), turno_atual=4)
+
+		# Executar verificação
+		verificar_conquistas_progesso(self.user)
+
+		# A conquista não deve ter sido criada
+		self.assertFalse(
+			ConquistaDesbloqueada.objects.filter(partida=partida, conquista__titulo='Persistente!').exists()
+		)

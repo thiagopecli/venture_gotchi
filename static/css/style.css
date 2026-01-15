@@ -262,6 +262,45 @@ footer {
     border-left-color: var(--danger-color);
 }
 
+/* Mensagens fixas no topo (exibição sutil) */
+.top-messages {
+    position: fixed;
+    top: 70px; /* abaixo do header */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: calc(100% - 40px);
+    max-width: 820px;
+    pointer-events: none; /* permite clicar nas coisas atrás quando não no alerta */
+}
+.top-messages .alert {
+    pointer-events: auto;
+    margin: 0;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    opacity: 1;
+    transition: opacity .35s ease, transform .35s ease;
+}
+.top-messages .alert.hide {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+/* Mensagens inline dentro do jogo */
+.inline-messages {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.inline-messages .alert {
+    margin: 0;
+    width: 100%;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
 /*  Container de Jogo  */
 .game-container {
     display: flex;

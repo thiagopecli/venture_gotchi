@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title%} Conquistas {% endblock %}
+
+{% block content %}
+<h2> Minhas Conquistas </h2>
+
+{% if conquistas %}
+    <ul>
+    {% for conquista in conquistas %}
+        <li class="card">
+            <strong>{{ conquista.conquista.titulo }}</strong><br>
+            <small>{{ conquista.conquista.descricao }}</small>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+
+<p>Você ainda não desbloqueou nenhuma conquista.</p>
+{% endif %}
+
+<a href="{% url 'dashboard' %}">Voltar</a>
+{% endblock %}

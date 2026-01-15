@@ -5,7 +5,9 @@ from django.utils import timezone
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import login
 from django.contrib import messages
+from django.contrib.messages import get_messages
 from decimal import Decimal
+from core.services.conquistas import verificar_conquistas_partida, verificar_conquistas_progesso
 from .models import User, Partida, Startup, HistoricoDecisao 
 from django.db.models import Prefetch
 
@@ -16,6 +18,10 @@ def registro_view(request):
     """
     View unificada para registro usando CadastroUsuarioForm.
     """
+   
+    if request.method == 'GET':
+        pass
+
     if request.method == 'POST':
         form = CadastroUsuarioForm(request.POST)
         if form.is_valid():
@@ -31,7 +37,7 @@ def registro_view(request):
     
     return render(request, 'registro.html', {'form': form})
 
-from .models import Partida, Startup, HistoricoDecisao 
+from .models import ConquistaDesbloqueada, Partida, Startup, HistoricoDecisao 
 from django.db.models import Prefetch
 
 def registro_view(request):
@@ -85,6 +91,9 @@ def nova_partida(request):
         
         Startup.objects.create(partida=partida, saldo_caixa=saldo_inicial)
         
+        # Verifica e registra conquistas que dependem da criação da partida
+        verificar_conquistas_partida(partida)
+
         return redirect('carregar_jogo', partida_id=partida.id)
     
     return render(request, 'nova_partida.html')
@@ -151,12 +160,16 @@ def salvar_jogo(request, partida_id):
             
             turno_atual = startup.turno_atual
             
-            # Registrar decisão no histórico
+            
             HistoricoDecisao.objects.create(
                 partida=partida,
                 decisao_tomada=decisao_tomada,
                 turno=turno_atual
             )
+
+    
+            verificar_conquistas_partida(partida)
+            verificar_conquistas_progesso(request.user)
             
         except Startup.DoesNotExist:
             messages.error(request, 'Erro: Startup não encontrada.')
@@ -229,6 +242,18 @@ def metricas(request, partida_id):
     })
 
 @login_required
+def conquistas(request):
+    
+    for partida in Partida.objects.filter(usuario=request.user):
+        verificar_conquistas_partida(partida)
+        verificar_conquistas_progesso(request.user)
+
+    conquistas = (
+        ConquistaDesbloqueada.objects
+        .select_related('conquista')
+        .filter(partida__usuario=request.user)
+    )
+    return render(request, 'conquistas.html', {'conquistas': conquistas})
 def redirect_handler(request):
     """Encaminha o usuário baseado na Categoria definida no seu Models"""
     cat = request.user.categoria

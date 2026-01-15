@@ -208,7 +208,7 @@ li {
     padding: 15px;
     margin-bottom: 10px;
     border-radius: var(--radius);
-    background-color: white;
+    background-color: var(--bg-secondary);
     display: flex;
     justify-content: space-between;
     align-items: center;

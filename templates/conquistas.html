@@ -46,3 +46,14 @@
 
 <a href="{% url 'dashboard' %}">Voltar</a>
 {% endblock %}
+
+<h2>Minhas Conquistas</h2>
+
+<ul>
+  {% for c in conquistas %}
+    <li>
+      <strong>{{ c.conquista.nome }}</strong> – 
+      {{ c.conquista.descricao }}
+    </li>
+  {% endfor %}
+</ul>

@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from decimal import Decimal
 from django.conf import settings
+from django.contrib.auth.models import User
 
 class User(AbstractUser):
     class Categorias(models.TextChoices):
@@ -383,3 +384,34 @@ class ConquistaDesbloqueada(models.Model):
 
     def __str__(self):
         return f"{self.conquista.titulo} - {self.partida.nome_empresa}"
+
+
+class UsuarioConquista(models.Model):
+    """Registro de conquistas desbloqueadas por usuário."""
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='conquistas_usuario',
+        db_index=True
+    )
+    conquista = models.ForeignKey(
+        Conquista,
+        on_delete=models.CASCADE,
+        related_name='usuarios_conquista',
+        db_index=True
+    )
+    data_desbloqueio = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        unique_together = ('usuario', 'conquista')
+        ordering = ['-data_desbloqueio']
+        verbose_name = 'Conquista do Usuário'
+        verbose_name_plural = 'Conquistas dos Usuários'
+        indexes = [
+            models.Index(fields=['usuario', '-data_desbloqueio'], name='idx_usuario_data_conquista'),
+        ]
+
+    def __str__(self):
+        return f"{self.usuario.username} - {self.conquista.titulo}"
+        
+        

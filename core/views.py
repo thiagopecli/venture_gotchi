@@ -11,6 +11,16 @@ from decimal import Decimal
 from core.services.conquistas import verificar_conquistas_partida, verificar_conquistas_progesso
 from .models import User, Partida, Startup, HistoricoDecisao 
 from django.db.models import Prefetch
+from django.contrib.auth.decorators import login_required
+from .models import UsuarioConquista
+
+@login_required
+def conquistas(request):
+    conquistas = UsuarioConquista.objects.filter(usuario=request.user)
+
+    return render(request, "conquistas.html", {
+        "conquistas": conquistas
+    })
 
 class PaginaLogin(LoginView):
     template_name = 'login.html'
@@ -344,3 +354,21 @@ def redirect_handler(request):
         return redirect('dashboard_corporativo')
 
     return redirect('home')
+
+
+
+@login_required
+def conquistas(request):
+    conquistas = UsuarioConquista.objects.filter(usuario=request.user)
+
+    return render(request, "conquistas.html", {
+        "conquistas": conquistas
+    })
+
+@login_required
+def conquistas(request):
+    conquistas = UsuarioConquista.objects.filter(usuario=request.user)
+
+    return render(request, "conquistas.html", {
+        "conquistas": conquistas
+    })

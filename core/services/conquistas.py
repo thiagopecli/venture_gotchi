@@ -34,6 +34,18 @@ def verificar_conquistas_progesso(usuario):
         }
     )
 
+    # Nova conquista: Primeiro Milhão
+    conquista_milhao, _ = Conquista.objects.get_or_create(
+        titulo='Primeiro Milhão!',
+        defaults={
+            'descricao': 'Você alcançou R$ 1.000.000 no caixa.',
+            'tipo': 'progresso',
+            'valor_objetivo': Decimal('1000000.00'),
+            'pontos': 50,
+            'ativo': True,
+        }
+    )
+
     partidas = Partida.objects.filter(usuario=usuario)
     for partida in partidas:
         turno_atual = 0
@@ -45,3 +57,13 @@ def verificar_conquistas_progesso(usuario):
                 conquista=conquista,
                 defaults={'turno': turno_atual}
             )
+        
+        # Verificar se alcançou o primeiro milhão
+        if hasattr(partida, 'startup') and partida.startup is not None:
+            saldo_caixa = getattr(partida.startup, 'saldo_caixa', Decimal('0.00'))
+            if saldo_caixa >= Decimal('1000000.00'):
+                ConquistaDesbloqueada.objects.get_or_create(
+                    partida=partida,
+                    conquista=conquista_milhao,
+                    defaults={'turno': turno_atual}
+                )

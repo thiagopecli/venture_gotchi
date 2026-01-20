@@ -99,7 +99,6 @@ def nova_partida(request):
         return redirect('carregar_jogo', partida_id=partida.id)
     
     return render(request, 'nova_partida.html')
-
 @login_required
 @pode_salvar_partida
 def salvar_jogo(request, partida_id):
@@ -116,14 +115,19 @@ def salvar_jogo(request, partida_id):
         
         try:
             startup = partida.startup
+            
+            # Impede novos envios se a partida já foi finalizada (Game Over ou Vitória)
+            if not partida.ativa:
+                messages.error(request, 'Partida encerrada. Não é possível realizar novas ações.')
+                return redirect('carregar_jogo', partida_id=partida.id)
+            
             decisao_tomada = request.POST.get('decisao', 'Decisão não especificada.')
             
+            # Cálculo de Fluxo de Caixa (Saldo anterior + Receita do turno)
             receita_atual = Decimal(str(startup.receita_mensal))
             saldo_atual = Decimal(str(startup.saldo_caixa)) + receita_atual
             
-            if receita_atual > 0:
-                messages.info(request, f'💰 Receita mensal de R$ {receita_atual:.2f} adicionada ao caixa!')
-            
+            # Dicionário de Custos
             custos_decisoes = {
                 'Investir em Marketing Agressivo': Decimal('5000.00'),
                 'Contratar Engenheiro Sênior': Decimal('8000.00'),
@@ -132,65 +136,58 @@ def salvar_jogo(request, partida_id):
             
             custo = custos_decisoes.get(decisao_tomada, Decimal('0.00'))
             
-            # Validar se tem saldo suficiente
+            # Validar se tem saldo suficiente antes de processar
             if saldo_atual < custo:
                 messages.error(
                     request, 
-                    f'❌ Saldo insuficiente! Você tem R$ {saldo_atual:.2f} mas precisa de R$ {custo:.2f} para {decisao_tomada}.'
+                    f'Saldo insuficiente. Disponível: R$ {saldo_atual:.2f} | Necessário: R$ {custo:.2f}'
                 )
                 return redirect('carregar_jogo', partida_id=partida.id)
             
-            # Aplicar custos e efeitos
+            # Aplicar custos
             novo_saldo = saldo_atual - custo
             
+            # Efeitos das Decisões
             if decisao_tomada == 'Investir em Marketing Agressivo':
-                # Marketing aumenta receita mensal
-                startup.receita_mensal = startup.receita_mensal + Decimal('3000.00')
-                messages.success(request, '📢 Investimento em marketing realizado! Receita mensal aumentada em R$ 3.000.')
+                startup.receita_mensal += Decimal('3000.00')
+                messages.success(request, 'Investimento em Marketing concluído. Receita aumentada.')
+                
             elif decisao_tomada == 'Contratar Engenheiro Sênior':
-                # Engenheiro aumenta valuation, funcionários e receita mensal
-                startup.valuation = startup.valuation + Decimal('25000.00')
-                startup.receita_mensal = startup.receita_mensal + Decimal('2000.00')
-                startup.funcionarios = startup.funcionarios + 1
-                messages.success(request, '👨‍💻 Engenheiro contratado! Valuation +R$ 25.000 e receita mensal +R$ 2.000.')
+                startup.valuation += Decimal('25000.00')
+                startup.receita_mensal += Decimal('2000.00')
+                startup.funcionarios += 1
+                messages.success(request, 'Novo Engenheiro Sênior integrado à equipe.')
+                
             elif decisao_tomada == 'Não fazer nada (Economizar)':
-                messages.info(request, '💰 Você economizou este turno.')
+                messages.info(request, 'Turno finalizado com foco em preservação de capital.')
             
-            # Atualizar startup
+            # Persistência de Dados
             startup.saldo_caixa = novo_saldo
-            startup.turno_atual = startup.turno_atual + 1 
+            startup.turno_atual += 1 
             startup.save()
             
-            turno_atual = startup.turno_atual
-            
-            
+            # Registrar no Histórico
             HistoricoDecisao.objects.create(
                 partida=partida,
                 decisao_tomada=decisao_tomada,
-                turno=turno_atual
+                turno=startup.turno_atual
             )
 
-    
+            # Sistema de Conquistas
             verificar_conquistas_partida(partida)
             verificar_conquistas_progesso(request.user)
             
         except Startup.DoesNotExist:
-            messages.error(request, 'Erro: Startup não encontrada.')
+            messages.error(request, 'Erro técnico: Startup não vinculada a esta partida.')
             return redirect('dashboard')
     
     return redirect('carregar_jogo', partida_id=partida_id)
 
 @login_required
 def carregar_jogo(request, partida_id):
-    """
-    Busca os dados no BDR e prepara o contexto para restaurar o estado do jogo.
-    """
     partida = get_object_or_404(
         Partida.objects.select_related('startup').prefetch_related(
-            Prefetch(
-                'decisoes',
-                queryset=HistoricoDecisao.objects.order_by('turno')
-            )
+            Prefetch('decisoes', queryset=HistoricoDecisao.objects.order_by('-turno'))
         ),
         id=partida_id,
         usuario=request.user,
@@ -199,10 +196,23 @@ def carregar_jogo(request, partida_id):
     startup_estado = partida.startup
     historico_decisoes = partida.decisoes.all()
 
+  
+    game_over = startup_estado.saldo_caixa <= 0
+    
+    meta_vitoria = Decimal('1000000.00')
+    vitoria = startup_estado.valuation >= meta_vitoria
+
+    
+    if (game_over or vitoria) and partida.ativa:
+        partida.ativa = False
+        partida.save()
+
     context = {
         'partida': partida,
         'estado_startup': startup_estado,
         'historico_decisoes': historico_decisoes,
+        'game_over': game_over, 
+        'vitoria': vitoria,     
     }
     
     return render(request, 'jogo.html', context)

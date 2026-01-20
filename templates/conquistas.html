@@ -1,48 +1,67 @@
 {% extends 'base.html' %}
 
-{% block title%} Conquistas {% endblock %}
+{% block title %} Conquistas {% endblock %}
 
 {% block content %}
-<h2> 🏆 {% if user.is_estudante %}Minhas Conquistas{% else %}Conquistas{% endif %} </h2>
-
-{% if not user.pode_visualizar_conquistas %}
-    <div class="alert alert-warning">
-        <p>Você não tem permissão para visualizar conquistas.</p>
+<main class="dashboard-main">
+    <div class="header-container">
+        <h2 class="profile-title">{% if user.is_estudante %}Minhas Conquistas{% else %}Conquistas{% endif %}</h2>
+        <a href="{% url 'dashboard' %}" class="btn-back-orange">← Voltar ao Dashboard</a>
     </div>
-{% else %}
 
-{% if conquistas %}
-    <ul>
-    {% for conquista in conquistas %}
-        <li class="card" style="background-color: #0D141F !important;">
-            <strong>{{ conquista.conquista.titulo }}</strong><br>
-            <small>{{ conquista.conquista.descricao }}</small><br><br>
-            <div style="background: rgba(33, 48, 64, 0.4); padding: 10px; margin-top: 10px; border-radius: 5px; border-left: 3px solid #2176F4;">
-                <strong>🏢 Empresa:</strong> {{ conquista.partida.nome_empresa }}<br>
-                <strong>🎯 Desbloqueada no turno:</strong> {{ conquista.turno }}<br>
-                <strong>📅 Data:</strong> {{ conquista.desbloqueada_em|date:"d/m/Y H:i" }}<br>
-                {% if conquista.partida.startup %}
-                <strong>💰 Saldo da conquista:</strong> R$ {{ conquista.partida.startup.saldo_caixa|floatformat:2 }}<br>
-                <strong>📊 Valuation:</strong> R$ {{ conquista.partida.startup.valuation|floatformat:2 }}<br>
-                <strong>👥 Funcionários:</strong> {{ conquista.partida.startup.funcionarios }}<br>
-                {% endif %}
-                <strong>🎮 Status da partida:</strong> {% if conquista.partida.ativa %}<span style="color: green;">Ativa</span>{% else %}<span style="color: gray;">Finalizada</span>{% endif %}
-            </div>
-        </li>
-    {% endfor %}
-    </ul>
-{% else %}
-
-<p>
-    {% if user.is_estudante %}
-        Você ainda não desbloqueou nenhuma conquista.
+    {% if not user.pode_visualizar_conquistas %}
+        <div class="alert alert-error">
+            <p>Você não tem permissão para visualizar conquistas.</p>
+        </div>
     {% else %}
-        Nenhuma conquista registrada no sistema.
+
+    <div class="conquistas-grid">
+        {% if conquistas %}
+            {% for conquista in conquistas %}
+            <div class="achievement-card">
+                <div class="achievement-header">
+                    <div class="achievement-main-info">
+                        <h3>{{ conquista.conquista.titulo }}</h3>
+                        <p class="achievement-desc">{{ conquista.conquista.descricao }}</p>
+                    </div>
+                    <span class="badge-turno">Turno {{ conquista.turno }}</span>
+                </div>
+
+                <div class="achievement-details">
+                    <div class="detail-item">
+                        <span>Empresa</span>
+                        <strong>{{ conquista.partida.nome_empresa }}</strong>
+                    </div>
+                    <div class="detail-item">
+                        <span>Data</span>
+                        <strong>{{ conquista.desbloqueada_em|date:"d/m/Y" }}</strong>
+                    </div>
+                    {% if conquista.partida.startup %}
+                    <div class="detail-item">
+                        <span>Saldo Final</span>
+                        <strong>R$ {{ conquista.partida.startup.saldo_caixa|floatformat:2 }}</strong>
+                    </div>
+                    <div class="detail-item">
+                        <span>Valuation</span>
+                        <strong>R$ {{ conquista.partida.startup.valuation|floatformat:2 }}</strong>
+                    </div>
+                    {% endif %}
+                    <div class="detail-item">
+                        <span>Status</span>
+                        <strong class="status-{% if conquista.partida.ativa %}active{% else %}finished{% endif %}">
+                            {% if conquista.partida.ativa %}Ativa{% else %}Finalizada{% endif %}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state-container">
+                <p class="empty-state">Você ainda não desbloqueou conquistas.</p>
+                <small>Continue jogando para registrar seus marcos de sucesso!</small>
+            </div>
+        {% endif %}
+    </div>
     {% endif %}
-</p>
-{% endif %}
-
-{% endif %}
-
-<a href="{% url 'dashboard' %}">Voltar</a>
+</main>
 {% endblock %}

@@ -1,18 +1,19 @@
 from django.test import TestCase
-from django.contrib.auth.models import User
+from core.models import User, Partida, Startup, HistoricoDecisao
+from core.forms import CadastroUsuarioForm
 from django.db.models import Prefetch
-
-from core.models import Partida, Startup, HistoricoDecisao
 
 
 class ORMOptimizationTests(TestCase):
 	def setUp(self):
 		self.user = User.objects.create_user(
-			username="tester", email="t@example.com", password="pass1234"
+			username="tester", email="t@example.com", password="pass1234",
+			documento="12345678901", categoria="ALUNO"
 		)
 		# Outra conta para "ruído"
 		other = User.objects.create_user(
-			username="other", email="o@example.com", password="pass1234"
+			username="other", email="o@example.com", password="pass1234",
+			documento="12345678902", categoria="PROFESSOR"
 		)
 
 		# Partida do usuário principal
@@ -139,3 +140,111 @@ class ORMOptimizationTests(TestCase):
 		self.assertFalse(
 			ConquistaDesbloqueada.objects.filter(partida=partida, conquista__titulo='Persistente!').exists()
 		)
+
+	def test_primeiro_milhao_desbloqueada_com_caixa_milhao(self):
+		from core.services.conquistas import verificar_conquistas_progesso
+		from core.models import ConquistaDesbloqueada
+		from decimal import Decimal
+
+		# Preparar partida com caixa de 1.000.000
+		partida = Partida.objects.create(usuario=self.user, nome_empresa="MilhaoTest")
+		Startup.objects.create(partida=partida, saldo_caixa=Decimal('1000000.00'), turno_atual=10)
+
+		# Executar verificação de conquistas de progresso
+		verificar_conquistas_progesso(self.user)
+
+		# A conquista Primeiro Milhão! deve existir para esta partida
+		self.assertTrue(
+			ConquistaDesbloqueada.objects.filter(partida=partida, conquista__titulo='Primeiro Milhão!').exists()
+		)
+
+	def test_primeiro_milhao_nao_desbloqueia_abaixo_milhao(self):
+		from core.services.conquistas import verificar_conquistas_progesso
+		from core.models import ConquistaDesbloqueada
+		from decimal import Decimal
+
+		# Preparar partida com caixa abaixo de 1.000.000
+		partida = Partida.objects.create(usuario=self.user, nome_empresa="MilhaoTest2")
+		Startup.objects.create(partida=partida, saldo_caixa=Decimal('999999.99'), turno_atual=10)
+
+		# Executar verificação
+		verificar_conquistas_progesso(self.user)
+
+		# A conquista não deve ter sido criada
+		self.assertFalse(
+			ConquistaDesbloqueada.objects.filter(partida=partida, conquista__titulo='Primeiro Milhão!').exists()
+		)
+
+	def test_cadastro_form_valida_cpf_11_digitos(self):
+		form_data = {
+			'username': 'testuser',
+			'password1': 'testpass123',
+			'password2': 'testpass123',
+			'first_name': 'Test User',
+			'email': 'test@example.com',
+			'tipo_documento': 'CPF',
+			'documento': '11111111111',  # 11 dígitos
+			'categoria': 'ALUNO',
+			'municipio': 'São Paulo',
+			'estado': 'SP',
+			'pais': 'Brasil'
+		}
+		form = CadastroUsuarioForm(data=form_data)
+		self.assertTrue(form.is_valid())
+		self.assertEqual(form.cleaned_data['documento'], '11111111111')
+
+	def test_cadastro_form_rejeita_cpf_menos_11_digitos(self):
+		form_data = {
+			'username': 'testuser2',
+			'password1': 'testpass123',
+			'password2': 'testpass123',
+			'first_name': 'Test User',
+			'email': 'test2@example.com',
+			'tipo_documento': 'CPF',
+			'documento': '2222222222',  # 10 dígitos
+			'categoria': 'ALUNO',
+			'municipio': 'São Paulo',
+			'estado': 'SP',
+			'pais': 'Brasil'
+		}
+		form = CadastroUsuarioForm(data=form_data)
+		self.assertFalse(form.is_valid())
+		self.assertIn('documento', form.errors)
+		self.assertEqual(form.errors['documento'], ['CPF deve ter exatamente 11 dígitos.'])
+
+	def test_cadastro_form_valida_cnpj_14_digitos(self):
+		form_data = {
+			'username': 'testuser3',
+			'password1': 'testpass123',
+			'password2': 'testpass123',
+			'first_name': 'Test User',
+			'email': 'test3@example.com',
+			'tipo_documento': 'CNPJ',
+			'documento': '11111111000111',  # 14 dígitos
+			'categoria': 'STARTUP_PJ',
+			'municipio': 'São Paulo',
+			'estado': 'SP',
+			'pais': 'Brasil'
+		}
+		form = CadastroUsuarioForm(data=form_data)
+		self.assertTrue(form.is_valid())
+		self.assertEqual(form.cleaned_data['documento'], '11111111000111')
+
+	def test_cadastro_form_rejeita_cnpj_menos_14_digitos(self):
+		form_data = {
+			'username': 'testuser4',
+			'password1': 'testpass123',
+			'password2': 'testpass123',
+			'first_name': 'Test User',
+			'email': 'test4@example.com',
+			'tipo_documento': 'CNPJ',
+			'documento': '2222222200012',  # 13 dígitos
+			'categoria': 'STARTUP_PJ',
+			'municipio': 'São Paulo',
+			'estado': 'SP',
+			'pais': 'Brasil'
+		}
+		form = CadastroUsuarioForm(data=form_data)
+		self.assertFalse(form.is_valid())
+		self.assertIn('documento', form.errors)
+		self.assertEqual(form.errors['documento'], ['CNPJ deve ter exatamente 14 dígitos.'])

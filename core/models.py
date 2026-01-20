@@ -124,6 +124,7 @@ class Startup(models.Model):
     class Meta:
         verbose_name = 'Startup'
         verbose_name_plural = 'Startups'
+        ordering = ['-valuation', 'nome']
         constraints = [
             models.CheckConstraint(
                 condition=models.Q(turno_atual__gte=1),

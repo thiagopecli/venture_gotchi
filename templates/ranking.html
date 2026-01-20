@@ -1,82 +1,85 @@
 {% extends 'base.html' %}
 
-{% block title %}Ranking - Venture Gotchi{% endblock %}
+{% block title %} Ranking - Venture Gotchi {% endblock %}
 
 {% block content %}
-<h2>🏆 {{ titulo }}</h2>
-
-<div class="card" style="display: block; margin-bottom: 20px; padding: 15px;">
-    <h3>Filtrar por:</h3>
-    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <a href="{% url 'ranking' %}?criterio=valuation" class="btn {% if criterio == 'valuation' %}btn-primary{% else %}btn-secondary{% endif %}">
-            💎 Valuation
-        </a>
-        <a href="{% url 'ranking' %}?criterio=saldo" class="btn {% if criterio == 'saldo' %}btn-primary{% else %}btn-secondary{% endif %}">
-            💰 Saldo em Caixa
-        </a>
-        <a href="{% url 'ranking' %}?criterio=turno" class="btn {% if criterio == 'turno' %}btn-primary{% else %}btn-secondary{% endif %}">
-            ⏱️ Turno Alcançado
-        </a>
-        <a href="{% url 'ranking' %}?criterio=conquistas" class="btn {% if criterio == 'conquistas' %}btn-primary{% else %}btn-secondary{% endif %}">
-            🏅 Conquistas
-        </a>
+<main class="dashboard-main">
+    <div class="header-container">
+        <h2 class="profile-title"> {{ titulo }}</h2>
+        <a href="{% url 'dashboard' %}" class="btn-back-orange">← Voltar ao Dashboard</a>
     </div>
-</div>
 
-{% if startups %}
-    <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; background: var(--bg-secondary); border: 1px solid var(--border-color);">
+    <section class="ranking-filter-section">
+        <h3>Filtrar por:</h3>
+        <div class="filter-group">
+            <a href="{% url 'ranking' %}?criterio=valuation" class="filter-btn {% if criterio == 'valuation' %}active{% endif %}">Valuation</a>
+            <a href="{% url 'ranking' %}?criterio=saldo" class="filter-btn {% if criterio == 'saldo' %}active{% endif %}">Saldo em Caixa</a>
+            <a href="{% url 'ranking' %}?criterio=turno" class="filter-btn {% if criterio == 'turno' %}active{% endif %}">Turno Alcançado</a>
+            <a href="{% url 'ranking' %}?criterio=conquistas" class="filter-btn {% if criterio == 'conquistas' %}active{% endif %}">Conquistas</a>
+        </div>
+    </section>
+
+    {% if startups %}
+    <div class="ranking-table-container">
+        <table class="modern-table">
             <thead>
-                <tr style="background: rgba(33, 118, 244, 0.2); border-bottom: 2px solid var(--accent-blue);">
-                    <th style="padding: 12px; text-align: left;">#</th>
-                    <th style="padding: 12px; text-align: left;">🏢 Empresa</th>
-                    <th style="padding: 12px; text-align: left;">👤 Fundador</th>
-                    <th style="padding: 12px; text-align: right;">💎 Valuation</th>
-                    <th style="padding: 12px; text-align: right;">💰 Saldo</th>
-                    <th style="padding: 12px; text-align: center;">⏱️ Turno</th>
-                    <th style="padding: 12px; text-align: center;">👥 Funcionários</th>
-                    <th style="padding: 12px; text-align: center;">🏅 Conquistas</th>
+                <tr>
+                    <th>#</th>
+                    <th>Empresa</th>
+                    <th>Fundador</th>
+                    <th class="text-right">Valuation</th>
+                    <th class="text-right">Saldo</th>
+                    <th class="text-center">Turno</th>
+                    <th class="text-center">Funcionários</th>
+                    <th class="text-center">Conquistas</th>
                 </tr>
             </thead>
             <tbody>
                 {% for startup in startups %}
-                <tr style="border-bottom: 1px solid var(--border-color); {% if startup.partida.usuario == user %}background: rgba(248, 201, 35, 0.1);{% endif %}">
-                    <td style="padding: 12px; font-weight: bold; color: var(--accent-yellow);">
-                        {{ forloop.counter }}
-                        {% if forloop.counter == 1 %}🥇{% elif forloop.counter == 2 %}🥈{% elif forloop.counter == 3 %}🥉{% endif %}
+                <tr class="{% if startup.partida.usuario == user %}highlight-row{% endif %}">
+                    <td class="rank-number">
+                        {% if forloop.counter == 1 %}1º{% elif forloop.counter == 2 %}2º{% elif forloop.counter == 3 %}3º{% else %}{{ forloop.counter }}{% endif %}
                     </td>
-                    <td style="padding: 12px;">
-                        <strong>{{ startup.nome }}</strong>
-                        {% if startup.partida.usuario == user %}<span style="color: var(--accent-yellow);"> (Você)</span>{% endif %}
+                    <td>
+                        <span class="company-name">{{ startup.partida.nome_empresa }}</span>
+                        {% if startup.partida.usuario == user %}<span class="me-badge">VOCÊ</span>{% endif %}
                     </td>
-                    <td style="padding: 12px;">{{ startup.partida.usuario.username }}</td>
-                    <td style="padding: 12px; text-align: right; font-weight: bold; color: var(--accent-blue);">
+                    <td>{{ startup.partida.usuario.get_full_name|default:startup.partida.usuario.username }}</td>
+                    
+                    <td class="text-right color-primary {% if criterio == 'valuation' %}font-bold{% endif %}">
                         R$ {{ startup.valuation|floatformat:2 }}
                     </td>
-                    <td style="padding: 12px; text-align: right; color: #4CAF50;">
+                    
+                    <td class="text-right color-success {% if criterio == 'saldo' %}font-bold{% endif %}">
                         R$ {{ startup.saldo_caixa|floatformat:2 }}
                     </td>
-                    <td style="padding: 12px; text-align: center;">{{ startup.turno_atual }}</td>
-                    <td style="padding: 12px; text-align: center;">{{ startup.funcionarios }}</td>
-                    <td style="padding: 12px; text-align: center;">{{ startup.total_conquistas }}</td>
+                    
+                    <td class="text-center {% if criterio == 'turno' %}font-bold{% endif %}">
+                        {{ startup.turno_atual }}
+                    </td>
+                    
+                    <td class="text-center">{{ startup.funcionarios }}</td>
+                    
+                    <td class="text-center {% if criterio == 'conquistas' %}font-bold{% endif %}">
+                        {{ startup.total_conquistas }}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     
-    <p style="margin-top: 15px; color: var(--text-light); font-size: 0.9em;">
-        📊 Exibindo top {{ startups|length }} startups ativas no momento.
+    <div class="ranking-footer">
+        <p>Exibindo top {{ startups|length }} startups ativas.</p>
         {% if user.is_educador %}
-        <br>💡 <em>Modo Educador: Você pode visualizar todas as startups do sistema.</em>
+            <span class="educator-note">💡 Modo Educador: Visualização total habilitada.</span>
         {% endif %}
-    </p>
-{% else %}
-    <div class="card" style="display: block; padding: 20px;">
-        <p>Ainda não há startups ativas no ranking.</p>
     </div>
-{% endif %}
 
-<a href="{% url 'dashboard' %}" class="btn btn-primary" style="margin-top: 20px;">Voltar ao Dashboard</a>
-
+    {% else %}
+    <div class="empty-state-container">
+        <p class="empty-state">Ainda não há startups ativas no ranking.</p>
+    </div>
+    {% endif %}
+</main>
 {% endblock %}

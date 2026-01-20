@@ -1,38 +1,55 @@
 {% extends 'base.html' %}
 
-{% block title%} Perfil {% endblock %}
+{% block title %} Perfil - Venture Gotchi {% endblock %}
 
 {% block content %}
-<h2> 👤 Perfil do Usuário </h2>
+<main class="dashboard-main">
+    <div class="header-container">
+        <h2 class="profile-title">Perfil do Usuário</h2>
+        <a href="{% url 'dashboard' %}" class="btn-back-orange">← Voltar ao Dashboard</a>
+    </div>
 
-<div class="card" style="display: block; margin-bottom: 20px;">
-    <h3>📋 Dados Cadastrais</h3>
-    <p><strong>Usuário:</strong> {{ usuario.username }}</p>
-    <p><strong>Email:</strong> {{ usuario.email }}</p>
-    <p><strong>Nome:</strong> {{ usuario.first_name }} {{ usuario.last_name }}</p>
-    <p><strong>Tipo de Documento:</strong> {{ usuario.tipo_documento }}</p>
-    <p><strong>Documento:</strong> {{ usuario.documento }}</p>
-    <p><strong>Categoria:</strong> {{ usuario.get_categoria_display }}</p>
-    {% if usuario.municipio %}<p><strong>Município:</strong> {{ usuario.municipio }}</p>{% endif %}
-    {% if usuario.estado %}<p><strong>Estado:</strong> {{ usuario.estado }}</p>{% endif %}
-    {% if usuario.pais %}<p><strong>País:</strong> {{ usuario.pais }}</p>{% endif %}
-    <p><strong>Membro desde:</strong> {{ usuario.date_joined|date:"d/m/Y" }}</p>
-</div>
+    <div class="info-card profile-card-main">
+        <h3 class="section-subtitle">Dados Cadastrais</h3>
+        <div class="profile-data-grid">
+            <div class="data-group">
+                <p><span>Usuário:</span> {{ usuario.username }}</p>
+                <p><span>Email:</span> {{ usuario.email }}</p>
+                <p><span>Nome:</span> {{ usuario.first_name }}</p>
+            </div>
+            <div class="data-group">
+                <p><span>Documento:</span> {{ usuario.documento }} ({{ usuario.tipo_documento }})</p>
+                <p><span>Categoria:</span> {{ usuario.get_categoria_display }}</p>
+                <p><span>Membro desde:</span> {{ usuario.date_joined|date:"d/m/Y" }}</p>
+            </div>
+            <div class="data-group">
+                {% if usuario.municipio %}
+                <p><span>Localização:</span> {{ usuario.municipio }} / {{ usuario.estado }}</p>
+                <p><span>País:</span> {{ usuario.pais|default:"Brasil" }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 
-<div class="card" style="display: block; margin-bottom: 20px;">
-    <h3>📊 Estatísticas de Jogo</h3>
-    <p><strong>🎮 Total de Partidas:</strong> {{ total_partidas }}</p>
-    <p><strong>✅ Partidas Ativas:</strong> {{ partidas_ativas }}</p>
-    <p><strong>🏁 Partidas Finalizadas:</strong> {{ partidas_finalizadas }}</p>
-    <p><strong>🏆 Total de Conquistas:</strong> {{ total_conquistas }}</p>
-</div>
+    <div class="dashboard-grid">
+        <div class="info-card stats-card">
+            <h3>Estatísticas de Jogo</h3>
+            <div class="simple-list">
+                <p><strong>Total de Partidas:</strong> {{ total_partidas }}</p>
+                <p><strong>Partidas Ativas:</strong> {{ partidas_ativas }}</p>
+                <p><strong>Partidas Finalizadas:</strong> {{ partidas_finalizadas }}</p>
+                <p><strong>Total de Conquistas:</strong> {{ total_conquistas }}</p>
+            </div>
+        </div>
 
-<div class="card" style="display: block; margin-bottom: 20px;">
-    <h3>🌟 Records</h3>
-    <p><strong>💰 Maior Saldo Alcançado:</strong> R$ {{ maior_saldo|floatformat:2 }}</p>
-    <p><strong>📈 Maior Valuation:</strong> R$ {{ maior_valuation|floatformat:2 }}</p>
-    <p><strong>⏱️ Maior Turno Alcançado:</strong> {{ maior_turno }}</p>
-</div>
-
-<a href="{% url 'dashboard' %}" class="btn btn-primary">Voltar ao Dashboard</a>
+        <div class="info-card stats-card">
+            <h3>Recordes Pessoais</h3>
+            <div class="simple-list">
+                <p><strong>Maior Saldo:</strong> R$ {{ maior_saldo|floatformat:2 }}</p>
+                <p><strong>Maior Valuation:</strong> R$ {{ maior_valuation|floatformat:2 }}</p>
+                <p><strong>Maior Turno:</strong> {{ maior_turno }}</p>
+            </div>
+        </div>
+    </div>
+</main>
 {% endblock %}

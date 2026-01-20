@@ -3,7 +3,7 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="login-page">
+
     <form class="login-container" method="post" action="{% url 'login' %}">
         {% csrf_token %}
         <h2 class="login-title">Login</h2>
@@ -13,5 +13,5 @@
     </form>
 
     <p class="signup-link text-center">Não tem uma conta? <a href="{% url 'registro' %}">Cadastre-se aqui</a></p>
-</div>
+
 {% endblock %}

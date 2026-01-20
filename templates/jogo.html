@@ -5,56 +5,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Jogo de simulação de startup no Venture Gotchi">
-    <meta name="keywords" content="jogo, startup, simulação, decisões">
-    <title>Jogando: {{ partida.nome_empresa }} - Venture Gotchi</title>
+    <title>Venture Gotchi - {{ partida.nome_empresa }}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <header>
-        <div class="header-title">Venture Gotchi: {{ partida.nome_empresa }}</div>
-        <nav>
-            <span>Turno Atual: {{ estado_startup.turno_atual }}</span>
-            <a href="{% url 'dashboard' %}">Voltar ao Dashboard</a>
-            <span class="user-greeting">| Olá, {{ user.username }}!</span>
-        </nav>
+    
+    {% if game_over or vitoria %}
+    <div class="overlay-endgame" style="display: flex !important;">
+        <div class="modal-endgame">
+            {% if vitoria %}
+                <h2 class="title-success">🏆 Objetivo Alcançado!</h2>
+                <p>Parabéns! Sua startup atingiu o patamar de unicórnio no mercado.</p>
+            {% else %}
+                <h2 class="title-danger">💀 Fim da Jornada</h2>
+                <p>O caixa zerou. Infelizmente a operação não resistiu aos custos operacionais.</p>
+            {% endif %}
+
+            <div class="endgame-stats">
+                <div class="stat-item">
+                    <span>Valuation Final</span>
+                    <strong>{{ estado_startup.valuation|moeda_br }}</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Turnos Sobrevividos</span>
+                    <strong>{{ estado_startup.turno_atual }}</strong>
+                </div>
+            </div>
+
+            <div class="endgame-actions">
+                <a href="{% url 'nova_partida' %}" class="btn-advance">Iniciar Nova Jornada</a>
+                <a href="{% url 'dashboard' %}" class="btn-outline">Voltar ao Menu</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-title">Venture Gotchi: {{ partida.nome_empresa }}</div>
+            <nav class="nav-menu">
+                <span class="turno-badge">Turno Atual: {{ estado_startup.turno_atual }}</span>
+                <a href="{% url 'dashboard' %}" class="btn-back-orange">Sair do Jogo</a>
+            </nav>
+        </div>
     </header>
 
-    <div class="game-container">
-        
-        <aside class="sidebar">
-            <h3>Métricas Atuais</h3>
-            
-            <div class="metric-box">
-                Caixa: <strong>{{ estado_startup.saldo_caixa|moeda_br }}</strong>
-            </div>
-            
-            <div class="metric-box">
-                Receita Mensal: <strong>{{ estado_startup.receita_mensal|moeda_br }}</strong>
-            </div>
-            
-            <div class="metric-box">
-                Valuation: <strong>{{ estado_startup.valuation|moeda_br }}</strong>
-            </div>
-            
-            <div class="metric-box">
-                Funcionários: <strong>{{ estado_startup.funcionarios }}</strong>
-            </div>
-            
-            <h3 class="mt-20">Histórico de Decisões</h3>
-            <div class="historico-log">
-                {% if historico_decisoes %}
-                    {% for decisao in historico_decisoes %}
-                        <p class="historico-item">
-                            T{{ decisao.turno }}: {{ decisao.decisao_tomada }} 
-                            <small>({{ decisao.data_decisao|date:"H:i" }})</small>
-                        </p>
-                    {% endfor %}
-                {% else %}
-                    <p>Nenhuma decisão registrada ainda.</p>
-                {% endif %}
-            </div>
+    <div id="choice-toast" class="choice-toast">Opção selecionada</div>
 
+    <div class="game-container">
+        <aside class="sidebar">
+            <h3>Métricas</h3>
+            <div class="metric-box">Caixa <strong>{{ estado_startup.saldo_caixa|moeda_br }}</strong></div>
+            <div class="metric-box">Receita <strong>{{ estado_startup.receita_mensal|moeda_br }}</strong></div>
+            <div class="metric-box">Valuation <strong>{{ estado_startup.valuation|moeda_br }}</strong></div>
+            <div class="metric-box">Equipe <strong>{{ estado_startup.funcionarios }}</strong></div>
+            
+            <h3 style="margin-top: 40px;">Histórico</h3>
+            <div class="historico-log">
+                {% for decisao in historico_decisoes %}
+                    <p class="log-item">T{{ decisao.turno }}: {{ decisao.decisao_tomada|truncatechars:20 }}</p>
+                {% empty %}
+                    <p class="log-empty">Início da jornada.</p>
+                {% endfor %}
+            </div>
         </aside>
 
         <section class="main-content">
@@ -66,89 +79,92 @@
                 </div>
             {% endif %}
 
-            <h2>Próxima Decisão (Turno {{ estado_startup.turno_atual|add:1 }})</h2>
-            
-            {% if estado_startup.receita_mensal > 0 %}
-            <p class="alert alert-success">
-                💰 No próximo turno você receberá <strong>{{ estado_startup.receita_mensal|moeda_br }}</strong> de receita mensal no seu caixa!
-            </p>
-            {% endif %}
-            
-            <p class="alert alert-info">
-                Atual cenário: Sua startup precisa decidir se investe em marketing agressivo ou contrata um novo engenheiro sênior. O que você faz?
-            </p>
-
-            <form method="post" action="{% url 'salvar_jogo' partida.id %}" class="mt-20">
-                {% csrf_token %}
-                
-                <h3>Escolha uma Opção</h3>
-                
-                <div class="decision-options">
-                    <label class="decision-option">
-                        <input type="radio" name="decisao" value="Investir em Marketing Agressivo" required>
-                        <div class="option-card">
-                            <h4>📢 Investir em Marketing</h4>
-                            <p>Aumenta a visibilidade da marca e atrai mais clientes.</p>
-                            <ul>
-                                <li>✅ Aumenta receita mensal em R$ 3.000</li>
-                                <li>✅ Receita é adicionada ao caixa a cada turno</li>
-                                <li>❌ Custo: R$ 5.000</li>
-                                <li>⏱️ Impacto: Permanente</li>
-                            </ul>
-                        </div>
-                    </label>
-
-                    <label class="decision-option">
-                        <input type="radio" name="decisao" value="Contratar Engenheiro Sênior" required>
-                        <div class="option-card">
-                            <h4>👨‍💻 Contratar Engenheiro</h4>
-                            <p>Melhora a qualidade do produto e aumenta a produtividade.</p>
-                            <ul>
-                                <li>✅ Aumenta valuation em R$ 25.000</li>
-                                <li>✅ Aumenta receita mensal em R$ 2.000</li>
-                                <li>✅ Adiciona 1 funcionário à equipe</li>
-                                <li>❌ Custo: R$ 8.000</li>
-                                <li>⏱️ Impacto: Permanente</li>
-                            </ul>
-                        </div>
-                    </label>
-
-                    <label class="decision-option">
-                        <input type="radio" name="decisao" value="Não fazer nada (Economizar)" required>
-                        <div class="option-card">
-                            <h4>💰 Economizar</h4>
-                            <p>Mantém o fluxo de caixa e acumula recursos.</p>
-                            <ul>
-                                <li>✅ Preserva caixa</li>
-                                <li>❌ Sem crescimento</li>
-                                <li>⏱️ Impacto: Nenhum</li>
-                            </ul>
-                        </div>
-                    </label>
+            {% if not game_over and not vitoria %}
+                <div class="decision-header">
+                    <h2>Turno {{ estado_startup.turno_atual|add:1 }}</h2>
+                    <p class="scenario-text">Escolha a estratégia para a <strong>{{ partida.nome_empresa }}</strong>:</p>
                 </div>
-                
-                <input type="hidden" name="saldo_atual" value="{{ estado_startup.saldo_caixa }}">
-                <button type="submit" class="btn btn-success" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 16px;">
-                    ✅ Confirmar Decisão e Avançar Turno
-                </button>
-            </form>
-            
+
+                <form method="post" action="{% url 'salvar_jogo' partida.id %}">
+                    {% csrf_token %}
+                    <div class="decision-grid">
+                        
+                        <label class="card-option">
+                            <input type="radio" name="decisao" value="Investir em Marketing Agressivo" required onclick="showToast('Marketing')">
+                            <div class="card-content">
+                                <div class="card-icon">📢</div>
+                                <div class="card-info">
+                                    <h4>Marketing</h4>
+                                    <p>Atração de novos clientes e visibilidade de marca.</p>
+                                    <div class="card-tags">
+                                        <span class="tag positive">+ R$ 3.000 receita</span>
+                                        <span class="tag negative">- R$ 5.000 custo</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="card-option">
+                            <input type="radio" name="decisao" value="Contratar Engenheiro Sênior" required onclick="showToast('Engenharia')">
+                            <div class="card-content">
+                                <div class="card-icon">👨‍💻</div>
+                                <div class="card-info">
+                                    <h4>Engenharia</h4>
+                                    <p>Aumento de valuation e robustez técnica do produto.</p>
+                                    <div class="card-tags">
+                                        <span class="tag positive">+ R$ 25.000 val.</span>
+                                        <span class="tag negative">- R$ 8.000 custo</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="card-option">
+                            <input type="radio" name="decisao" value="Não fazer nada (Economizar)" required onclick="showToast('Economizar')">
+                            <div class="card-content">
+                                <div class="card-icon">💰</div>
+                                <div class="card-info">
+                                    <h4>Economizar</h4>
+                                    <p>Preservação de capital e segurança financeira.</p>
+                                    <div class="card-tags">
+                                        <span class="tag neutral">Sem custos extras</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+
+                    </div>
+
+                    <button type="submit" class="btn-primary-lg">Confirmar e Avançar Turno</button>
+                </form>
+            {% else %}
+                <div class="end-warning">
+                    <h3>Simulação Encerrada</h3>
+                    <p>Confira seu desempenho final no relatório central.</p>
+                    <div style="margin-top: 20px;">
+                        <a href="{% url 'dashboard' %}" class="btn-back-orange">Sair do Jogo</a>
+                    </div>
+                </div>
+            {% endif %}
         </section>
     </div>
-    
-    <footer>
-        <p class="text-center mt-20">Venture Gotchi - Aprendendo Empreendedorismo</p>
-    </footer>
 
     <script>
-        // Auto-dismiss para mensagens dentro do jogo
+        function showToast(nome) {
+            const toast = document.getElementById('choice-toast');
+            toast.innerText = "Selecionado: " + nome;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2000);
+        }
+
         document.addEventListener('DOMContentLoaded', function(){
-            const inlines = document.querySelectorAll('.inline-messages .alert');
-            inlines.forEach((el) => {
-                setTimeout(()=>{
-                    el.classList.add('hide');
-                    setTimeout(()=> el.remove(), 600);
-                }, 5000);
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach((el) => {
+                setTimeout(() => {
+                    el.style.opacity = '0';
+                    el.style.transition = 'opacity 0.6s';
+                    setTimeout(() => el.remove(), 600);
+                }, 3000);
             });
         });
     </script>

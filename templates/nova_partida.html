@@ -4,56 +4,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Criar nova partida no Venture Gotchi">
-    <meta name="keywords" content="nova partida, startup, simulação">
     <title>Nova Partida - Venture Gotchi</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <header class="dashboard-header">
-        <nav>
-            <a href="{% url 'dashboard' %}" class="nav-link nav-link-primary">Dashboard</a> 
-            |
-            <span class="user-name">Olá, {{ user.username }}!</span>
-            |
-            <a href="{% url 'logout' %}" class="logout-link">Sair (Logout)</a>
-        </nav>
+    <header class="main-header">
+        <div class="header-logo">Venture Gotchi</div>
     </header>
 
-    <main class="container-sm">
-        
-        <h1>Defina Sua Startup</h1>
-        
-        <form method="post" action="{% url 'nova_partida' %}" class="form-card">
-            
-            {% csrf_token %}
-            <p class="form-intro">
-                Para começar, informe o nome da sua empresa.
-            </p>
+    <main class="dashboard-main">
+        <div class="header-container">
+            <h2 class="profile-title">Nova Partida</h2>
+            <a href="{% url 'dashboard' %}" class="btn-back-orange">← Voltar ao Dashboard</a>
+        </div>
 
-            <label for="nome_empresa" class="form-label">Nome da Startup:</label>
-            <input type="text" id="nome_empresa" name="nome_empresa" required 
-                   placeholder="Ex: Panthe Games"
-                   class="form-input">
-            
-            <label for="saldo_inicial" class="form-label">Saldo Inicial (R$):</label>
-            <input type="number" id="saldo_inicial" name="saldo_inicial" 
-                   required 
-                   min="0.01" 
-                   step="0.01" 
-                   placeholder="Ex: 50000"
-                   class="form-input">
-            <small class="form-help">Valor mínimo: R$ 0,01</small>
-            
-            <button type="submit" class="btn btn-success">
-                Iniciar Simulação
-            </button>
-            
-        </form>
+        <div style="display: flex; justify-content: center; width: 100%; margin-top: 30px;">
+            <div class="auth-card"> 
+                <h1>Defina Sua Startup</h1>
+                <p class="subtitle">Configure os parâmetros iniciais da sua jornada empreendedora.</p>
+                
+                <form method="post" action="{% url 'nova_partida' %}" class="form-standard">
+                    {% csrf_token %}
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label for="nome_empresa">Nome da Startup</label>
+                        <input type="text" id="nome_empresa" name="nome_empresa" required 
+                               placeholder="Ex: Panthe Games" class="input-field">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="saldo_inicial">Saldo Inicial (R$)</label>
+                        <input type="number" id="saldo_inicial" name="saldo_inicial" 
+                               required min="0.01" step="0.01" 
+                               placeholder="Ex: 50000" class="input-field">
+                        <small class="helper-text">Recomendado para iniciantes: R$ 50.000,00</small>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">
+                        Iniciar Simulação
+                    </button>
+                </form>
+            </div>
+        </div>
     </main>
 
-    <footer>
-        <p class="text-center">© 2025 - Venture Gotchi</p>
+    <footer class="footer-simple">
+        <p>© 2026 - Venture Gotchi</p>
     </footer>
 </body>
 </html>

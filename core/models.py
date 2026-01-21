@@ -1,20 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from decimal import Decimal
 from django.conf import settings
 
 class User(AbstractUser):
     class Categorias(models.TextChoices):
-        # Categorias para CPF
-        ALUNO = "ALUNO", "Aluno (CPF)"
-        PROFESSOR = "PROFESSOR", "Professor (CPF)"
-        STARTUP_PF = "STARTUP_PF", "Startup (CPF - Pré-formalizada)"
-        
-        # Categorias para CNPJ
-        STARTUP_PJ = "STARTUP_PJ", "Startup (CNPJ)"
-        EMPRESA = "EMPRESA", "Empresa (CNPJ)"
-        INSTITUICAO = "INSTITUICAO", "Instituição de Ensino (CNPJ)"
+        ESTUDANTE_UNIVERSITARIO = "ESTUDANTE_UNIVERSITARIO", "Estudante Universitário"
+        ASPIRANTE_EMPREENDEDOR = "ASPIRANTE_EMPREENDEDOR", "Aspirante a Empreendedor"
+        EDUCADOR_NEGOCIOS = "EDUCADOR_NEGOCIOS", "Educador de Negócios"
+        PROFISSIONAL_CORPORATIVO = "PROFISSIONAL_CORPORATIVO", "Profissional Corporativo"
 
     tipo_documento = models.CharField(
         max_length=4, 
@@ -22,29 +17,36 @@ class User(AbstractUser):
         default='CPF'
     )
     documento = models.CharField(max_length=18, unique=True, help_text="CPF ou CNPJ")
-    categoria = models.CharField(max_length=20, choices=Categorias.choices)
+    categoria = models.CharField(max_length=30, choices=Categorias.choices)
     municipio = models.CharField(max_length=100, verbose_name="Município", blank=True, null=True)
     estado = models.CharField(max_length=100, verbose_name="Estado", blank=True, null=True)
     pais = models.CharField(max_length=100, verbose_name="País", default="Brasil", blank=True, null=True)
+    codigo_turma = models.CharField(max_length=100, verbose_name="Código de Turma", blank=True, null=True, validators=[RegexValidator(r'^[A-Z]{3}-[0-9]{3}$', 'Código de Turma deve estar no formato AAA-999.')])
+    matricula_aluno = models.CharField(max_length=10, verbose_name="Matrícula do Aluno", blank=True, null=True, validators=[RegexValidator(r'^\d{1,10}$', 'Matrícula deve ter até 10 dígitos numéricos.')])
+    nome_instituicao = models.CharField(max_length=100, verbose_name="Nome da Instituição", blank=True, null=True)
+    area_atuacao = models.CharField(max_length=100, verbose_name="Área de Atuação", blank=True, null=True)
+    cnpj = models.CharField(max_length=18, verbose_name="CNPJ", blank=True, null=True, validators=[RegexValidator(r'^\d{14}$', 'CNPJ deve ter exatamente 14 dígitos.')])
+    nome_empresa = models.CharField(max_length=100, verbose_name="Nome da Empresa", blank=True, null=True)
 
     def __str__(self):
         return f"{self.username} - {self.categoria}"
     
     # Métodos de Permissões
     def is_estudante(self):
-        """Verifica se é Estudante/Aspirante (Aluno, Startup PF/PJ)"""
-        return self.categoria in [
-            self.Categorias.ALUNO,
-            self.Categorias.STARTUP_PF,
-            self.Categorias.STARTUP_PJ
-        ]
+        """Verifica se é Estudante Universitário"""
+        return self.categoria == self.Categorias.ESTUDANTE_UNIVERSITARIO
+    
+    def is_aspirante(self):
+        """Verifica se é Aspirante a Empreendedor"""
+        return self.categoria == self.Categorias.ASPIRANTE_EMPREENDEDOR
     
     def is_educador(self):
-        """Verifica se é Educador de Negócios (Professor, Instituição)"""
-        return self.categoria in [
-            self.Categorias.PROFESSOR,
-            self.Categorias.INSTITUICAO
-        ]
+        """Verifica se é Educador de Negócios"""
+        return self.categoria == self.Categorias.EDUCADOR_NEGOCIOS
+    
+    def is_profissional(self):
+        """Verifica se é Profissional Corporativo"""
+        return self.categoria == self.Categorias.PROFISSIONAL_CORPORATIVO
     
     def is_empresa(self):
         """Verifica se é Empresa"""

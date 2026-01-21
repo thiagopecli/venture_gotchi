@@ -3,15 +3,32 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
+<div style="display: flex; width: 100%; max-width: 1100px; align-items: center; justify-content: center; gap: 100px; padding: 40px 20px;">
+    
+    <div style="flex: 1; text-align: left; max-width: 480px;">
+        <h1 style="color: var(--primary); font-size: 3.5rem; font-weight: 800; margin-bottom: 10px; line-height: 1;">Venture Gotchi</h1>
+        <p style="font-size: 1.3rem; font-weight: 600; color: var(--text-main); margin-bottom: 30px;">Aprendendo Empreendedorismo na Prática.</p>
+        
+        <p style="font-size: 1.1rem; line-height: 1.6; color: var(--text-muted);">
+            No <strong>VentureGotchi</strong>, através de um simulador prático e totalmente gamificado, você toma decisões reais, 
+            gerencia sua própria startup e aprende sobre o mundo dos negócios sem riscos. 
+            <span style="color: var(--primary); font-weight: 700;">Da Ideia ao Sucesso!</span>
+        </p>
+    </div>
 
-    <form class="login-container" method="post" action="{% url 'login' %}">
-        {% csrf_token %}
-        <h2 class="login-title">Login</h2>
-        {{ form.as_p }}
+    <div style="flex: 0 0 420px;">
+        <form class="login-container" method="post" action="{% url 'login' %}" style="margin-bottom: 15px; border: 1px solid var(--border); box-shadow: var(--shadow); padding: 40px; border-radius: var(--radius); background: var(--bg-white);">
+            {% csrf_token %}
+            <h2 class="login-title" style="margin-bottom: 25px;">Login</h2>
+            {{ form.as_p }}
 
-        <button class="btn-login" type="submit">Entrar</button>
-    </form>
+            <button class="btn-login" type="submit">Entrar</button>
+        </form>
+        
+        <p class="signup-link" style="text-align: center; margin-top: 20px;">
+            Não tem uma conta? <a href="{% url 'registro' %}" style="color: var(--primary); font-weight: 700;">Cadastre-se aqui</a>
+        </p>
+    </div>
 
-    <p class="signup-link text-center">Não tem uma conta? <a href="{% url 'registro' %}">Cadastre-se aqui</a></p>
-
+</div>
 {% endblock %}

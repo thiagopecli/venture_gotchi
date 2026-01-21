@@ -41,17 +41,6 @@ def registro_view(request):
 from .models import ConquistaDesbloqueada, Partida, Startup, HistoricoDecisao 
 from django.db.models import Prefetch
 
-def registro_view(request):
-    if request.method == 'POST':
-        form = CadastroUsuarioForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('login')
-    else:
-        form = CadastroUsuarioForm()
-    
-    return render(request, 'registro.html', {'form': form})
-
 @login_required 
 def dashboard(request):
     """
@@ -345,13 +334,16 @@ def redirect_handler(request):
     """Encaminha o usuário baseado na Categoria definida no seu Models"""
     cat = request.user.categoria
 
-    if cat in [User.Categorias.ALUNO, User.Categorias.PROFESSOR]:
-        return redirect('dashboard_academico')
+    if cat == User.Categorias.ESTUDANTE_UNIVERSITARIO:
+        return redirect('dashboard')  # ou algum dashboard específico
     
-    elif cat in [User.Categorias.STARTUP_PF, User.Categorias.STARTUP_PJ]:
-        return redirect('dashboard_startup')
+    elif cat == User.Categorias.ASPIRANTE_EMPREENDEDOR:
+        return redirect('dashboard')
     
-    elif cat in [User.Categorias.EMPRESA, User.Categorias.INSTITUICAO]:
-        return redirect('dashboard_corporativo')
+    elif cat == User.Categorias.EDUCADOR_NEGOCIOS:
+        return redirect('dashboard')
+    
+    elif cat == User.Categorias.PROFISSIONAL_CORPORATIVO:
+        return redirect('dashboard')
 
-    return redirect('home')
+    return redirect('dashboard')

@@ -1,18 +1,133 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="form-container"> <h2 class="form-title">Criar Nova Conta</h2> <form method="post" action="{% url 'registro' %}" novalidate>
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+<div class="form-container"> <h2 class="form-title">Criar Nova Conta</h2> <form method="post" action="{% url 'registro' %}" novalidate id="registro-form">
         {% csrf_token %}
         
         {% for field in form %}
-            <div class="field-group">
-                <label>{{ field.label }}</label>
-                {{ field }}
-                {% if field.help_text %}
-                    <small class="help-text">{{ field.help_text }}</small>
-                {% endif %}
-            </div>
+            {% if field.name == 'tipo_documento' %}
+                <div class="field-group" id="tipo_documento_group" style="display: none;">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error">{{ field.errors }}</div>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% elif field.name == 'documento' %}
+                <div class="field-group" id="documento_group" style="display: none;">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error">{{ field.errors }}</div>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% elif field.name == 'codigo_turma' %}
+                <div class="field-group" id="codigo_turma_group" style="display: none;">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error">{{ field.errors }}</div>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% elif field.name == 'matricula_aluno' %}
+                <div class="field-group" id="matricula_aluno_group" style="display: none;">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error">{{ field.errors }}</div>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% elif field.name == 'cpf' %}
+                <div class="field-group" id="cpf_group" style="display: none;">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error">{{ field.errors }}</div>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% elif field.name == 'nome_instituicao' %}
+                <div class="field-group" id="nome_instituicao_group" style="display: none;">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error">{{ field.errors }}</div>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% elif field.name == 'area_atuacao' %}
+                <div class="field-group" id="area_atuacao_group" style="display: none;">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error">{{ field.errors }}</div>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% elif field.name == 'cnpj' %}
+                <div class="field-group" id="cnpj_group" style="display: none;">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error">{{ field.errors }}</div>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% elif field.name == 'nome_empresa' %}
+                <div class="field-group" id="nome_empresa_group" style="display: none;">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error">{{ field.errors }}</div>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="field-group">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error">{{ field.errors }}</div>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% endif %}
         {% endfor %}
+
+        {% if form.non_field_errors %}
+            <div class="error">{{ form.non_field_errors }}</div>
+        {% endif %}
 
         <button type="submit" class="btn-primary">Finalizar Cadastro</button>
 
@@ -21,4 +136,65 @@
         </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const categoriaSelect = document.querySelector('select[name="categoria"]');
+    const codigoTurmaGroup = document.getElementById('codigo_turma_group');
+    const matriculaAlunoGroup = document.getElementById('matricula_aluno_group');
+    const cpfGroup = document.getElementById('cpf_group');
+    const nomeInstituicaoGroup = document.getElementById('nome_instituicao_group');
+    const areaAtuacaoGroup = document.getElementById('area_atuacao_group');
+    const cnpjGroup = document.getElementById('cnpj_group');
+    const nomeEmpresaGroup = document.getElementById('nome_empresa_group');
+
+    function toggleFields() {
+        const categoria = categoriaSelect.value;
+        // Hide all
+        codigoTurmaGroup.style.display = 'none';
+        matriculaAlunoGroup.style.display = 'none';
+        cpfGroup.style.display = 'none';
+        nomeInstituicaoGroup.style.display = 'none';
+        areaAtuacaoGroup.style.display = 'none';
+        cnpjGroup.style.display = 'none';
+        nomeEmpresaGroup.style.display = 'none';
+
+        // Make fields not required
+        document.querySelector('input[name="codigo_turma"]').required = false;
+        document.querySelector('input[name="matricula_aluno"]').required = false;
+        document.querySelector('input[name="cpf"]').required = false;
+        document.querySelector('input[name="nome_instituicao"]').required = false;
+        document.querySelector('input[name="area_atuacao"]').required = false;
+        document.querySelector('input[name="cnpj"]').required = false;
+        document.querySelector('input[name="nome_empresa"]').required = false;
+
+        // Show based on category
+        if (categoria === 'ESTUDANTE_UNIVERSITARIO') {
+            codigoTurmaGroup.style.display = 'block';
+            matriculaAlunoGroup.style.display = 'block';
+            document.querySelector('input[name="codigo_turma"]').required = true;
+            document.querySelector('input[name="matricula_aluno"]').required = true;
+        } else if (categoria === 'EDUCADOR_NEGOCIOS') {
+            cpfGroup.style.display = 'block';
+            nomeInstituicaoGroup.style.display = 'block';
+            document.querySelector('input[name="cpf"]').required = true;
+            document.querySelector('input[name="nome_instituicao"]').required = true;
+        } else if (categoria === 'ASPIRANTE_EMPREENDEDOR') {
+            cpfGroup.style.display = 'block';
+            areaAtuacaoGroup.style.display = 'block';
+            document.querySelector('input[name="cpf"]').required = true;
+            document.querySelector('input[name="area_atuacao"]').required = true;
+        } else if (categoria === 'PROFISSIONAL_CORPORATIVO') {
+            cnpjGroup.style.display = 'block';
+            nomeEmpresaGroup.style.display = 'block';
+            document.querySelector('input[name="cnpj"]').required = true;
+            document.querySelector('input[name="nome_empresa"]').required = true;
+        }
+    }
+
+    categoriaSelect.addEventListener('change', toggleFields);
+    // Initial check
+    toggleFields();
+});
+</script>
 {% endblock %}

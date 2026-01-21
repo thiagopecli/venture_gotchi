@@ -2,6 +2,49 @@
 
 {% block title %} Ranking - Venture Gotchi {% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Estilos para o Ranking de Negócios */
+    .modern-table tbody tr.highlight-row {
+        background-color: rgba(255, 152, 0, 0.1) !important;
+        border-left: 4px solid #ff9800;
+    }
+
+    .rank-number {
+        font-weight: bold;
+        width: 50px;
+    }
+
+    /* Cores do Pódio */
+    .rank-1 { color: #FFD700; font-size: 1.2rem; } /* Ouro */
+    .rank-2 { color: #C0C0C0; font-size: 1.1rem; } /* Prata */
+    .rank-3 { color: #CD7F32; font-size: 1.05rem; } /* Bronze */
+
+    .badge-tipo {
+        font-size: 0.65rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        text-transform: uppercase;
+        font-weight: bold;
+        display: inline-block;
+        margin-top: 4px;
+    }
+
+    .badge-pj { background-color: #e3f2fd; color: #0d47a1; border: 1px solid #bbdefb; }
+    .badge-pf { background-color: #f5f5f5; color: #616161; border: 1px solid #e0e0e0; }
+    
+    .font-bold { font-weight: 800 !important; }
+    .me-badge {
+        background: #ff9800;
+        color: white;
+        font-size: 0.6rem;
+        padding: 2px 5px;
+        border-radius: 3px;
+        margin-left: 5px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <main class="dashboard-main">
     <div class="header-container">
@@ -26,8 +69,8 @@
                 <tr>
                     <th>#</th>
                     <th>Empresa</th>
-                    <th>Fundador</th>
-                    <th class="text-right">Valuation</th>
+                    <th>Fundador (Tipo)</th>
+                    <th class="text-right">Valuation Final</th>
                     <th class="text-right">Saldo</th>
                     <th class="text-center">Turno</th>
                     <th class="text-center">Funcionários</th>
@@ -38,16 +81,32 @@
                 {% for startup in startups %}
                 <tr class="{% if startup.partida.usuario == user %}highlight-row{% endif %}">
                     <td class="rank-number">
-                        {% if forloop.counter == 1 %}1º{% elif forloop.counter == 2 %}2º{% elif forloop.counter == 3 %}3º{% else %}{{ forloop.counter }}{% endif %}
+                        {% if forloop.counter == 1 %}
+                            <span class="rank-1">1º</span>
+                        {% elif forloop.counter == 2 %}
+                            <span class="rank-2">2º</span>
+                        {% elif forloop.counter == 3 %}
+                            <span class="rank-3">3º</span>
+                        {% else %}
+                            {{ forloop.counter }}º
+                        {% endif %}
                     </td>
                     <td>
-                        <span class="company-name">{{ startup.partida.nome_empresa }}</span>
+                        <span class="company-name">{{ startup.partida.nome_empresa|default:startup.nome }}</span>
                         {% if startup.partida.usuario == user %}<span class="me-badge">VOCÊ</span>{% endif %}
                     </td>
-                    <td>{{ startup.partida.usuario.get_full_name|default:startup.partida.usuario.username }}</td>
+                    <td>
+                        {{ startup.partida.usuario.get_full_name|default:startup.partida.usuario.username }}
+                        <br>
+                        {% if startup.partida.usuario.is_pj %} 
+                            <span class="badge-tipo badge-pj">Pessoa Jurídica</span>
+                        {% else %}
+                            <span class="badge-tipo badge-pf">Pessoa Física</span>
+                        {% endif %}
+                    </td>
                     
                     <td class="text-right color-primary {% if criterio == 'valuation' %}font-bold{% endif %}">
-                        R$ {{ startup.valuation|floatformat:2 }}
+                        <strong>R$ {{ startup.valuation|floatformat:2 }}</strong>
                     </td>
                     
                     <td class="text-right color-success {% if criterio == 'saldo' %}font-bold{% endif %}">
@@ -72,7 +131,7 @@
     <div class="ranking-footer">
         <p>Exibindo top {{ startups|length }} startups ativas.</p>
         {% if user.is_educador %}
-            <span class="educator-note">💡 Modo Educador: Visualização total habilitada.</span>
+            <span class="educator-note">💡 Modo Educador: Visualização total de perfis PF/PJ habilitada.</span>
         {% endif %}
     </div>
 

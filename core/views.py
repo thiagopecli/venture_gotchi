@@ -340,6 +340,7 @@ def ranking(request):
     }
     
     return render(request, 'ranking.html', context)
+
 def redirect_handler(request):
     """Encaminha o usuário baseado na Categoria definida no seu Models"""
     cat = request.user.categoria

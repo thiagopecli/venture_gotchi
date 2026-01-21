@@ -7,6 +7,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('registro/', views.registro_view, name='registro'),
+    path('redirect/', views.redirect_handler, name='redirect_handler'),
     path('', views.dashboard, name='dashboard'), 
     path('nova/', views.nova_partida, name='nova_partida'), 
     path('salvar/<int:partida_id>/', views.salvar_jogo, name='salvar_jogo'), 

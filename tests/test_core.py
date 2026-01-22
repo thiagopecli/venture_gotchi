@@ -971,6 +971,14 @@ class PermissionTests(TestCase):
 			documento="11122233344",
 			categoria="ASPIRANTE_EMPREENDEDOR"
 		)
+		
+		self.profissional = User.objects.create_user(
+			username="professional",
+			email="professional@example.com",
+			password="pass1234",
+			documento="55566677788",
+			categoria="PROFISSIONAL_CORPORATIVO"
+		)
 	
 	def test_estudante_pode_criar_partida(self):
 		"""Teste: Estudante pode criar nova partida"""
@@ -1004,6 +1012,41 @@ class PermissionTests(TestCase):
 		from django.urls import reverse
 		
 		self.client.login(username="educator", password="pass1234")
+		
+		response = self.client.get(reverse('ranking'))
+		self.assertEqual(response.status_code, 200)
+	def test_aspirante_pode_criar_partida(self):
+		"""Teste: Aspirante pode criar nova partida"""
+		from django.urls import reverse
+		
+		self.client.login(username="aspirant", password="pass1234")
+		
+		response = self.client.get(reverse('nova_partida'))
+		self.assertEqual(response.status_code, 200)
+
+	def test_profissional_pode_criar_partida(self):
+		"""Teste: Profissional Corporativo pode criar partida"""
+		from django.urls import reverse
+		
+		self.client.login(username="professional", password="pass1234")
+		
+		response = self.client.get(reverse('nova_partida'))
+		self.assertEqual(response.status_code, 200)
+
+	def test_ranking_acessivel_para_profissional(self):
+		"""Teste: Profissional Corporativo pode acessar ranking"""
+		from django.urls import reverse
+		
+		self.client.login(username="professional", password="pass1234")
+		
+		response = self.client.get(reverse('ranking'))
+		self.assertEqual(response.status_code, 200)
+
+	def test_ranking_acessivel_para_aspirante(self):
+		"""Teste: Aspirante pode acessar ranking"""
+		from django.urls import reverse
+		
+		self.client.login(username="aspirant", password="pass1234")
 		
 		response = self.client.get(reverse('ranking'))
 		self.assertEqual(response.status_code, 200)

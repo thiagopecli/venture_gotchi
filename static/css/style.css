@@ -596,6 +596,11 @@ main.dashboard-main {
    ALERTAS E MENSAGENS DE CONFIRMAÇÃO (SISTEMA)
    ========================================================================== */
 
+.messages-container {
+    margin: 20px 5%;
+    max-width: 1200px;
+}
+
 .inline-messages {
     margin-bottom: 25px;
     width: 100%;
@@ -1263,4 +1268,42 @@ main {
 .login-footer-text {
     margin-top: 20px;
     font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   TABELAS (Dashboard Educador & Ranking)
+   ========================================================================== */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.custom-table th {
+    text-align: left;
+    padding: 12px 15px;
+    background-color: var(--bg-light);
+    color: var(--text-muted);
+    font-weight: 700;
+    border-bottom: 2px solid var(--border);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.custom-table td {
+    padding: 14px 15px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-main);
+}
+
+.custom-table tr:last-child td {
+    border-bottom: none;
+}
+
+.custom-table tr:hover {
+    background-color: #fff9f5; /* Leve tom laranja no hover */
 }

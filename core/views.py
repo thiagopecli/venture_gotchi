@@ -12,6 +12,8 @@ from core.services.conquistas import verificar_conquistas_partida, verificar_con
 from .models import User, Partida, Startup, HistoricoDecisao 
 from django.db.models import Prefetch
 from .forms import EditarPerfilForm
+from django.db.models import Avg, Max, Count, Sum
+from django.core.exceptions import PermissionDenied
 
 def formatar_moeda_br(valor):
     """
@@ -299,27 +301,35 @@ def conquistas(request):
 @pode_acessar_ranking
 def ranking(request):
     """
-    Exibe ranking das startups por diferentes critérios.
-    Disponível para Estudantes e Educadores.
+    Exibe ranking das startups com filtro de turma para Educadores.
     """
     from django.db.models import Max, Count, Q
     
-    # Determinar critério de ordenação
+    # 1. Captura parâmetros
     criterio = request.GET.get('criterio', 'valuation')
+    codigo_turma = request.GET.get('codigo_turma', '').strip() # Novo
     
-    # Buscar todas as startups ativas
+    # 2. Queryset Base (Apenas startups ativas)
     startups = (
         Startup.objects
         .select_related('partida', 'partida__usuario')
         .filter(partida__ativa=True)
     )
     
-    # Anotar com informações adicionais
+    # 3. Lógica de Filtro por Turma (Exclusivo Educador/Admin)
+    # Verifica se é educador para permitir o filtro
+    is_educador = request.user.categoria == User.Categorias.EDUCADOR_NEGOCIOS or request.user.is_superuser
+    
+    if is_educador and codigo_turma:
+        # Filtra pelo campo codigo_turma do Usuário dono da partida
+        startups = startups.filter(partida__usuario__codigo_turma__iexact=codigo_turma)
+
+    # 4. Anotações
     startups = startups.annotate(
         total_conquistas=Count('partida__conquistas')
     )
     
-    # Ordenar baseado no critério
+    # 5. Ordenação
     if criterio == 'valuation':
         startups = startups.order_by('-valuation', '-saldo_caixa')
         titulo = 'Ranking por Valuation'
@@ -343,6 +353,8 @@ def ranking(request):
         'startups': startups,
         'criterio': criterio,
         'titulo': titulo,
+        'is_educador': is_educador, 
+        'filtro_turma': codigo_turma
     }
     
     return render(request, 'ranking.html', context)
@@ -379,3 +391,77 @@ def editar_perfil(request):
         form = EditarPerfilForm(instance=request.user)
     
     return render(request, 'editar_perfil.html', {'form': form})
+
+def educador_only(view_func):
+    """Decorator para garantir que apenas Educadores acessem"""
+    def _wrapped_view(request, *args, **kwargs):
+        if request.user.categoria != User.Categorias.EDUCADOR_NEGOCIOS and not request.user.is_superuser:
+            return redirect('dashboard')
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+@login_required
+@educador_only
+def educador_dashboard(request):
+
+    codigo_turma = request.GET.get('codigo_turma', '').strip()
+    
+    
+    partidas = Partida.objects.filter(ativa=True)
+    users_alunos = User.objects.filter(categoria=User.Categorias.ESTUDANTE_UNIVERSITARIO)
+
+    
+    if codigo_turma:
+        
+        partidas = partidas.filter(usuario__codigo_turma__iexact=codigo_turma)
+        users_alunos = users_alunos.filter(codigo_turma__iexact=codigo_turma)
+
+    
+    kpis = Startup.objects.filter(partida__in=partidas).aggregate(
+        media_valuation=Avg('valuation'),
+        media_caixa=Avg('saldo_caixa'),
+        maior_valuation=Max('valuation'),
+        total_startups=Count('id')
+    )
+
+    
+    ranking = (
+        Startup.objects
+        .select_related('partida', 'partida__usuario')
+        .filter(partida__in=partidas)
+        .order_by('-valuation')[:20]
+    )
+
+    context = {
+        'kpis': kpis,
+        'ranking': ranking,
+        'filtro_atual': codigo_turma,
+        'total_alunos': users_alunos.count()
+    }
+
+    return render(request, 'educador_dashboard.html', context)
+
+import random
+import string
+
+@login_required
+@educador_required
+def gerar_codigo_turma(request):
+    """
+    Gera um código único de turma para educadores.
+    """
+    if request.method == 'POST':
+        while True:
+            letras = ''.join(random.choices(string.ascii_uppercase, k=3))
+            numeros = ''.join(random.choices(string.digits, k=3))
+            codigo = f"{letras}-{numeros}"
+            
+            
+            if not User.objects.filter(codigo_turma=codigo).exists():
+                break
+        
+        
+        messages.success(request, f'Código de turma gerado: {codigo}')
+        return redirect('dashboard')
+    
+    return redirect('dashboard')

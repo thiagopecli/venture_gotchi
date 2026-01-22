@@ -53,13 +53,41 @@
         <a href="{% url 'dashboard' %}" class="btn-back-orange">← Voltar ao Dashboard</a>
     </div>
 
+    {% if is_educador %}
+    <section class="info-card" style="margin-bottom: 20px; border: 1px solid var(--primary);">
+        <form method="GET" style="display: flex; gap: 10px; align-items: center;">
+            <input type="hidden" name="criterio" value="{{ criterio }}">
+            
+            <label for="codigo_turma" style="font-weight: 700; color: var(--text-main);">Filtrar por Turma:</label>
+            <input type="text" name="codigo_turma" id="codigo_turma" 
+                   value="{{ filtro_turma }}" placeholder="Ex: TURMA_A" 
+                   style="margin-bottom: 0; flex: 1; padding: 8px;">
+            
+            <button type="submit" class="btn-primary" style="width: auto; margin-top: 0; padding: 8px 20px;">
+                Buscar
+            </button>
+            
+            {% if filtro_turma %}
+                <a href="{% url 'ranking' %}?criterio={{ criterio }}" style="font-size: 0.8rem; color: var(--text-muted);">Limpar Filtro</a>
+            {% endif %}
+        </form>
+    </section>
+    {% endif %}
+
     <section class="ranking-filter-section">
         <h3>Filtrar por:</h3>
         <div class="filter-group">
-            <a href="{% url 'ranking' %}?criterio=valuation" class="filter-btn {% if criterio == 'valuation' %}active{% endif %}">Valuation</a>
-            <a href="{% url 'ranking' %}?criterio=saldo" class="filter-btn {% if criterio == 'saldo' %}active{% endif %}">Saldo em Caixa</a>
-            <a href="{% url 'ranking' %}?criterio=turno" class="filter-btn {% if criterio == 'turno' %}active{% endif %}">Turno Alcançado</a>
-            <a href="{% url 'ranking' %}?criterio=conquistas" class="filter-btn {% if criterio == 'conquistas' %}active{% endif %}">Conquistas</a>
+            <a href="{% url 'ranking' %}?criterio=valuation{% if filtro_turma %}&codigo_turma={{ filtro_turma }}{% endif %}" 
+               class="filter-btn {% if criterio == 'valuation' %}active{% endif %}">Valuation</a>
+            
+            <a href="{% url 'ranking' %}?criterio=saldo{% if filtro_turma %}&codigo_turma={{ filtro_turma }}{% endif %}" 
+               class="filter-btn {% if criterio == 'saldo' %}active{% endif %}">Saldo em Caixa</a>
+            
+            <a href="{% url 'ranking' %}?criterio=turno{% if filtro_turma %}&codigo_turma={{ filtro_turma }}{% endif %}" 
+               class="filter-btn {% if criterio == 'turno' %}active{% endif %}">Turno Alcançado</a>
+            
+            <a href="{% url 'ranking' %}?criterio=conquistas{% if filtro_turma %}&codigo_turma={{ filtro_turma }}{% endif %}" 
+               class="filter-btn {% if criterio == 'conquistas' %}active{% endif %}">Conquistas</a>
         </div>
     </section>
 

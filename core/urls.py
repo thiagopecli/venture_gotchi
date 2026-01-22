@@ -18,4 +18,6 @@ urlpatterns = [
     path('conquistas/', views.conquistas, name='conquistas'),
     path('ranking/', views.ranking, name='ranking'),
     path('perfil/editar/', views.editar_perfil, name='editar_perfil'),
+    path('educador/', views.educador_dashboard, name='educador_dashboard'),
+    path('gerar-codigo-turma/', views.gerar_codigo_turma, name='gerar_codigo_turma'),
 ]

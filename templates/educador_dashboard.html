@@ -1,0 +1,94 @@
+{% extends 'base.html' %} {% block content %}
+<main class="dashboard-main">
+    
+    <div class="header-container">
+        <div>
+            <h1 class="header-title">Painel do Educador</h1>
+            <p style="color: var(--text-muted);">Acompanhamento de desempenho e ranking das turmas.</p>
+        </div>
+        <div class="cta-container">
+            <a href="{% url 'ranking' %}" class="btn-primary-dash" style="background-color: #4D4D4D !important;">Ver Ranking Global</a>
+        </div>
+    </div>
+
+    <div class="info-card" style="margin-bottom: 30px; padding: 20px;">
+        <form method="GET" style="display: flex; gap: 15px; align-items: flex-end;">
+            <div style="flex: 1;">
+                <label for="codigo_turma" style="font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; display:block;">Filtrar por Código da Turma:</label>
+                <input type="text" name="codigo_turma" id="codigo_turma" value="{{ filtro_atual }}" 
+                       placeholder="Ex: TURMA-2024-A" style="margin-bottom: 0;">
+            </div>
+            <button type="submit" class="btn-primary" style="width: auto; margin-top: 0; padding: 10px 24px;">Filtrar</button>
+            {% if filtro_atual %}
+                <a href="{% url 'educador_dashboard' %}" class="btn-outline" style="padding: 10px 24px; text-decoration: none; border: 1px solid var(--border);">Limpar</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); gap: 20px;">
+        
+        <div class="info-card" style="text-align: center;">
+            <h3>Média Valuation</h3>
+            <p style="font-size: 1.4rem; font-weight: 800; color: var(--primary);">
+                R$ {{ kpis.media_valuation|floatformat:2|default:"0,00" }}
+            </p>
+        </div>
+
+        <div class="info-card" style="text-align: center;">
+            <h3>Caixa Médio</h3>
+            <p style="font-size: 1.4rem; font-weight: 800; color: var(--text-main);">
+                R$ {{ kpis.media_caixa|floatformat:2|default:"0,00" }}
+            </p>
+        </div>
+
+        <div class="info-card" style="text-align: center;">
+            <h3>Top Recorde</h3>
+            <p style="font-size: 1.4rem; font-weight: 800; color: #28a745;">
+                R$ {{ kpis.maior_valuation|floatformat:2|default:"0,00" }}
+            </p>
+        </div>
+
+        <div class="info-card" style="text-align: center;">
+            <h3>Startups Ativas</h3>
+            <p style="font-size: 1.4rem; font-weight: 800; color: var(--text-muted);">
+                {{ kpis.total_startups|default:"0" }}
+            </p>
+        </div>
+    </div>
+
+    <div class="info-card" style="margin-top: 30px;">
+        <h3 style="margin-bottom: 20px; color: var(--text-main);">Ranking da Turma {{ filtro_atual }}</h3>
+        
+        {% if ranking %}
+        <div class="table-responsive">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Estudante</th>
+                        <th>Empresa</th>
+                        <th>Turno</th>
+                        <th>Valuation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for startup in ranking %}
+                    <tr>
+                        <td style="font-weight: bold;">{{ forloop.counter }}º</td>
+                        <td>{{ startup.partida.usuario.username }}</td> <td>{{ startup.partida.nome_empresa }}</td>
+                        <td>{{ startup.turno_atual }}</td>
+                        <td style="font-weight: bold; color: var(--primary);">R$ {{ startup.valuation|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <div class="empty-state-container">
+                <span class="empty-state">Nenhum dado encontrado para esta seleção.</span>
+            </div>
+        {% endif %}
+    </div>
+
+</main>
+{% endblock %}

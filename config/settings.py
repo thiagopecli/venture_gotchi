@@ -20,10 +20,10 @@ load_dotenv(BASE_DIR / ".env")
 SECRET_KEY = os.getenv("SECRET_KEY", "chave-insegura-fallback-para-dev")
 
 # Lê do ambiente. Retorna 'True' se o valor for "True", senão False.
-DEBUG = os.getenv("DEBUG", "False") == "True"
+DEBUG = True
 
 # Hosts permitidos
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
 # O Render define a variável RENDER_EXTERNAL_HOSTNAME automaticamente
 render_host = os.getenv("RENDER_EXTERNAL_HOSTNAME")

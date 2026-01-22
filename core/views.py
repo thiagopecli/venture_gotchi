@@ -11,6 +11,7 @@ from decimal import Decimal
 from core.services.conquistas import verificar_conquistas_partida, verificar_conquistas_progesso
 from .models import User, Partida, Startup, HistoricoDecisao 
 from django.db.models import Prefetch
+from .forms import EditarPerfilForm
 
 class PaginaLogin(LoginView):
     template_name = 'login.html'
@@ -347,3 +348,18 @@ def redirect_handler(request):
         return redirect('dashboard')
 
     return redirect('dashboard')
+
+@login_required
+def editar_perfil(request):
+    if request.method == 'POST':
+        form = EditarPerfilForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Perfil atualizado com sucesso!')
+            return redirect('perfil')
+        else:
+            messages.error(request, 'Erro ao atualizar perfil. Verifique os campos.')
+    else:
+        form = EditarPerfilForm(instance=request.user)
+    
+    return render(request, 'editar_perfil.html', {'form': form})

@@ -17,4 +17,5 @@ urlpatterns = [
     path('metricas/<int:partida_id>/', views.metricas, name='metricas'),
     path('conquistas/', views.conquistas, name='conquistas'),
     path('ranking/', views.ranking, name='ranking'),
+    path('perfil/editar/', views.editar_perfil, name='editar_perfil'),
 ]

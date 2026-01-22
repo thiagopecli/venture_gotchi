@@ -69,3 +69,38 @@ class CadastroUsuarioForm(UserCreationForm):
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError('Este e-mail já está em uso.')
         return email
+    
+class EditarPerfilForm(forms.ModelForm):
+    first_name = forms.CharField(label="Nome Completo", required=True)
+    email = forms.EmailField(label="E-mail", required=True)
+    codigo_turma = forms.CharField(label="Código de Turma", required=False, max_length=100, validators=[RegexValidator(r'^[A-Z]{3}-[0-9]{3}$', 'Formato AAA-999.')])
+    matricula_aluno = forms.CharField(label="Matrícula", required=False, max_length=10)
+    cpf = forms.CharField(label="CPF", required=False, max_length=18)
+    cnpj = forms.CharField(label="CNPJ", required=False, max_length=18)
+
+    class Meta:
+        model = User
+        fields = [
+            'first_name', 'email', 'municipio', 'estado', 'pais', 
+            'codigo_turma', 'matricula_aluno', 'cpf', 'nome_instituicao', 
+            'area_atuacao', 'cnpj', 'nome_empresa'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['codigo_turma'].widget.attrs.update({'class': 'estudante-field'})
+        self.fields['matricula_aluno'].widget.attrs.update({'class': 'estudante-field'})
+        self.fields['cpf'].widget.attrs.update({'class': 'educador-field aspirante-field'})
+        self.fields['nome_instituicao'].widget.attrs.update({'class': 'educador-field'})
+        self.fields['area_atuacao'].widget.attrs.update({'class': 'aspirante-field'})
+        self.fields['cnpj'].widget.attrs.update({'class': 'profissional-field'})
+        self.fields['nome_empresa'].widget.attrs.update({'class': 'profissional-field'})
+
+    def clean(self):
+        cleaned_data = super().clean()
+        categoria = self.instance.categoria
+        
+        
+        if categoria == 'ESTUDANTE_UNIVERSITARIO' and not cleaned_data.get('codigo_turma'):
+            self.add_error('codigo_turma', 'Campo obrigatório para estudantes.')
+        return cleaned_data

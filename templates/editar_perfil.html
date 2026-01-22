@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<main class="dashboard-main" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    <h2>Editar Perfil: {{ request.user.get_categoria_display }}</h2>
+
+    <form method="post" id="edit-profile-form">
+        {% csrf_token %}
+        <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            {% for field in form %}
+                <div class="field-wrapper" data-field-name="{{ field.name }}" style="margin-bottom: 10px;">
+                    <label><strong>{{ field.label }}</strong></label>
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn-login" style="margin-top: 20px;">Salvar</button>
+    </form>
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const categoria = "{{ request.user.categoria }}";
+    const allWrappers = document.querySelectorAll('.field-wrapper');
+
+    
+    const camposPorCategoria = {
+        'ESTUDANTE_UNIVERSITARIO': ['first_name', 'email', 'codigo_turma', 'matricula_aluno', 'municipio', 'estado', 'pais'],
+        'EDUCADOR_NEGOCIOS': ['first_name', 'email', 'cpf', 'nome_instituicao', 'municipio', 'estado', 'pais'],
+        'ASPIRANTE_EMPREENDEDOR': ['first_name', 'email', 'cpf', 'area_atuacao', 'municipio', 'estado', 'pais'],
+        'PROFISSIONAL_CORPORATIVO': ['first_name', 'email', 'cnpj', 'nome_empresa', 'municipio', 'estado', 'pais']
+    };
+
+    const camposPermitidos = camposPorCategoria[categoria] || [];
+
+    allWrappers.forEach(wrapper => {
+        const fieldName = wrapper.getAttribute('data-field-name');
+        if (!camposPermitidos.includes(fieldName)) {
+            wrapper.style.display = 'none'; // Esconde o campo
+            // Opcional: remover o input para não enviar dados vazios/errados
+            const input = wrapper.querySelector('input, select');
+            if(input) input.disabled = true;
+        }
+    });
+});
+</script>
+{% endblock %}

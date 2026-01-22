@@ -31,7 +31,9 @@ class CadastroUsuarioForm(UserCreationForm):
                 raise forms.ValidationError({'codigo_turma': 'Este campo é obrigatório para Estudante Universitário.'})
             if not cleaned_data.get('matricula_aluno'):
                 raise forms.ValidationError({'matricula_aluno': 'Este campo é obrigatório para Estudante Universitário.'})
-            # Para estudante, não precisa de documento
+            # Para estudante, documento deve ser None
+            cleaned_data['documento'] = None
+            cleaned_data['tipo_documento'] = 'CPF'
         
         elif categoria == User.Categorias.EDUCADOR_NEGOCIOS:
             if not cleaned_data.get('cpf'):

@@ -16,7 +16,7 @@ class User(AbstractUser):
         choices=[('CPF', 'CPF'), ('CNPJ', 'CNPJ')],
         default='CPF'
     )
-    documento = models.CharField(max_length=18, unique=True, help_text="CPF ou CNPJ")
+    documento = models.CharField(max_length=18, unique=True, blank=True, null=True, help_text="CPF ou CNPJ")
     categoria = models.CharField(max_length=30, choices=Categorias.choices)
     municipio = models.CharField(max_length=100, verbose_name="Município", blank=True, null=True)
     estado = models.CharField(max_length=100, verbose_name="Estado", blank=True, null=True)

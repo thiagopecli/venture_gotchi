@@ -132,6 +132,10 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+# Adicione este bloco para o Django achar a pasta static da raiz
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type

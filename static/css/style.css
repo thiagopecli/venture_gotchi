@@ -651,6 +651,66 @@ main.dashboard-main {
     background: #ef4444;
 }
 
+/* Estilo para Conquistas Desbloqueadas */
+.alert-conquista {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #92400e;
+    border-color: #fcd34d;
+    box-shadow: 0 8px 20px rgba(252, 211, 77, 0.3);
+    animation: conquistaEntrada 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
+    overflow: hidden;
+}
+
+.alert-conquista::before {
+    content: '🏆';
+    font-size: 1.2rem;
+    margin-right: 12px;
+    animation: trofeoPulse 1.5s infinite;
+}
+
+.alert-conquista::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300%;
+    height: 300%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+    transform: translate(-50%, -50%) scale(0);
+    animation: conquistaBrilho 0.8s ease-out;
+}
+
+@keyframes conquistaEntrada {
+    0% {
+        transform: translateY(-100px) scale(0.8);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(10px) scale(1.05);
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes trofeoPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+@keyframes conquistaBrilho {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+    }
+}
+
 /* ==========================================================================
    TELA DE RESULTADO FINAL (MODAL)
    ========================================================================== */

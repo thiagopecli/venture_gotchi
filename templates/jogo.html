@@ -160,11 +160,15 @@
         document.addEventListener('DOMContentLoaded', function(){
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach((el) => {
+                // Conquistas ficam visíveis por mais tempo (6 segundos)
+                const isConquista = el.classList.contains('alert-conquista');
+                const delay = isConquista ? 6000 : 3000;
+                
                 setTimeout(() => {
                     el.style.opacity = '0';
                     el.style.transition = 'opacity 0.6s';
                     setTimeout(() => el.remove(), 600);
-                }, 3000);
+                }, delay);
             });
         });
     </script>

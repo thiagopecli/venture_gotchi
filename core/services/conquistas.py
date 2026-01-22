@@ -140,7 +140,12 @@ def verificar_conquistas_partida(partida):
             turno_atual = getattr(partida.startup, 'turno_atual', 1)
         ConquistaDesbloqueada.objects.create(partida=partida, conquista=conquista, turno=turno_atual)
 
-def verificar_conquistas_progesso(usuario):
+def verificar_conquistas_progesso(usuario, partida_especifica=None):
+    """
+    Verifica e desbloqueia conquistas de progresso.
+    Retorna lista de novas conquistas desbloqueadas.
+    """
+    novas_conquistas = []
     
     conquista, _ = Conquista.objects.get_or_create(
         titulo='Persistente!',
@@ -174,17 +179,24 @@ def verificar_conquistas_progesso(usuario):
         )
     }
 
-    partidas = Partida.objects.filter(usuario=usuario).select_related('startup')
+    # Se uma partida específica foi passada, verificar apenas ela
+    if partida_especifica:
+        partidas = [partida_especifica]
+    else:
+        partidas = Partida.objects.filter(usuario=usuario).select_related('startup')
+    
     for partida in partidas:
         turno_atual = 0
         if hasattr(partida, 'startup') and partida.startup is not None:
             turno_atual = getattr(partida.startup, 'turno_atual', 0)
         if turno_atual >= 5:
-            ConquistaDesbloqueada.objects.get_or_create(
+            obj, created = ConquistaDesbloqueada.objects.get_or_create(
                 partida=partida,
                 conquista=conquista,
                 defaults={'turno': turno_atual}
             )
+            if created:
+                novas_conquistas.append(conquista)
         
         # Verificar conquistas de saldo
         if hasattr(partida, 'startup') and partida.startup is not None:
@@ -193,8 +205,12 @@ def verificar_conquistas_progesso(usuario):
             # Desbloquear todas as conquistas alcançadas
             for valor, conquista_obj in conquistas_saldo_map.items():
                 if saldo_caixa >= valor:
-                    ConquistaDesbloqueada.objects.get_or_create(
+                    obj, created = ConquistaDesbloqueada.objects.get_or_create(
                         partida=partida,
                         conquista=conquista_obj,
                         defaults={'turno': turno_atual}
                     )
+                    if created:
+                        novas_conquistas.append(conquista_obj)
+    
+    return novas_conquistas

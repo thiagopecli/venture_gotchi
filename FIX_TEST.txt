@@ -1,0 +1,6 @@
+Teste de partida finalizada está falhando porque a mensagem contém mais texto que esperado.
+
+Mensagem atual: 'Partida encerrada. Não é possível realizar novas ações.'
+Busca esperada: 'encerrada'
+
+Solução: Usar uma busca case-insensitive ou verificar de forma diferente.

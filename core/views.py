@@ -13,6 +13,30 @@ from .models import User, Partida, Startup, HistoricoDecisao
 from django.db.models import Prefetch
 from .forms import EditarPerfilForm
 
+def formatar_moeda_br(valor):
+    """
+    Formata um valor numérico para o padrão monetário brasileiro: R$ 1.234.567,89
+    """
+    try:
+        if valor is None:
+            return 'R$ 0,00'
+        
+        # Converter para Decimal se necessário
+        if isinstance(valor, (int, float)):
+            valor = Decimal(str(valor))
+        elif not isinstance(valor, Decimal):
+            valor = Decimal(str(valor))
+        
+        # Formatar com 2 casas decimais
+        formatted = f'{valor:,.2f}'
+        
+        # Substituir separadores: vírgula por ponto (milhar) e ponto por vírgula (decimal)
+        formatted = formatted.replace(',', 'X').replace('.', ',').replace('X', '.')
+        
+        return f'R$ {formatted}'
+    except (ValueError, TypeError, AttributeError):
+        return 'R$ 0,00'
+
 class PaginaLogin(LoginView):
     template_name = 'login.html'
 
@@ -64,16 +88,8 @@ def nova_partida(request):
     """
     if request.method == 'POST':
         nome_empresa = request.POST.get('nome_empresa', 'Nova Startup')
-        saldo_inicial = request.POST.get('saldo_inicial', '50000')
-        
-        try:
-            saldo_inicial = Decimal(saldo_inicial)
-            if saldo_inicial < Decimal('0.01'):
-                messages.error(request, 'O saldo inicial deve ser de pelo menos R$ 0,01')
-                return render(request, 'nova_partida.html')
-        except (ValueError, TypeError):
-            messages.error(request, 'Saldo inicial inválido. Use apenas números.')
-            return render(request, 'nova_partida.html')
+        # Saldo inicial fixo: R$ 30.000,00
+        saldo_inicial = Decimal('30000.00')
         
         partida = Partida.objects.create(
             usuario=request.user,
@@ -130,7 +146,7 @@ def salvar_jogo(request, partida_id):
             if saldo_atual < custo:
                 messages.error(
                     request, 
-                    f'Saldo insuficiente. Disponível: R$ {saldo_atual:.2f} | Necessário: R$ {custo:.2f}'
+                    f'Saldo insuficiente. Disponível: {formatar_moeda_br(saldo_atual)} | Necessário: {formatar_moeda_br(custo)}'
                 )
                 return redirect('carregar_jogo', partida_id=partida.id)
             

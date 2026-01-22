@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 
 {% block title %} Ranking - Venture Gotchi {% endblock %}
 
@@ -106,11 +107,11 @@
                     </td>
                     
                     <td class="text-right color-primary {% if criterio == 'valuation' %}font-bold{% endif %}">
-                        <strong>R$ {{ startup.valuation|floatformat:2 }}</strong>
+                        <strong>{{ startup.valuation|moeda_br }}</strong>
                     </td>
                     
                     <td class="text-right color-success {% if criterio == 'saldo' %}font-bold{% endif %}">
-                        R$ {{ startup.saldo_caixa|floatformat:2 }}
+                        {{ startup.saldo_caixa|moeda_br }}
                     </td>
                     
                     <td class="text-center {% if criterio == 'turno' %}font-bold{% endif %}">

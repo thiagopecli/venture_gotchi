@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 
 {% block title %} Conquistas {% endblock %}
 
@@ -39,11 +40,11 @@
                     {% if conquista.partida.startup %}
                     <div class="detail-item">
                         <span>Saldo Final</span>
-                        <strong>R$ {{ conquista.partida.startup.saldo_caixa|floatformat:2 }}</strong>
+                        <strong>{{ conquista.partida.startup.saldo_caixa|moeda_br }}</strong>
                     </div>
                     <div class="detail-item">
                         <span>Valuation</span>
-                        <strong>R$ {{ conquista.partida.startup.valuation|floatformat:2 }}</strong>
+                        <strong>{{ conquista.partida.startup.valuation|moeda_br }}</strong>
                     </div>
                     {% endif %}
                     <div class="detail-item">

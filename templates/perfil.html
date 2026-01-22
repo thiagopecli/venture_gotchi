@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 
 {% block title %} Perfil - Venture Gotchi {% endblock %}
 
@@ -50,8 +51,8 @@
         <div class="info-card stats-card">
             <h3>Recordes Pessoais</h3>
             <div class="simple-list">
-                <p><strong>Maior Saldo:</strong> R$ {{ maior_saldo|floatformat:2 }}</p>
-                <p><strong>Maior Valuation:</strong> R$ {{ maior_valuation|floatformat:2 }}</p>
+                <p><strong>Maior Saldo:</strong> {{ maior_saldo|moeda_br }}</p>
+                <p><strong>Maior Valuation:</strong> {{ maior_valuation|moeda_br }}</p>
                 <p><strong>Maior Turno:</strong> {{ maior_turno }}</p>
             </div>
         </div>

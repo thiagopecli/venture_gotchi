@@ -183,7 +183,15 @@ def salvar_jogo(request, partida_id):
 
             # Sistema de Conquistas
             verificar_conquistas_partida(partida)
-            verificar_conquistas_progesso(request.user)
+            novas_conquistas = verificar_conquistas_progesso(request.user, partida_especifica=partida)
+            
+            # Adicionar conquistas desbloqueadas às mensagens
+            for conquista in novas_conquistas:
+                messages.success(
+                    request, 
+                    f'🏆 Conquista Desbloqueada: {conquista.titulo}! +{conquista.pontos} pontos',
+                    extra_tags='conquista'
+                )
             
         except Startup.DoesNotExist:
             messages.error(request, 'Erro técnico: Startup não vinculada a esta partida.')

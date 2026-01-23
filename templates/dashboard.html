@@ -35,7 +35,7 @@
         <div class="welcome-section">
             <div class="welcome-text">
                 <h1>Olá, {{ user.first_name|default:user.username }}! </h1>
-                {% if user.is_estudante or user.is_aspirante %}
+                {% if user.is_estudante or user.is_aspirante or user.is_profissional %}
                 <p>Gerencie sua startup, tome decisões estratégicas e acompanhe o crescimento.</p>
                 {% elif user.is_educador %}
                 <p>Acesse relatórios agregados e acompanhe o desempenho dos estudantes.</p>
@@ -47,7 +47,7 @@
         </div>
 
         <div class="dashboard-grid">
-            {% if user.is_estudante or user.is_aspirante %}
+            {% if user.is_estudante or user.is_aspirante or user.is_profissional %}
             <section class="dash-column">
                 <div class="info-card">
                     <h3>Minhas Simulações</h3>

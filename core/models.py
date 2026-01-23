@@ -54,24 +54,24 @@ class User(AbstractUser):
     
     # Permissões específicas
     def pode_salvar_carregar_partida(self):
-        """Estudantes e Aspirantes podem salvar/carregar partidas"""
-        return self.is_estudante() or self.is_aspirante()
+        """Estudantes, Aspirantes e Profissionais Corporativos podem salvar/carregar partidas"""
+        return self.is_estudante() or self.is_aspirante() or self.is_profissional()
     
     def pode_visualizar_propria_partida(self):
-        """Estudantes e Aspirantes podem visualizar suas próprias partidas"""
-        return self.is_estudante() or self.is_aspirante()
+        """Estudantes, Aspirantes e Profissionais Corporativos podem visualizar suas próprias partidas"""
+        return self.is_estudante() or self.is_aspirante() or self.is_profissional()
     
     def pode_acessar_relatorios_agregados(self):
         """Apenas Educadores podem acessar relatórios agregados"""
         return self.is_educador()
     
     def pode_acessar_ranking(self):
-        """Estudantes, Aspirantes e Educadores podem acessar ranking"""
-        return self.is_estudante() or self.is_aspirante() or self.is_educador()
+        """Estudantes, Aspirantes, Profissionais e Educadores podem acessar ranking"""
+        return self.is_estudante() or self.is_aspirante() or self.is_profissional() or self.is_educador()
     
     def pode_desbloquear_conquistas(self):
-        """Estudantes e Aspirantes podem desbloquear conquistas"""
-        return self.is_estudante() or self.is_aspirante()
+        """Estudantes, Aspirantes e Profissionais Corporativos podem desbloquear conquistas"""
+        return self.is_estudante() or self.is_aspirante() or self.is_profissional()
     
     def pode_visualizar_conquistas(self):
         """Todos podem visualizar conquistas"""

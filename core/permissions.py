@@ -16,7 +16,7 @@ def estudante_required(view_func):
         if not request.user.is_authenticated:
             return redirect('login')
         
-        if not (request.user.is_estudante() or request.user.is_aspirante()):
+        if not (request.user.is_estudante() or request.user.is_aspirante() or request.user.is_profissional()):
             messages.error(
                 request, 
                 'Acesso negado. Esta funcionalidade está disponível apenas para Estudantes/Aspirantes/Profissionais.'

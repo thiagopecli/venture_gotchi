@@ -1,4 +1,4 @@
-﻿/* Paleta Clean & Moderna */
+/* Paleta Clean & Moderna */
 :root {
     --primary: #F27405;
     --bg-light: #F8F9FA;
@@ -19,7 +19,7 @@
 
 html, body {
     height: 100%;
-    overflow-x: hidden;
+    overflow-x: hidden; /* Evita rolagem lateral indesejada no mobile */
 }
 
 body {
@@ -41,16 +41,16 @@ a:hover { text-decoration: underline; }
 /* --- HEADER GERAL --- */
 .header-bar, .main-header {
     background-color: var(--bg-white);
-    padding: 15px 5%; /* Limite lateral do header */
+    padding: 15px 5%;
     border-bottom: 1px solid var(--border);
     width: 100%;
-    position: relative;
+    position: relative; /* Necessário para o menu mobile absoluto */
     z-index: 1000;
 }
 
 .header-container {
     display: flex;
-    justify-content: space-between; /* Joga os itens para as pontas */
+    justify-content: space-between;
     align-items: center;
     max-width: 1200px;
     margin: 0 auto;
@@ -61,8 +61,6 @@ a:hover { text-decoration: underline; }
     font-size: 1.5em;
     font-weight: 800;
     text-decoration: none;
-    /* Garante que o logo não encolha */
-    flex-shrink: 0;
 }
 
 /* --- MENU DESKTOP (Padrão) --- */
@@ -71,10 +69,9 @@ a:hover { text-decoration: underline; }
     list-style: none;
     gap: 20px;
     align-items: center;
-    margin: 0;
-    padding: 0;
 }
 
+/* Botão Sair Clean */
 .logout-btn-clean, a[href*="logout"], .nav-item.logout {
     background: none !important;
     border: none !important;
@@ -86,15 +83,14 @@ a:hover { text-decoration: underline; }
     padding: 0;
 }
 
-/* --- BOTÃO HAMBÚRGUER --- */
+/* --- BOTÃO HAMBÚRGUER (Escondido no Desktop) --- */
 .hamburger {
-    display: none; /* Invisível no desktop */
+    display: none; /* Padrão invisível */
     cursor: pointer;
     background: none;
     border: none;
     flex-direction: column;
     gap: 5px;
-    padding: 5px; /* Aumenta a área de clique */
 }
 
 .hamburger span {
@@ -136,6 +132,7 @@ main {
     font-size: 1.6rem;
 }
 
+/* Inputs */
 input, select, textarea {
     width: 100%;
     padding: 10px 12px;
@@ -150,6 +147,7 @@ input:focus, select:focus {
     box-shadow: 0 0 5px rgba(242, 116, 5, 0.2);
 }
 
+/* Botões */
 .btn-login, .btn-primary, .btn-primary-dash {
     width: 100%;
     padding: 12px;
@@ -178,7 +176,7 @@ main.dashboard-main {
 
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr; /* Desktop: 2 colunas */
     gap: 30px;
     margin-top: 30px;
     align-items: start;
@@ -201,74 +199,7 @@ main.dashboard-main {
 }
 .cta-desc { font-size: 0.85rem; color: var(--text-muted); }
 
-/* --- PERFIL --- */
-.profile-card-main {
-    background: var(--bg-white);
-    padding: 40px !important;
-    border-radius: 15px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-    margin-bottom: 30px;
-}
-.profile-data-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-}
-
-/* --- PARTIDAS SALVAS --- */
-.saved-games-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-height: 320px; 
-    overflow-y: auto;  
-    padding-right: 8px;
-}
-.game-entry {
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
-    padding: 12px 15px;
-    background-color: var(--bg-light);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-}
-.btn-play-small {
-    background-color: var(--primary) !important;
-    color: white !important;
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 700;
-}
-
-/* --- RANKING --- */
-.ranking-table-container {
-    overflow-x: auto;
-    background: var(--bg-white);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-}
-.modern-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 600px;
-}
-.modern-table th, .modern-table td { padding: 15px; text-align: left; }
-
-/* --- RODAPÉ --- */
-footer, .footer-simple, .main-footer {
-    width: 100%;
-    padding: 25px 0;
-    text-align: center;
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    border-top: 1px solid var(--border);
-    margin-top: auto; 
-}
-
-/* ==========================================================================
+/* ========================================================================== 
    RESPONSIVIDADE (TABLET E MOBILE) - ATÉ 768px
    ========================================================================== */
 @media (max-width: 768px) {

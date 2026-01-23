@@ -57,5 +57,17 @@
     <footer class="footer-simple">
         <p>© 2026 VentureGotchi. Desenvolvido por Intranet Panthe On Ltda.</p>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const alerts = document.querySelectorAll('#top-messages .alert, .inline-messages .alert');
+            alerts.forEach((el) => {
+                setTimeout(()=>{
+                    el.classList.add('hide');
+                    setTimeout(()=> el.remove(), 600);
+                }, 5000);
+            });
+        });
+    </script>
 </body>
 </html>

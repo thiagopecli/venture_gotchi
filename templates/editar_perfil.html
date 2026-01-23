@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
 <main class="dashboard-main" style="max-width: 800px; margin: 0 auto; padding: 20px;">
-    <h2>Editar Perfil: {{ request.user.get_categoria_display }}</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin: 0;">Editar Perfil: {{ request.user.get_categoria_display }}</h2>
+        <a href="{% url 'perfil' %}" class="btn-back-orange">← Voltar ao Perfil</a>
+    </div>
 
     <form method="post" id="edit-profile-form">
         {% csrf_token %}

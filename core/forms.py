@@ -70,6 +70,33 @@ class CadastroUsuarioForm(UserCreationForm):
             raise forms.ValidationError('Este e-mail já está em uso.')
         return email
     
+    def save(self, commit=True):
+        """
+        Override do save para mapear cpf/cnpj para documento
+        """
+        user = super().save(commit=False)
+        
+        # Garantir que tipo_documento e documento sejam definidos corretamente
+        categoria = self.cleaned_data.get('categoria')
+        
+        if categoria == User.Categorias.EDUCADOR_NEGOCIOS:
+            user.tipo_documento = 'CPF'
+            user.documento = self.cleaned_data.get('cpf')
+        elif categoria == User.Categorias.ASPIRANTE_EMPREENDEDOR:
+            user.tipo_documento = 'CPF'
+            user.documento = self.cleaned_data.get('cpf')
+        elif categoria == User.Categorias.PROFISSIONAL_CORPORATIVO:
+            user.tipo_documento = 'CNPJ'
+            user.documento = self.cleaned_data.get('cnpj')
+        elif categoria == User.Categorias.ESTUDANTE_UNIVERSITARIO:
+            user.documento = None
+            user.tipo_documento = 'CPF'
+        
+        if commit:
+            user.save()
+        return user
+
+    
 class EditarPerfilForm(forms.ModelForm):
     first_name = forms.CharField(label="Nome Completo", required=True)
     email = forms.EmailField(label="E-mail", required=True)
@@ -95,6 +122,13 @@ class EditarPerfilForm(forms.ModelForm):
         self.fields['area_atuacao'].widget.attrs.update({'class': 'aspirante-field'})
         self.fields['cnpj'].widget.attrs.update({'class': 'profissional-field'})
         self.fields['nome_empresa'].widget.attrs.update({'class': 'profissional-field'})
+        
+        # Preencher cpf e cnpj a partir do campo documento da instância
+        if self.instance.pk:
+            if self.instance.tipo_documento == 'CPF':
+                self.fields['cpf'].initial = self.instance.documento
+            elif self.instance.tipo_documento == 'CNPJ':
+                self.fields['cnpj'].initial = self.instance.documento
 
     def clean(self):
         cleaned_data = super().clean()
@@ -104,3 +138,28 @@ class EditarPerfilForm(forms.ModelForm):
         if categoria == 'ESTUDANTE_UNIVERSITARIO' and not cleaned_data.get('codigo_turma'):
             self.add_error('codigo_turma', 'Campo obrigatório para estudantes.')
         return cleaned_data
+    
+    def save(self, commit=True):
+        """
+        Override do save para mapear cpf/cnpj para documento
+        """
+        user = super().save(commit=False)
+        categoria = user.categoria
+        
+        # Mapear cpf/cnpj para documento baseado na categoria
+        if categoria == 'EDUCADOR_NEGOCIOS':
+            user.tipo_documento = 'CPF'
+            user.documento = self.cleaned_data.get('cpf')
+        elif categoria == 'ASPIRANTE_EMPREENDEDOR':
+            user.tipo_documento = 'CPF'
+            user.documento = self.cleaned_data.get('cpf')
+        elif categoria == 'PROFISSIONAL_CORPORATIVO':
+            user.tipo_documento = 'CNPJ'
+            user.documento = self.cleaned_data.get('cnpj')
+        elif categoria == 'ESTUDANTE_UNIVERSITARIO':
+            user.documento = None
+            user.tipo_documento = 'CPF'
+        
+        if commit:
+            user.save()
+        return user

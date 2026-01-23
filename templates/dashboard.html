@@ -8,6 +8,14 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body class="dashboard-body">
+    <div id="top-messages" class="top-messages">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
     <header class="main-header">
         <div class="header-container">
             <a href="{% url 'dashboard' %}" class="header-logo">Venture Gotchi</a>
@@ -99,6 +107,16 @@
     </footer>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const alerts = document.querySelectorAll('#top-messages .alert');
+            alerts.forEach((el) => {
+                setTimeout(()=>{
+                    el.classList.add('hide');
+                    setTimeout(()=> el.remove(), 600);
+                }, 5000);
+            });
+        });
+
         // Menu Hambúrguer
         const hamburgerBtn = document.getElementById('hamburger-btn');
         const navMenu = document.getElementById('nav-menu');

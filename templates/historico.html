@@ -9,31 +9,42 @@
         <a href="{% url 'dashboard' %}" class="btn-back-orange">← Voltar ao Dashboard</a>
     </div>
 
-    <section class="timeline-container">
-        {% if decisoes %}
-            <div class="timeline-line"></div>
-            
-            {% for decisao in decisoes %}
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-card">
-                    <div class="timeline-header">
-                        <span class="turno-badge-small">Turno {{ decisao.turno }}</span>
-                        <span class="timeline-date">{{ decisao.data_decisao|date:"d/m/Y H:i" }}</span>
-                    </div>
-                    <div class="timeline-body">
-                        <p>{{ decisao.decisao_tomada }}</p>
-                    </div>
+    {% if decisoes_por_empresa %}
+        {% for grupo in decisoes_por_empresa %}
+        <div class="empresa-group">
+            <div class="empresa-header">
+                <h3 class="empresa-title">{{ grupo.empresa }}</h3>
+                <div class="empresa-pontos">
+                    <span class="pontos-label">Total de Decisões:</span>
+                    <span class="pontos-valor">{{ grupo.total_decisoes }}</span>
                 </div>
             </div>
-            {% endfor %}
-
-        {% else %}
-            <div class="empty-state-container">
-                <p class="empty-state">Nenhuma decisão registrada ainda.</p>
-                <small>As decisões da sua startup aparecerão aqui cronologicamente.</small>
-            </div>
-        {% endif %}
-    </section>
+            
+            <section class="timeline-container">
+                <div class="timeline-line"></div>
+                
+                {% for decisao in grupo.decisoes %}
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="timeline-header">
+                            <span class="turno-badge-small">Turno {{ decisao.turno }}</span>
+                            <span class="timeline-date">{{ decisao.data_decisao|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        <div class="timeline-body">
+                            <p>{{ decisao.decisao_tomada }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </section>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state-container">
+            <p class="empty-state">Nenhuma decisão registrada ainda.</p>
+            <small>As decisões das suas startups aparecerão aqui cronologicamente, organizadas por empresa.</small>
+        </div>
+    {% endif %}
 </main>
 {% endblock %}

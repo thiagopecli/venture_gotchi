@@ -24,7 +24,11 @@
                 <p><span>Nome:</span> {{ usuario.first_name }}</p>
             </div>
             <div class="data-group">
-                <p><span>Documento:</span> {{ usuario.documento }} ({{ usuario.tipo_documento }})</p>
+                {% if usuario.is_estudante %}
+                    <p><span>Matrícula:</span> {{ usuario.matricula_aluno }}</p>
+                {% else %}
+                    <p><span>Documento:</span> {{ usuario.documento }} ({{ usuario.tipo_documento }})</p>
+                {% endif %}
                 <p><span>Categoria:</span> {{ usuario.get_categoria_display }}</p>
                 <p><span>Membro desde:</span> {{ usuario.date_joined|date:"d/m/Y" }}</p>
             </div>

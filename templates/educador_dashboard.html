@@ -4,7 +4,6 @@
 
 {% block content %}
 <main class="dashboard-main">
-    <!-- Seção de Boas-vindas -->
     <div class="welcome-section">
         <div class="welcome-text">
             <h1>Olá, {{ user.first_name|default:user.username }}!</h1>
@@ -15,61 +14,69 @@
         </div>
     </div>
 
-    <!-- Grid de colunas principais -->
     <div class="dashboard-grid">
-        <!-- Coluna 1: Minhas Turmas -->
         <section class="dash-column">
             <div class="info-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3>Minhas Turmas</h3>
-                    <button type="button" class="btn-primary" onclick="document.getElementById('modalCriarTurma').style.display='flex'" style="width: auto; padding: 8px 16px; font-size: 0.85rem;">
-                        + Criar
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px;">
+                    <h3 style="margin: 0;">Minhas Turmas</h3>
+                    <button type="button" class="btn-primary" onclick="document.getElementById('modalCriarTurma').style.display='flex'" style="width: auto; padding: 8px 20px; font-size: 0.9rem; margin: 0;">
+                        + Criar Turma
                     </button>
                 </div>
-                <p class="hint">Gerencie suas turmas e acompanhe o desempenho.</p>
                 
                 {% if turmas_educador %}
                 <div class="turmas-list">
                     {% for turma in turmas_educador %}
                     <div class="turma-entry">
                         <div class="turma-info">
-                            <span class="turma-code" style="color: var(--primary); font-weight: bold;">{{ turma.codigo }}</span>
+                            <span class="turma-code">{{ turma.codigo }}</span>
                             <span class="turma-name">{{ turma.nome }}</span>
                             {% if turma.descricao %}
-                            <span class="turma-desc" style="font-size: 0.85rem; color: var(--text-muted);">{{ turma.descricao|truncatewords:10 }}</span>
+                            <span class="turma-desc">{{ turma.descricao|truncatewords:8 }}</span>
                             {% endif %}
                         </div>
-                        <a href="{% url 'analise_turma' turma.codigo %}" class="btn-play-small" style="font-size: 0.9rem;">Analisar</a>
+                        <a href="{% url 'analise_turma' turma.codigo %}" class="btn-play-small">Analisar</a>
                     </div>
                     {% endfor %}
                 </div>
                 {% else %}
                 <div class="empty-state-container">
-                    <p class="empty-state">Nenhuma turma criada ainda.</p>
-                    <small>Clique em "Criar" para começar a gerenciar suas turmas.</small>
+                    <p class="empty-state">Nenhuma turma criada.</p>
+                    <small>Crie sua primeira turma para começar.</small>
                 </div>
                 {% endif %}
             </div>
         </section>
 
-        <!-- Coluna 2: Atalhos Rápidos -->
         <section class="dash-column">
             <div class="info-card">
-                <h3>Atalhos Rápidos</h3>
-                <p class="hint">Acesse funcionalidades principais.</p>
+                <div style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px;">
+                    <h3 style="margin: 0;">Atalhos Rápidos</h3>
+                </div>
                 
-                <div class="cta-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-                    <a href="{% url 'ranking_turmas' %}" class="btn-primary-dash" style="background-color: #ff9500 !important;">
-                        <strong>Ranking de Turmas</strong>
-                        <span style="display: block; font-size: 0.85rem; font-weight: normal; margin-top: 4px;">Veja o desempenho de todas as turmas</span>
+                <div class="cta-container">
+                    <a href="{% url 'ranking_turmas' %}" class="btn-primary-dash shortcut-btn">
+                        <span class="icon">🏆</span>
+                        <div class="text-content">
+                            <strong>Ranking de Turmas</strong>
+                            <span>Comparativo de desempenho entre salas</span>
+                        </div>
                     </a>
-                    <a href="{% url 'metricas_turmas' %}" class="btn-primary-dash" style="background-color: #ff9500 !important;">
-                        <strong>Análise Geral</strong>
-                        <span style="display: block; font-size: 0.85rem; font-weight: normal; margin-top: 4px;">KPIs agregados de todas as turmas</span>
+                    
+                    <a href="{% url 'metricas_turmas' %}" class="btn-primary-dash shortcut-btn">
+                        <span class="icon">📊</span>
+                        <div class="text-content">
+                            <strong>Análise Geral</strong>
+                            <span>KPIs agregados de todo o sistema</span>
+                        </div>
                     </a>
-                    <a href="{% url 'ranking' %}" class="btn-primary-dash" style="background-color: #ff9500 !important;">
-                        <strong>Ranking Global</strong>
-                        <span style="display: block; font-size: 0.85rem; font-weight: normal; margin-top: 4px;">Todas as startups da plataforma</span>
+                    
+                    <a href="{% url 'ranking' %}" class="btn-primary-dash shortcut-btn">
+                        <span class="icon">🌍</span>
+                        <div class="text-content">
+                            <strong>Ranking Global</strong>
+                            <span>Listagem geral de todas as startups</span>
+                        </div>
                     </a>
                 </div>
             </div>
@@ -77,30 +84,29 @@
     </div>
 </main>
 
-<!-- Modal para Criar Turma -->
-<div id="modalCriarTurma" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
-    <div style="background: var(--bg-main); padding: 30px; border-radius: 8px; max-width: 500px; width: 90%;">
-        <h3 style="margin-bottom: 20px; color: var(--text-main);">Criar Nova Turma</h3>
+<div id="modalCriarTurma" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+    <div style="background: var(--bg-white); padding: 40px; border-radius: 12px; max-width: 500px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.2);">
+        <h3 style="margin-bottom: 25px; color: var(--text-main); font-size: 1.5rem;">Criar Nova Turma</h3>
         <form method="POST" action="{% url 'criar_turma' %}">
             {% csrf_token %}
             <div style="margin-bottom: 20px;">
-                <label for="nome_turma" style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-main);">Nome da Turma *</label>
+                <label for="nome_turma" style="display: block; font-weight: 700; margin-bottom: 8px; color: var(--text-main);">Nome da Turma *</label>
                 <input type="text" id="nome_turma" name="nome_turma" required 
                        placeholder="Ex: Empreendedorismo 2026.1" 
-                       style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-secondary); color: var(--text-main);">
+                       style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px;">
             </div>
-            <div style="margin-bottom: 20px;">
-                <label for="descricao_turma" style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-main);">Descrição (opcional)</label>
+            <div style="margin-bottom: 25px;">
+                <label for="descricao_turma" style="display: block; font-weight: 700; margin-bottom: 8px; color: var(--text-main);">Descrição (opcional)</label>
                 <textarea id="descricao_turma" name="descricao_turma" rows="3"
                           placeholder="Adicione detalhes sobre a turma..." 
-                          style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-secondary); color: var(--text-main);"></textarea>
+                          style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px;"></textarea>
             </div>
-            <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                <button type="button" class="btn-outline" onclick="document.getElementById('modalCriarTurma').style.display='none'" style="padding: 10px 24px;">
+            <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                <button type="button" class="btn-outline" onclick="document.getElementById('modalCriarTurma').style.display='none'" style="padding: 12px 24px; border-radius: 8px; cursor: pointer;">
                     Cancelar
                 </button>
-                <button type="submit" class="btn-primary" style="width: auto; padding: 10px 24px;">
-                    Criar Turma
+                <button type="submit" class="btn-primary" style="width: auto; padding: 12px 30px; margin: 0;">
+                    Criar
                 </button>
             </div>
         </form>
@@ -108,80 +114,127 @@
 </div>
 
 <style>
+    /* Grid Principal */
     .dashboard-grid {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-    }
-
-    .dash-column {
-        display: flex;
-        flex-direction: column;
+        grid-template-columns: 1fr 1fr; /* Largura uniforme 50% / 50% */
+        gap: 40px; /* Mais espaço entre os cards */
+        align-items: stretch; /* Garante que tenham a mesma altura */
+        margin-top: 30px;
     }
 
     .info-card {
         display: flex;
         flex-direction: column;
-        height: 100%;
+        height: 100%; /* Ocupa toda altura disponível */
+        padding: 30px; /* Espaçamento interno confortável */
     }
 
-    .cta-container {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        flex: 1;
-    }
-
-    .cta-container .btn-primary-dash {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-    }
-
+    /* Lista de Turmas */
     .turmas-list {
         display: flex;
         flex-direction: column;
-        gap: 10px;
-        max-height: 400px;
+        gap: 15px;
+        flex: 1; /* Empurra o conteúdo para preencher espaço */
+        min-height: 250px; /* Garante uma altura mínima visual */
+        max-height: 500px;
         overflow-y: auto;
+        padding-right: 5px;
     }
 
     .turma-entry {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 12px;
-        background: var(--bg-secondary);
-        border-radius: 6px;
-        border-left: 3px solid var(--primary);
+        padding: 15px;
+        background: var(--bg-light);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        transition: transform 0.2s, border-color 0.2s;
     }
 
-    .turma-info {
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-        flex: 1;
+    .turma-entry:hover {
+        transform: translateX(5px);
+        border-color: var(--primary);
     }
 
     .turma-code {
-        font-size: 0.9rem;
-    }
-
-    .turma-name {
-        font-weight: 600;
-        color: var(--text-main);
-    }
-
-    .turma-desc {
+        color: var(--primary);
+        font-weight: 800;
         font-size: 0.85rem;
-        color: var(--text-muted);
+        background: rgba(242, 116, 5, 0.1);
+        padding: 2px 8px;
+        border-radius: 4px;
+        margin-right: 8px;
     }
 
-    @media (max-width: 768px) {
+    /* Container de Atalhos */
+    .cta-container {
+        display: flex;
+        flex-direction: column; /* Lista vertical para alinhar com a esquerda */
+        gap: 15px;
+        height: 100%;
+    }
+
+    /* Botões de Atalho Estilizados */
+    .shortcut-btn {
+        display: flex !important;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: left;
+        padding: 20px;
+        background-color: var(--bg-light) !important; /* Fundo claro */
+        color: var(--text-main) !important;
+        border: 1px solid var(--border);
+        transition: all 0.2s;
+        height: 100%;
+        max-height: 100px;
+    }
+
+    .shortcut-btn:hover {
+        border-color: var(--primary);
+        background-color: #fff !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        transform: translateY(-2px);
+    }
+
+    .shortcut-btn .icon {
+        font-size: 1.8rem;
+        margin-right: 15px;
+        background: #fff;
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .shortcut-btn .text-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .shortcut-btn strong {
+        font-size: 1rem;
+        color: var(--primary);
+    }
+
+    .shortcut-btn span {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 2px;
+        font-weight: normal;
+    }
+
+    /* Scrollbar personalizada */
+    .turmas-list::-webkit-scrollbar { width: 5px; }
+    .turmas-list::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
+    @media (max-width: 900px) {
         .dashboard-grid {
-            grid-template-columns: 1fr !important;
+            grid-template-columns: 1fr; /* Em mobile vira 1 coluna */
         }
     }
 </style>

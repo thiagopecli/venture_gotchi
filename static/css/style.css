@@ -19,6 +19,7 @@
 
 html, body {
     height: 100%;
+    overflow-x: hidden; /* Evita rolagem lateral indesejada no mobile */
 }
 
 body {
@@ -29,24 +30,30 @@ body {
     color: var(--text-main);
 }
 
-/* --- AJUSTE GLOBAL DE LINKS --- */
+/* --- LINKS --- */
 a {
     color: var(--primary) !important;
     text-decoration: none;
     font-weight: 600;
 }
+a:hover { text-decoration: underline; }
 
-a:hover {
-    text-decoration: underline;
-}
-
-/* --- HEADER GERAL (Base) --- */
+/* --- HEADER GERAL --- */
 .header-bar, .main-header {
     background-color: var(--bg-white);
     padding: 15px 5%;
     border-bottom: 1px solid var(--border);
     width: 100%;
-    text-align: center;
+    position: relative; /* Necessário para o menu mobile absoluto */
+    z-index: 1000;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .header-title, .header-logo {
@@ -56,18 +63,56 @@ a:hover {
     text-decoration: none;
 }
 
+/* --- MENU DESKTOP (Padrão) --- */
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 20px;
+    align-items: center;
+}
+
+/* Botão Sair Clean */
+.logout-btn-clean, a[href*="logout"], .nav-item.logout {
+    background: none !important;
+    border: none !important;
+    color: var(--primary) !important; 
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 0;
+}
+
+/* --- BOTÃO HAMBÚRGUER (Escondido no Desktop) --- */
+.hamburger {
+    display: none; /* Padrão invisível */
+    cursor: pointer;
+    background: none;
+    border: none;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.hamburger span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: var(--primary);
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
 /* --- CONTEÚDO PRINCIPAL --- */
 main {
     flex: 1;
     display: flex;
-    flex-direction: column; /* Garante que elementos fiquem um abaixo do outro */
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
     padding: 20px;
     width: 100%;
 }
 
-/* --- CARDS DE LOGIN E REGISTRO --- */
+/* --- CARDS E FORMULÁRIOS --- */
 .login-container, .form-container, .login-box, #box-registro {
     background-color: var(--bg-white) !important;
     padding: 30px 40px;
@@ -77,14 +122,7 @@ main {
     max-width: 420px;
     text-align: left;
     border: 1px solid var(--border) !important;
-    margin-bottom: 20px; /* Espaço para o link "Cadastre-se" abaixo dele */
-}
-
-/* Centraliza o texto "Não tem uma conta" abaixo da caixa */
-.login-footer-text, main > p {
-    text-align: center;
-    width: 100%;
-    margin-top: 10px;
+    margin-bottom: 20px;
 }
 
 .login-title, .form-title {
@@ -94,37 +132,23 @@ main {
     font-size: 1.6rem;
 }
 
-/* --- AJUSTE DE INPUTS (Bordas Sutis) --- */
+/* Inputs */
 input, select, textarea {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #ccc; /* Borda cinza sutil por padrão */
+    border: 1px solid #ccc;
     border-radius: 8px;
     margin-bottom: 15px;
     outline: none;
-    transition: border-color 0.3s ease; /* Transição suave */
+    transition: border-color 0.3s ease;
 }
-
-/* Fica laranja somente quando clicar/focar */
 input:focus, select:focus {
     border: 2px solid var(--primary);
     box-shadow: 0 0 5px rgba(242, 116, 5, 0.2);
 }
 
-/* Espaçamento para as instruções de senha no Registro */
-form ul, .helptext {
-    margin: 10px 0 20px 0;
-    padding-left: 20px;
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    line-height: 1.5;
-}
-
-form ul li {
-    margin-bottom: 5px;
-}
-
-.btn-login, .btn-primary {
+/* Botões */
+.btn-login, .btn-primary, .btn-primary-dash {
     width: 100%;
     padding: 12px;
     background-color: var(--primary) !important;
@@ -134,13 +158,14 @@ form ul li {
     font-weight: 700;
     cursor: pointer;
     margin-top: 10px;
+    text-align: center;
+    display: inline-block;
+    transition: filter 0.2s;
 }
+.btn-primary:hover, .btn-primary-dash:hover { filter: brightness(1.1); }
+.btn-primary-dash { width: fit-content; padding: 12px 24px; }
 
-/* ==========================================================================
-   DASHBOARD (Ajustes Específicos)
-   ========================================================================== */
-
-/* CORREÇÃO PRINCIPAL: Anula o flex-column e o alinhamento central do Login */
+/* --- DASHBOARD --- */
 main.dashboard-main {
     display: block !important; 
     max-width: 1200px;
@@ -149,24 +174,9 @@ main.dashboard-main {
     text-align: left; 
 }
 
-/* Ajuste do Hiperlink Sair no Menu para ficar igual aos outros */
-.logout-btn-clean, a[href*="logout"], .nav-item.logout {
-    background: none !important;
-    border: none !important;
-    color: var(--primary) !important; 
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    font-family: inherit;
-    text-decoration: none;
-    padding: 0;
-    display: inline;
-}
-
-/* Organização dos Cards em Colunas (Lado a lado) */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr; 
+    grid-template-columns: 1fr 1fr; /* Desktop: 2 colunas */
     gap: 30px;
     margin-top: 30px;
     align-items: start;
@@ -178,1192 +188,93 @@ main.dashboard-main {
     border-radius: 15px;
     box-shadow: var(--shadow);
     border: 1px solid var(--border);
-    text-align: left; 
 }
 
-/* Espaçamentos internos do card de simulação */
-.info-card h3 {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.info-card p {
-    margin-bottom: 20px;
-    color: var(--text-muted);
-}
-
-/* --- ALTERAÇÃO SOLICITADA: Centraliza o conjunto do botão e frase --- */
 .cta-container { 
     display: flex; 
     flex-direction: column; 
-    align-items: center; /* Centraliza o botão e o texto horizontalmente */
-    text-align: center;  /* Garante que o texto da frase também centralize */
+    align-items: center;
+    text-align: center;
     gap: 5px; 
 }
+.cta-desc { font-size: 0.85rem; color: var(--text-muted); }
 
-.btn-primary-dash {
-    background-color: var(--primary) !important;
-    color: white !important;
-    padding: 12px 24px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 700;
-    display: inline-block;
-    width: fit-content;
-}
-
-.cta-desc { 
-    font-size: 0.85rem; 
-    color: var(--text-muted);
-    margin-top: 0; 
-}
-
-/* Ajuste do Header da Dashboard */
-.header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.nav-menu {
-    display: flex;
-    list-style: none;
-    gap: 20px;
-}
-
-/* ==========================================================================
-   PERFIL (Ajustes Consolidados e Limpos)
+/* ========================================================================== 
+   RESPONSIVIDADE (TABLET E MOBILE) - ATÉ 768px
    ========================================================================== */
-
-.profile-title {
-    font-weight: 800;
-    color: var(--text-main);
-    font-size: 1.8rem;
-}
-
-/* Link Voltar em Laranja (Substitui o antigo .btn-back) */
-.btn-back-orange {
-    color: var(--primary) !important;
-    font-weight: 700;
-    font-size: 0.95rem;
-    text-decoration: none;
-    transition: opacity 0.2s;
-}
-
-.btn-back-orange:hover {
-    text-decoration: underline;
-    opacity: 0.8;
-}
-
-/* Card de Dados Principal com espaçamento interno generoso */
-.profile-card-main {
-    background: var(--bg-white);
-    padding: 40px !important;
-    border-radius: 15px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-    margin-bottom: 30px;
-}
-
-.section-subtitle {
-    font-weight: 700;
-    margin-bottom: 25px !important;
-    border-bottom: 2px solid var(--bg-light);
-    padding-bottom: 10px;
-    display: inline-block;
-    color: var(--text-main);
-}
-
-/* Organização dos dados cadastrais em colunas limpas */
-.profile-data-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-    text-align: left;
-}
-
-.data-group p {
-    margin-bottom: 12px;
-    font-size: 0.95rem;
-    color: var(--text-main);
-}
-
-/* Estilo para os rótulos dos dados (ex: Usuário, Email) */
-.data-group p span {
-    color: var(--text-muted);
-    font-weight: 600;
-    margin-right: 5px;
-    display: inline-block;
-    min-width: 80px;
-}
-
-/* Estilo para as caixas de estatísticas e records abaixo */
-.stats-card {
-    padding: 30px !important;
-}
-
-.simple-list {
-    margin-top: 15px;
-}
-
-.simple-list p {
-    margin-bottom: 15px;
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--bg-light);
-    padding-bottom: 8px;
-    font-size: 0.95rem;
-}
-
-.simple-list p strong {
-    color: var(--text-muted);
-    font-weight: 600;
-}
-
-/* Reset de qualquer classe .card antiga para evitar conflitos */
-.card {
-    background: none !important;
-    border: none !important;
-    box-shadow: none !important;
-}
-
-/* ==========================================================================
-   BOX PARTIDAS SALVAS (Versão Final Consolidada)
-   ========================================================================== */
-
-/* Container que envolve a lista de partidas */
-.saved-games-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px; /* Reduzi levemente o gap para caber mais itens antes do scroll */
-    max-height: 320px; 
-    overflow-y: auto;  
-    padding-right: 8px; /* Espaço para a barra de scroll não colar no card */
-}
-
-/* Item individual de cada partida */
-.game-entry {
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
-    padding: 12px 15px; /* Padding vertical levemente reduzido */
-    background-color: var(--bg-light);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    transition: all 0.2s ease;
-}
-
-.game-entry:hover {
-    transform: translateX(5px);
-    border-color: var(--primary); /* Destaque sutil na borda ao passar o mouse */
-}
-
-/* Estilo do texto (Nome e Data) */
-.game-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    text-align: left;
-}
-
-.game-info .name {
-    font-weight: 700;
-    color: var(--text-main);
-    font-size: 0.95rem;
-    word-break: break-all;
-}
-
-.game-info .date {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-}
-
-/* Botão "Jogar" compacto */
-.btn-play-small {
-    background-color: var(--primary) !important;
-    color: white !important;
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-decoration: none;
-    white-space: nowrap;
-}
-
-/* Customização da barra de rolagem */
-.saved-games-list::-webkit-scrollbar {
-    width: 5px;
-}
-.saved-games-list::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 10px;
-}
-
-/* Centralização do texto de 'vazio' (Melhorado) */
-.empty-state-container {
-    text-align: center;
-    padding: 30px 10px;
-}
-
-.empty-state {
-    display: block;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    font-weight: 600;
-    font-style: normal; /* Removido o itálico para manter o padrão clean */
-}
-
-.empty-state-container small {
-    display: block;
-    color: #999;
-    font-size: 0.75rem;
-    margin-top: 5px;
-}
-
-/* ==========================================================================
-   TELA DE JOGO - VERSÃO OTIMIZADA (CLEAN)
-   ========================================================================== */
-
-.game-container {
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 40px;
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 0 20px;
-}
-
-/* Sidebar e Métricas */
-.sidebar {
-    background: var(--bg-white);
-    padding: 25px;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-}
-
-.sidebar h3 {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-muted);
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 10px;
-}
-
-.metric-box {
-    padding: 12px 0;
-    border-bottom: 1px solid var(--bg-light);
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.95rem;
-}
-
-/* Container de Decisões em Lista Vertical */
-.decision-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 25px;
-}
-
-/* Esconde o rádio original e prepara o card como label */
-.card-option { 
-    cursor: pointer; 
-    display: block; 
-}
-
-.card-option input[type="radio"] { 
-    display: none; 
-}
-
-/* Estilo do Card Horizontal */
-.card-content {
-    display: flex;
-    align-items: center;
-    padding: 16px;
-    background: var(--bg-white);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    transition: all 0.2s ease;
-}
-
-/* Feedback de Seleção */
-.card-option input[type="radio"]:checked + .card-content {
-    border-color: var(--primary);
-    background-color: #fff9f5; /* Tom leve de laranja */
-    box-shadow: 0 4px 12px rgba(242, 116, 5, 0.1);
-}
-
-/* Ícone do Card */
-.card-icon {
-    font-size: 1.8rem;
-    margin-right: 18px;
-    background: var(--bg-light);
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-}
-
-/* Informações de Texto */
-.card-info h4 { 
-    margin: 0 0 4px 0; 
-    font-size: 1.1rem; 
-    color: var(--text-main); 
-}
-
-.card-info p { 
-    margin: 0 0 10px 0; 
-    font-size: 0.9rem; 
-    color: var(--text-muted); 
-}
-
-/* Tags de Impacto (Lado a Lado) */
-.card-tags { 
-    display: flex; 
-    gap: 8px; 
-    flex-wrap: wrap; 
-}
-
-.tag {
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.tag.positive { background: #e3f9e5; color: #1f8b24; }
-.tag.negative { background: #fee2e2; color: #dc2626; }
-.tag.neutral { background: #f1f2f6; color: #57606f; }
-
-/* Botão de Avanço (Largo) */
-.btn-primary-lg {
-    width: 100%;
-    padding: 16px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: filter 0.2s;
-}
-
-.btn-primary-lg:hover { 
-    filter: brightness(1.1); 
-}
-
-/* Notificação Minimalista (Toast) - Posicionamento Corrigido */
-.choice-toast {
-    display: none; /* Escondido por padrão, controlado pelo JS */
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: #333;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 50px; /* Formato de pílula */
-    font-size: 0.9rem;
-    font-weight: 500;
-    z-index: 9999;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    animation: fadeInSlide 0.3s ease-out; /* Animação suave ao aparecer */
-}
-
-/* Animação para o Toast não aparecer "seco" */
-@keyframes fadeInSlide {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
+@media (max-width: 768px) {
+    
+    /* 1. CORREÇÃO DE POSICIONAMENTO DO HAMBÚRGUER */
+    .hamburger {
+        display: flex;
+        z-index: 1002;
+        /* Força o botão para a direita se houver espaço sobrando */
+        margin-left: auto; 
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+
+    /* IMPORTANTE: Remove a tag <nav> do fluxo do layout Flexbox.
+       Isso faz com que o header só enxergue [Logo] e [Hambúrguer].
+       Com space-between, eles vão para os extremos.
+    */
+    .header-container nav {
+        position: absolute; 
+        width: 0;
+        height: 0;
+        /* Não use display:none, senão o menu dentro dele some também */
     }
-}
 
-/* ==========================================================================
-   ALERTAS E MENSAGENS DE CONFIRMAÇÃO (SISTEMA)
-   ========================================================================== */
-
-.messages-container {
-    margin: 20px 5%;
-    max-width: 1200px;
-}
-
-.inline-messages {
-    margin-bottom: 25px;
-    width: 100%;
-}
-
-.alert {
-    display: flex;
-    align-items: center;
-    padding: 14px 20px;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    line-height: 1.4;
-    border: 1px solid transparent;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
-    animation: fadeInSlide 0.4s ease-out;
-}
-
-/* Estilo específico para Sucesso (Verde Clean) */
-.alert-success {
-    background-color: #ecfdf5; /* Verde bem clarinho */
-    color: #065f46;            /* Verde escuro para leitura */
-    border-color: #a7f3d0;
-}
-
-/* Adiciona um ícone de check antes da mensagem automaticamente */
-.alert-success::before {
-    content: '✓';
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    background: #10b981;
-    color: white;
-    border-radius: 50%;
-    margin-right: 12px;
-    font-size: 0.75rem;
-    font-weight: bold;
-    flex-shrink: 0;
-}
-
-/* Estilo para Erros ou Avisos (Caso precise) */
-.alert-error, .alert-danger {
-    background-color: #fef2f2;
-    color: #991b1b;
-    border-color: #fecaca;
-}
-
-.alert-error::before {
-    content: '!';
-    /* ... mesmo estilo do círculo acima, mas vermelho ... */
-    background: #ef4444;
-}
-
-/* Estilo para Conquistas Desbloqueadas */
-.alert-conquista {
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    color: #92400e;
-    border-color: #fcd34d;
-    box-shadow: 0 8px 20px rgba(252, 211, 77, 0.3);
-    animation: conquistaEntrada 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    position: relative;
-    overflow: hidden;
-}
-
-.alert-conquista::before {
-    content: '🏆';
-    font-size: 1.2rem;
-    margin-right: 12px;
-    animation: trofeoPulse 1.5s infinite;
-}
-
-.alert-conquista::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 300%;
-    height: 300%;
-    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
-    transform: translate(-50%, -50%) scale(0);
-    animation: conquistaBrilho 0.8s ease-out;
-}
-
-@keyframes conquistaEntrada {
-    0% {
-        transform: translateY(-100px) scale(0.8);
-        opacity: 0;
+    /* 2. Menu Deslizante */
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        right: -100%; /* Começa escondido */
+        width: 75%;   /* Largura do menu aberto */
+        height: 100vh;
+        background-color: var(--bg-white);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+        transition: right 0.4s ease;
+        z-index: 1001;
+        gap: 25px;
     }
-    50% {
-        transform: translateY(10px) scale(1.05);
+
+    .nav-menu.active {
+        right: 0; /* Desliza para dentro */
     }
-    100% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
+
+    .nav-item {
+        font-size: 1.2rem;
     }
-}
 
-@keyframes trofeoPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-}
+    /* Animação do X */
+    .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
 
-@keyframes conquistaBrilho {
-    0% {
-        transform: translate(-50%, -50%) scale(0);
-        opacity: 1;
+    /* 3. Ajustes de Layout Mobile */
+    .dashboard-grid {
+        grid-template-columns: 1fr; 
+        gap: 20px;
     }
-    100% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 0;
+
+    .main-header, main.dashboard-main {
+        padding: 20px 5%;
     }
-}
 
-/* ==========================================================================
-   TELA DE RESULTADO FINAL (MODAL)
-   ========================================================================== */
+    .profile-card-main {
+        padding: 20px !important;
+    }
 
-.overlay-endgame {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.9); /* Fundo bem escuro */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999; /* Garante que fica por cima de tudo */
-    backdrop-filter: blur(8px);
-}
-
-.modal-endgame {
-    background: white;
-    padding: 40px;
-    border-radius: 12px;
-    max-width: 400px;
-    width: 90%;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-.modal-endgame h2 {
-    font-size: 2rem;
-    margin-bottom: 10px;
-}
-
-.title-success { color: #28a745; }
-.title-danger { color: #dc3545; }
-
-.endgame-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin: 30px 0;
-    padding: 20px;
-    background: var(--bg-light);
-    border-radius: 10px;
-}
-
-.stat-item span {
-    display: block;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    margin-bottom: 5px;
-}
-
-.stat-item strong {
-    font-size: 1.2rem;
-    color: var(--text-main);
-}
-
-.endgame-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.btn-outline {
-    padding: 15px;
-    text-decoration: none;
-    color: var(--text-main);
-    font-weight: 600;
-    font-size: 0.9rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    transition: background 0.2s;
-}
-
-.btn-outline:hover {
-    background: #eee;
-}
-
-
-/* ==========================================================================
-   TELA: NOVA PARTIDA / AUTH
-   ========================================================================== */
-
-.container-central {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: calc(100vh - 160px); /* Desconta header e footer */
-    padding: 20px;
-}
-
-.auth-card {
-    background: var(--bg-white);
-    padding: 40px;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    max-width: 450px;
-    width: 100%;
-    text-align: center;
-}
-
-.auth-card h1 {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: var(--text-main);
-    margin-bottom: 10px;
-}
-
-.auth-card .subtitle {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    margin-bottom: 30px;
-}
-
-/* Campos de Formulário Padronizados */
-.form-standard {
-    text-align: left;
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-main);
-    margin-bottom: 8px;
-}
-
-.input-field {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 1rem;
-    transition: border-color 0.2s;
-}
-
-.input-field:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(255, 133, 27, 0.1); /* Brilho sutil laranja */
-}
-
-.helper-text {
-    display: block;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-top: 5px;
-}
-
-.footer-simple {
-    text-align: center;
-    padding: 20px;
-    color: var(--text-muted);
-    font-size: 0.85rem;
-}
-
-/* Alerts */
-.alert {
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 20px;
-    font-size: 0.85rem;
-}
-.alert-error { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
-
-/* --- CORREÇÃO DO HEADER (IGUAL AO SEGUNDO PRINT) --- */
-.header-container-game {
-    display: flex;
-    justify-content: center; /* Mantém o título no centro */
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-    position: relative;
-    padding: 20px 0;
-}
-
-.header-logo-center {
-    color: var(--primary); /* Laranja */
-    font-size: 1.8rem;
-    font-weight: 800;
-    text-align: center;
-}
-
-/* Estilo para o link "Voltar" (Texto puro com seta) */
-.link-back-simple {
-    position: absolute;
-    right: 20px;
-    color: var(--primary); /* Laranja */
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: opacity 0.2s;
-}
-
-.link-back-simple:hover {
-    text-decoration: underline;
-    opacity: 0.8;
-}
-
-/* --- AJUSTE DO RODAPÉ PADRÃO --- */
-.footer-simple {
-    text-align: center;
-    padding: 30px 20px;
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    border-top: 1px solid var(--border); /* Linha sutil se desejar */
-    margin-top: auto;
-}
-
-/* Garante que o body ocupe a tela toda para o rodapé ficar embaixo */
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-/* --- BOTÃO PADRONIZADO --- */
-/* Certifique-se de que a classe .btn-primary está assim: */
-.btn-primary {
-    width: 100%;
-    padding: 14px;
-    background-color: var(--primary) !important;
-    color: white !important;
-    border: none;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: filter 0.2s;
-}
-
-.btn-primary:hover {
-    filter: brightness(1.1);
-}
-
-/* ==========================================================================
-   TELA DE HISTÓRICO (TIMELINE)
-   ========================================================================== */
-
-.timeline-container {
-    position: relative;
-    max-width: 800px;
-    margin: 40px auto;
-    padding-left: 30px;
-}
-
-/* A linha vertical que liga os pontos */
-.timeline-line {
-    position: absolute;
-    left: 7px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: var(--border);
-    z-index: 1;
-}
-
-.timeline-item {
-    position: relative;
-    margin-bottom: 25px;
-    z-index: 2;
-}
-
-/* O ponto laranja na linha do tempo */
-.timeline-dot {
-    position: absolute;
-    left: -30px;
-    top: 20px;
-    width: 16px;
-    height: 16px;
-    background: var(--primary);
-    border: 3px solid var(--bg-white);
-    border-radius: 50%;
-    box-shadow: 0 0 0 3px var(--bg-light);
-}
-
-/* Card de cada decisão */
-.timeline-card {
-    background: var(--bg-white);
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-    transition: transform 0.2s ease;
-}
-
-.timeline-card:hover {
-    transform: translateX(5px);
-    border-color: var(--primary);
-}
-
-.timeline-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    border-bottom: 1px solid var(--bg-light);
-    padding-bottom: 8px;
-}
-
-.turno-badge-small {
-    background: var(--bg-light);
-    color: var(--primary);
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-weight: 700;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-}
-
-.timeline-date {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-}
-
-.timeline-body p {
-    font-size: 1rem;
-    color: var(--text-main);
-    font-weight: 500;
-}
-
-/* Ajuste para telas menores */
-@media (max-width: 600px) {
-    .timeline-header {
+    .game-entry {
         flex-direction: column;
         align-items: flex-start;
-        gap: 5px;
-    }
-}
-
-/* ==========================================================================
-   TELA DE CONQUISTAS
-   ========================================================================== */
-
-.conquistas-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    margin-top: 30px;
-}
-
-.achievement-card {
-    background: var(--bg-white);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    padding: 25px;
-    box-shadow: var(--shadow);
-    transition: transform 0.2s ease;
-}
-
-.achievement-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--primary);
-}
-
-.achievement-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--bg-light);
-    padding-bottom: 15px;
-}
-
-.achievement-main-info h3 {
-    font-size: 1.3rem;
-    font-weight: 800;
-    color: var(--text-main);
-    margin-bottom: 5px;
-}
-
-.achievement-desc {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
-
-.badge-turno {
-    background: #fff9f5;
-    color: var(--primary);
-    border: 1px solid rgba(242, 116, 5, 0.2);
-    padding: 4px 12px;
-    border-radius: 50px;
-    font-size: 0.8rem;
-    font-weight: 700;
-}
-
-/* Detalhes Técnicos dentro do Card */
-.achievement-details {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 15px;
-    background: var(--bg-light);
-    padding: 15px;
-    border-radius: 8px;
-}
-
-.detail-item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.detail-item span {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-.detail-item strong {
-    font-size: 0.95rem;
-    color: var(--text-main);
-}
-
-/* Status Colors */
-.status-active { color: #1f8b24; }
-.status-finished { color: #57606f; }
-
-@media (max-width: 600px) {
-    .achievement-header {
-        flex-direction: column;
         gap: 10px;
     }
-    .achievement-details {
-        grid-template-columns: 1fr 1fr;
+    
+    .btn-play-small {
+        width: 100%;
+        text-align: center;
     }
-}
-
-/* ==========================================================================
-   TELA DE RANKING (TABELA MODERNA)
-   ========================================================================== */
-
-.ranking-filter-section {
-    background: var(--bg-white);
-    padding: 20px;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    margin-bottom: 25px;
-}
-
-.ranking-filter-section h3 {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 12px;
-}
-
-.filter-group {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.filter-btn {
-    padding: 8px 16px;
-    background: var(--bg-light);
-    color: var(--text-main);
-    border-radius: 6px;
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 600;
-    border: 1px solid var(--border);
-    transition: all 0.2s;
-}
-
-/* Melhora a visibilidade do filtro selecionado */
-.filter-btn.active {
-    background-color: var(--primary) !important;
-    color: #ffffff !important; /* Branco puro para contraste */
-    border-color: var(--primary);
-    font-weight: 700;
-    box-shadow: 0 2px 8px rgba(242, 116, 5, 0.3);
-}
-
-/* Garante que o link não mude de cor ao ser clicado */
-.filter-btn.active:hover {
-    color: #ffffff !important;
-    filter: brightness(1.1);
-}
-
-/* Tabela */
-.ranking-table-container {
-    background: var(--bg-white);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    overflow: hidden; /* Garante que as bordas arredondadas funcionem */
-    box-shadow: var(--shadow);
-}
-
-.modern-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.95rem;
-}
-
-.modern-table thead tr {
-    background: #f8f9fa;
-    border-bottom: 2px solid var(--border);
-}
-
-.modern-table th {
-    padding: 15px;
-    text-align: left;
-    color: var(--text-muted);
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.5px;
-}
-
-.modern-table td {
-    padding: 15px;
-    border-bottom: 1px solid var(--bg-light);
-    color: var(--text-main);
-}
-
-/* Destaque para a linha do próprio usuário */
-.modern-table tr.highlight-row {
-    background-color: #fff9f5;
-}
-
-.modern-table tr.highlight-row td {
-    border-bottom: 1px solid #fee2d5;
-}
-
-.rank-number {
-    font-weight: 800;
-    color: var(--primary);
-}
-
-.company-name {
-    font-weight: 700;
-}
-
-.me-badge {
-    font-size: 0.65rem;
-    background: var(--primary);
-    color: white;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-left: 8px;
-    vertical-align: middle;
-}
-
-/* Utilitários da Tabela */
-.text-right { text-align: right !important; }
-.text-center { text-align: center !important; }
-.font-bold { font-weight: 700; }
-.color-primary { color: var(--primary); }
-.color-success { color: #1f8b24; }
-
-.ranking-footer {
-    margin-top: 20px;
-    padding: 10px;
-}
-
-.educator-note {
-    font-size: 0.85rem;
-    color: var(--primary);
-    font-style: italic;
-    display: block;
-    margin-top: 5px;
-}
-
-/* --- RODAPÉ PADRONIZADO (GLOBAL) --- */
-footer, .footer-simple, .main-footer {
-    width: 100%;
-    padding: 25px 0;
-    text-align: center;
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    background-color: transparent; /* Mantém o padrão clean */
-    border-top: 1px solid var(--border);
-    margin-top: auto; /* Truque fundamental para empurrar o rodapé para o fim */
-}
-
-/* Ajuste no Body para permitir que o 'margin-top: auto' do footer funcione */
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* Garante que o corpo ocupe a tela toda */
-    margin: 0;
-    font-family: 'Inter', 'Segoe UI', sans-serif;
-    background-color: var(--bg-light);
-    color: var(--text-main);
-}
-
-/* Ajuste no Main para não "prender" o rodapé no meio da tela */
-main {
-    flex: 1 0 auto; /* Faz o conteúdo crescer e empurrar o rodapé */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 40px 20px;
-    width: 100%;
-}
-
-/* Estilo para o link de cadastro abaixo do card de login */
-.login-footer-text {
-    margin-top: 20px;
-    font-size: 0.95rem;
-}
-
-/* ==========================================================================
-   TABELAS (Dashboard Educador & Ranking)
-   ========================================================================== */
-.table-responsive {
-    overflow-x: auto;
-}
-
-.custom-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.95rem;
-}
-
-.custom-table th {
-    text-align: left;
-    padding: 12px 15px;
-    background-color: var(--bg-light);
-    color: var(--text-muted);
-    font-weight: 700;
-    border-bottom: 2px solid var(--border);
-    text-transform: uppercase;
-    font-size: 0.8rem;
-}
-
-.custom-table td {
-    padding: 14px 15px;
-    border-bottom: 1px solid var(--border);
-    color: var(--text-main);
-}
-
-.custom-table tr:last-child td {
-    border-bottom: none;
-}
-
-.custom-table tr:hover {
-    background-color: #fff9f5; /* Leve tom laranja no hover */
 }

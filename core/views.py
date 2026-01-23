@@ -307,6 +307,7 @@ def conquistas(request):
     Apenas garante que as conquistas existem, sem reprocessar tudo.
     """
     from core.services.conquistas import _garantir_conquistas_existem
+    from itertools import groupby
     
     # Apenas garante que as conquistas base existem no sistema
     _garantir_conquistas_existem()
@@ -316,9 +317,23 @@ def conquistas(request):
         ConquistaDesbloqueada.objects
         .select_related('conquista', 'partida', 'partida__startup')
         .filter(partida__usuario=request.user)
-        .order_by('-conquista__pontos', 'conquista__titulo')
+        .order_by('partida__nome_empresa', '-desbloqueada_em')
     )
-    return render(request, 'conquistas.html', {'conquistas': conquistas})
+    
+    # Agrupar por empresa e calcular pontos
+    conquistas_por_empresa = []
+    conquistas_list = list(conquistas)
+    
+    for empresa_nome, grupo in groupby(conquistas_list, key=lambda x: x.partida.nome_empresa):
+        grupo_list = list(grupo)
+        pontos_totais = sum(conquista.conquista.pontos for conquista in grupo_list)
+        conquistas_por_empresa.append({
+            'empresa': empresa_nome,
+            'conquistas': grupo_list,
+            'pontos_totais': pontos_totais
+        })
+    
+    return render(request, 'conquistas.html', {'conquistas_por_empresa': conquistas_por_empresa})
 
 @login_required
 @pode_acessar_ranking

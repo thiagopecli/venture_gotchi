@@ -16,53 +16,289 @@
         </div>
     {% else %}
 
-    <div class="conquistas-grid">
-        {% if conquistas %}
-            {% for conquista in conquistas %}
-            <div class="achievement-card">
-                <div class="achievement-header">
-                    <div class="achievement-main-info">
-                        <h3>{{ conquista.conquista.titulo }}</h3>
-                        <p class="achievement-desc">{{ conquista.conquista.descricao }}</p>
-                    </div>
-                    <span class="badge-turno">Turno {{ conquista.turno }}</span>
+    {% if conquistas_por_empresa %}
+        {% for grupo in conquistas_por_empresa %}
+        <div class="empresa-group">
+            <div class="empresa-header">
+                <h3 class="empresa-title">{{ grupo.empresa }}</h3>
+                <div class="empresa-pontos">
+                    <span class="pontos-label">Pontos:</span>
+                    <span class="pontos-valor">{{ grupo.pontos_totais }}</span>
                 </div>
+            </div>
+            
+            {% if grupo.conquistas|length == 1 %}
+                <!-- Se houver apenas uma conquista, não usar carrossel -->
+                <div class="conquistas-grid">
+                    {% for conquista in grupo.conquistas %}
+                    <div class="achievement-card">
+                        <div class="achievement-header">
+                            <div class="achievement-main-info">
+                                <h3>{{ conquista.conquista.titulo }}</h3>
+                                <p class="achievement-desc">{{ conquista.conquista.descricao }}</p>
+                            </div>
+                            <span class="badge-turno">Turno {{ conquista.turno }}</span>
+                        </div>
 
-                <div class="achievement-details">
-                    <div class="detail-item">
-                        <span>Empresa</span>
-                        <strong>{{ conquista.partida.nome_empresa }}</strong>
+                        <div class="achievement-details">
+                            <div class="detail-item">
+                                <span>Data</span>
+                                <strong>{{ conquista.desbloqueada_em|date:"d/m/Y" }}</strong>
+                            </div>
+                            {% if conquista.partida.startup %}
+                            <div class="detail-item">
+                                <span>Saldo Final</span>
+                                <strong>{{ conquista.partida.startup.saldo_caixa|moeda_br }}</strong>
+                            </div>
+                            <div class="detail-item">
+                                <span>Valuation</span>
+                                <strong>{{ conquista.partida.startup.valuation|moeda_br }}</strong>
+                            </div>
+                            {% endif %}
+                            <div class="detail-item">
+                                <span>Status</span>
+                                <strong class="status-{% if conquista.partida.ativa %}active{% else %}finished{% endif %}">
+                                    {% if conquista.partida.ativa %}Ativa{% else %}Finalizada{% endif %}
+                                </strong>
+                            </div>
+                        </div>
                     </div>
-                    <div class="detail-item">
-                        <span>Data</span>
-                        <strong>{{ conquista.desbloqueada_em|date:"d/m/Y" }}</strong>
-                    </div>
-                    {% if conquista.partida.startup %}
-                    <div class="detail-item">
-                        <span>Saldo Final</span>
-                        <strong>{{ conquista.partida.startup.saldo_caixa|moeda_br }}</strong>
-                    </div>
-                    <div class="detail-item">
-                        <span>Valuation</span>
-                        <strong>{{ conquista.partida.startup.valuation|moeda_br }}</strong>
-                    </div>
-                    {% endif %}
-                    <div class="detail-item">
-                        <span>Status</span>
-                        <strong class="status-{% if conquista.partida.ativa %}active{% else %}finished{% endif %}">
-                            {% if conquista.partida.ativa %}Ativa{% else %}Finalizada{% endif %}
-                        </strong>
-                    </div>
+                    {% endfor %}
                 </div>
-            </div>
-            {% endfor %}
-        {% else %}
-            <div class="empty-state-container">
-                <p class="empty-state">Você ainda não desbloqueou conquistas.</p>
-                <small>Continue jogando para registrar seus marcos de sucesso!</small>
-            </div>
-        {% endif %}
-    </div>
+            {% else %}
+                <!-- Carrossel para múltiplas conquistas -->
+                <div class="swiper-container carousel-empresa">
+                    <div class="swiper-wrapper">
+                        {% for conquista in grupo.conquistas %}
+                        <div class="swiper-slide">
+                            <div class="achievement-card">
+                                <div class="achievement-header">
+                                    <div class="achievement-main-info">
+                                        <h3>{{ conquista.conquista.titulo }}</h3>
+                                        <p class="achievement-desc">{{ conquista.conquista.descricao }}</p>
+                                    </div>
+                                    <span class="badge-turno">Turno {{ conquista.turno }}</span>
+                                </div>
+
+                                <div class="achievement-details">
+                                    <div class="detail-item">
+                                        <span>Data</span>
+                                        <strong>{{ conquista.desbloqueada_em|date:"d/m/Y" }}</strong>
+                                    </div>
+                                    {% if conquista.partida.startup %}
+                                    <div class="detail-item">
+                                        <span>Saldo Final</span>
+                                        <strong>{{ conquista.partida.startup.saldo_caixa|moeda_br }}</strong>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span>Valuation</span>
+                                        <strong>{{ conquista.partida.startup.valuation|moeda_br }}</strong>
+                                    </div>
+                                    {% endif %}
+                                    <div class="detail-item">
+                                        <span>Status</span>
+                                        <strong class="status-{% if conquista.partida.ativa %}active{% else %}finished{% endif %}">
+                                            {% if conquista.partida.ativa %}Ativa{% else %}Finalizada{% endif %}
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Navegação do carrossel -->
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state-container">
+            <p class="empty-state">Você ainda não desbloqueou conquistas.</p>
+            <small>Continue jogando para registrar seus marcos de sucesso!</small>
+        </div>
+    {% endif %}
+
     {% endif %}
 </main>
+
+<!-- Swiper.js CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+<style>
+    .empresa-group {
+        margin-bottom: 5rem;
+    }
+    
+    .empresa-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #ff9500;
+    }
+    
+    .empresa-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+    }
+
+    .empresa-pontos {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        background-color: #fff3e0;
+        padding: 0.5rem 1.25rem;
+        border-radius: 20px;
+        border: 2px solid #ff9500;
+    }
+
+    .pontos-label {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.95rem;
+    }
+
+    .pontos-valor {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ff9500;
+    }
+    
+    .conquistas-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .carousel-empresa {
+        max-width: 100%;
+        margin-bottom: 4rem;
+        padding: 0 3rem 2rem 3rem;
+    }
+
+    .carousel-empresa .swiper-slide {
+        width: auto;
+        display: flex;
+        justify-content: center;
+    }
+
+    .carousel-empresa .achievement-card {
+        min-width: 350px;
+        max-width: 400px;
+        height: 100%;
+    }
+
+    .carousel-empresa .swiper-button-prev,
+    .carousel-empresa .swiper-button-next {
+        width: 40px;
+        height: 40px;
+        background-color: #ff9500;
+        border-radius: 50%;
+        color: white;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+    }
+
+    .carousel-empresa .swiper-button-prev::after,
+    .carousel-empresa .swiper-button-next::after {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .carousel-empresa .swiper-button-prev {
+        left: 0;
+    }
+
+    .carousel-empresa .swiper-button-next {
+        right: 0;
+    }
+
+    .carousel-empresa .swiper-button-prev:hover,
+    .carousel-empresa .swiper-button-next:hover {
+        background-color: #ff7f00;
+    }
+
+    .carousel-empresa .swiper-pagination {
+        position: relative;
+        bottom: auto;
+        margin-top: 1.5rem;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .carousel-empresa .swiper-pagination-bullet {
+        background-color: #ff9500;
+        opacity: 0.6;
+        width: 10px;
+        height: 10px;
+        margin: 0;
+    }
+
+    .carousel-empresa .swiper-pagination-bullet-active {
+        background-color: #ff9500;
+        opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+        .empresa-group {
+            margin-bottom: 4rem;
+        }
+
+        .empresa-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .carousel-empresa {
+            padding: 0 2rem 1.5rem 2rem;
+            margin-bottom: 3.5rem;
+        }
+
+        .carousel-empresa .achievement-card {
+            min-width: 280px;
+            max-width: 320px;
+        }
+
+        .carousel-empresa .swiper-button-prev,
+        .carousel-empresa .swiper-button-next {
+            width: 32px;
+            height: 32px;
+        }
+    }
+</style>
+
+<!-- Swiper.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar todos os carrosséis de empresas
+        const carousels = document.querySelectorAll('.carousel-empresa');
+        carousels.forEach(carousel => {
+            new Swiper(carousel, {
+                slidesPerView: 'auto',
+                spaceBetween: 20,
+                navigation: {
+                    nextEl: carousel.querySelector('.swiper-button-next'),
+                    prevEl: carousel.querySelector('.swiper-button-prev'),
+                },
+                pagination: {
+                    el: carousel.querySelector('.swiper-pagination'),
+                    clickable: true,
+                },
+                keyboard: true,
+            });
+        });
+    });
+</script>
 {% endblock %}

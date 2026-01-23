@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% load custom_filters %}
+
+{% block title %}Análise Geral de Turmas - Venture Gotchi{% endblock %}
+
+{% block content %}
+<main class="dashboard-main">
+    <!-- Seção de Boas-vindas -->
+    <div class="welcome-section">
+        <div class="welcome-text">
+            <h1>Análise Geral</h1>
+            <p>Métricas agregadas de todas as turmas do sistema.</p>
+            <div class="profile-info" style="margin-top: 12px;">
+                <a href="{% url 'educador_dashboard' %}" class="btn-outline" style="padding: 8px 16px; text-decoration: none; border: 1px solid var(--border); font-size: 0.9rem;">← Voltar</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPIs Gerais -->
+    <section style="margin-top: 20px;">
+        <div class="info-card">
+            <h3 style="margin-bottom: 20px;">Métricas Agregadas do Sistema</h3>
+            
+            <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <div class="kpi-card" style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; text-align: center;">
+                    <small style="color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Total de Turmas</small>
+                    <p style="font-size: 1.6rem; font-weight: 800; color: var(--primary); margin: 10px 0;">
+                        {{ total_turmas }}
+                    </p>
+                </div>
+                <div class="kpi-card" style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; text-align: center;">
+                    <small style="color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Total de Alunos</small>
+                    <p style="font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin: 10px 0;">
+                        {{ total_alunos }}
+                    </p>
+                </div>
+                <div class="kpi-card" style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; text-align: center;">
+                    <small style="color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Startups Ativas</small>
+                    <p style="font-size: 1.6rem; font-weight: 800; color: #FF6B6B; margin: 10px 0;">
+                        {{ total_startups }}
+                    </p>
+                </div>
+                <div class="kpi-card" style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; text-align: center;">
+                    <small style="color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Média Valuation</small>
+                    <p style="font-size: 1.6rem; font-weight: 800; color: var(--primary); margin: 10px 0;">
+                        {{ media_valuation|moeda_br }}
+                    </p>
+                </div>
+                <div class="kpi-card" style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; text-align: center;">
+                    <small style="color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Caixa Médio</small>
+                    <p style="font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin: 10px 0;">
+                        {{ media_caixa|moeda_br }}
+                    </p>
+                </div>
+                <div class="kpi-card" style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; text-align: center;">
+                    <small style="color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Top Recorde</small>
+                    <p style="font-size: 1.6rem; font-weight: 800; color: #28a745; margin: 10px 0;">
+                        {{ maior_valuation|moeda_br }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Distribuição por Turma -->
+    <section style="margin-top: 20px;">
+        <div class="info-card">
+            <h3 style="margin-bottom: 20px;">Distribuição por Turma</h3>
+            <p class="hint">Resumo de cada turma do sistema.</p>
+            
+            {% if turmas_dados %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
+                {% for turma_info in turmas_dados %}
+                <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; border-left: 3px solid var(--primary);">
+                    <h4 style="margin-bottom: 10px; color: var(--text-main);">{{ turma_info.turma.nome }}</h4>
+                    <small style="color: var(--primary); font-weight: bold;">{{ turma_info.turma.codigo }}</small>
+                    
+                    <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9rem;">
+                        <div>
+                            <small style="color: var(--text-muted);">Alunos</small>
+                            <p style="font-weight: bold; color: var(--text-main);">{{ turma_info.total_alunos }}</p>
+                        </div>
+                        <div>
+                            <small style="color: var(--text-muted);">Startups</small>
+                            <p style="font-weight: bold; color: #FF6B6B;">{{ turma_info.startups_ativas }}</p>
+                        </div>
+                        <div>
+                            <small style="color: var(--text-muted);">Média Val.</small>
+                            <p style="font-weight: bold; color: var(--primary);">{{ turma_info.media_valuation|moeda_br }}</p>
+                        </div>
+                        <div>
+                            <small style="color: var(--text-muted);">Top</small>
+                            <p style="font-weight: bold; color: #28a745;">{{ turma_info.maior_valuation|moeda_br }}</p>
+                        </div>
+                    </div>
+                    
+                    <a href="{% url 'analise_turma' turma_info.turma.codigo %}" class="btn-play-small" style="width: 100%; margin-top: 15px; text-align: center; font-size: 0.9rem;">
+                        Ver Detalhes
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state-container">
+                <span class="empty-state">Nenhuma turma encontrada no sistema.</span>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</main>
+{% endblock %}

@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.contrib.messages import get_messages
 from decimal import Decimal
 from core.services.conquistas import verificar_conquistas_partida, verificar_conquistas_progesso
-from .models import User, Partida, Startup, HistoricoDecisao 
+from .models import User, Partida, Startup, HistoricoDecisao, Turma
 from django.db.models import Prefetch
 from .forms import EditarPerfilForm
 from django.db.models import Avg, Max, Count, Sum
@@ -72,7 +72,12 @@ from django.db.models import Prefetch
 def dashboard(request):
     """
     Lista as partidas existentes do usuário, ordenadas da mais recente.
+    Redireciona educadores para o painel específico deles.
     """
+    # Redirecionar educadores para o dashboard específico
+    if request.user.is_educador():
+        return redirect('educador_dashboard')
+    
     partidas = (
         Partida.objects
         .filter(usuario=request.user)
@@ -360,8 +365,9 @@ def ranking(request):
     )
     
     # 3. Filtro por categoria do usuário (cada perfil visualiza apenas startups do mesmo tipo)
-    if request.user.categoria:
-        startups = startups.filter(partida__usuario__categoria=request.user.categoria)
+    # COMENTADO: Permitir que educadores vejam todas as startups
+    # if request.user.categoria:
+    #     startups = startups.filter(partida__usuario__categoria=request.user.categoria)
     
     # 4. Lógica de Filtro por Turma (Exclusivo Educador/Admin)
     # Verifica se é educador para permitir o filtro
@@ -418,7 +424,7 @@ def redirect_handler(request):
         return redirect('dashboard')
     
     elif cat == User.Categorias.EDUCADOR_NEGOCIOS:
-        return redirect('dashboard')
+        return redirect('educador_dashboard')
     
     elif cat == User.Categorias.PROFISSIONAL_CORPORATIVO:
         return redirect('dashboard')
@@ -451,43 +457,182 @@ def educador_only(view_func):
 @login_required
 @educador_only
 def educador_dashboard(request):
+    # Buscar todas as turmas do educador
+    turmas_educador = Turma.objects.filter(educador=request.user, ativa=True)
+    
+    context = {
+        'turmas_educador': turmas_educador,
+    }
 
-    codigo_turma = request.GET.get('codigo_turma', '').strip()
-    
-    
-    partidas = Partida.objects.filter(ativa=True)
-    users_alunos = User.objects.filter(categoria=User.Categorias.ESTUDANTE_UNIVERSITARIO)
+    return render(request, 'educador_dashboard.html', context)
 
-    
-    if codigo_turma:
+@login_required
+@educador_only
+def criar_turma(request):
+    """
+    Cria uma nova turma para o educador com código único gerado automaticamente.
+    """
+    if request.method == 'POST':
+        nome_turma = request.POST.get('nome_turma', '').strip()
+        descricao_turma = request.POST.get('descricao_turma', '').strip()
         
-        partidas = partidas.filter(usuario__codigo_turma__iexact=codigo_turma)
-        users_alunos = users_alunos.filter(codigo_turma__iexact=codigo_turma)
-
+        if not nome_turma:
+            messages.error(request, 'O nome da turma é obrigatório.')
+            return redirect('educador_dashboard')
+        
+        # Gerar código único
+        codigo = Turma.gerar_codigo_unico()
+        
+        # Criar turma
+        turma = Turma.objects.create(
+            codigo=codigo,
+            nome=nome_turma,
+            descricao=descricao_turma,
+            educador=request.user
+        )
+        
+        messages.success(request, f'Turma "{nome_turma}" criada com sucesso! Código: {codigo}')
+        return redirect('educador_dashboard')
     
+    return redirect('educador_dashboard')
+
+@login_required
+@educador_only
+@login_required
+@educador_only
+def analise_turma(request, codigo_turma):
+    """
+    Exibe análise detalhada de uma turma específica.
+    """
+    turma = get_object_or_404(Turma, codigo__iexact=codigo_turma)
+    
+    # Buscar partidas e alunos dessa turma (case-insensitive)
+    partidas = Partida.objects.filter(ativa=True, usuario__codigo_turma__iexact=turma.codigo)
+    users_alunos = User.objects.filter(categoria=User.Categorias.ESTUDANTE_UNIVERSITARIO, codigo_turma__iexact=turma.codigo)
+    
+    # Calcular KPIs
     kpis = Startup.objects.filter(partida__in=partidas).aggregate(
         media_valuation=Avg('valuation'),
         media_caixa=Avg('saldo_caixa'),
         maior_valuation=Max('valuation'),
-        total_startups=Count('id')
+        total_startups=Count('partida'),
+        media_turno=Avg('turno_atual')
     )
-
     
+    # Ranking da turma
     ranking = (
         Startup.objects
         .select_related('partida', 'partida__usuario')
         .filter(partida__in=partidas)
         .order_by('-valuation')[:20]
     )
-
+    
     context = {
+        'turma': turma,
         'kpis': kpis,
         'ranking': ranking,
-        'filtro_atual': codigo_turma,
-        'total_alunos': users_alunos.count()
+        'total_alunos': users_alunos.count(),
+        'turno_medio': int(kpis.get('media_turno') or 0),
     }
+    
+    return render(request, 'analise_turma.html', context)
 
-    return render(request, 'educador_dashboard.html', context)
+@login_required
+@educador_only
+def ranking_turmas(request):
+    """
+    Exibe ranking com dados agregados de TODAS as turmas do sistema.
+    """
+    # Buscar TODAS as turmas que têm alunos ativos
+    turmas = Turma.objects.filter(ativa=True).order_by('-data_criacao')
+    
+    turmas_dados = []
+    for turma in turmas:
+        partidas = Partida.objects.filter(ativa=True, usuario__codigo_turma__iexact=turma.codigo)
+        users_alunos = User.objects.filter(categoria=User.Categorias.ESTUDANTE_UNIVERSITARIO, codigo_turma__iexact=turma.codigo)
+        
+        kpis = Startup.objects.filter(partida__in=partidas).aggregate(
+            media_valuation=Avg('valuation'),
+            maior_valuation=Max('valuation'),
+            total_startups=Count('partida')
+        )
+        
+        turmas_dados.append({
+            'turma': turma,
+            'total_alunos': users_alunos.count(),
+            'startups_ativas': kpis.get('total_startups') or 0,
+            'media_valuation': kpis.get('media_valuation') or 0,
+            'maior_valuation': kpis.get('maior_valuation') or 0,
+        })
+    
+    context = {
+        'turmas_dados': turmas_dados,
+    }
+    
+    return render(request, 'ranking_turmas.html', context)
+
+@login_required
+@educador_only
+def metricas_turmas(request):
+    """
+    Exibe análise geral agregada de TODAS as turmas do sistema.
+    """
+    # Buscar TODAS as turmas ativas
+    turmas = Turma.objects.filter(ativa=True).order_by('-data_criacao')
+    
+    # Buscar todos os dados das turmas
+    turmas_dados = []
+    total_alunos = 0
+    total_startups = 0
+    total_valuation = 0
+    max_valuation = 0
+    
+    for turma in turmas:
+        partidas = Partida.objects.filter(ativa=True, usuario__codigo_turma__iexact=turma.codigo)
+        users_alunos = User.objects.filter(categoria=User.Categorias.ESTUDANTE_UNIVERSITARIO, codigo_turma__iexact=turma.codigo)
+        
+        kpis = Startup.objects.filter(partida__in=partidas).aggregate(
+            media_valuation=Avg('valuation'),
+            maior_valuation=Max('valuation'),
+            total_startups=Count('partida'),
+            media_caixa=Avg('saldo_caixa')
+        )
+        
+        alunos_count = users_alunos.count()
+        startups_count = kpis.get('total_startups') or 0
+        media_val = kpis.get('media_valuation') or 0
+        maior_val = kpis.get('maior_valuation') or 0
+        
+        total_alunos += alunos_count
+        total_startups += startups_count
+        total_valuation += media_val
+        
+        if maior_val > max_valuation:
+            max_valuation = maior_val
+        
+        turmas_dados.append({
+            'turma': turma,
+            'total_alunos': alunos_count,
+            'startups_ativas': startups_count,
+            'media_valuation': media_val,
+            'maior_valuation': maior_val,
+            'media_caixa': kpis.get('media_caixa') or 0,
+        })
+    
+    # Calcular médias gerais
+    media_valuation_geral = total_valuation / len(turmas) if turmas.count() > 0 else 0
+    
+    context = {
+        'turmas_dados': turmas_dados,
+        'total_turmas': turmas.count(),
+        'total_alunos': total_alunos,
+        'total_startups': total_startups,
+        'media_valuation': media_valuation_geral,
+        'media_caixa': sum(t['media_caixa'] for t in turmas_dados) / len(turmas_dados) if turmas_dados else 0,
+        'maior_valuation': max_valuation,
+    }
+    
+    return render(request, 'metricas_turmas.html', context)
 
 import random
 import string

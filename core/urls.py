@@ -19,5 +19,9 @@ urlpatterns = [
     path('ranking/', views.ranking, name='ranking'),
     path('perfil/editar/', views.editar_perfil, name='editar_perfil'),
     path('educador/', views.educador_dashboard, name='educador_dashboard'),
+    path('criar-turma/', views.criar_turma, name='criar_turma'),
+    path('turma/<str:codigo_turma>/', views.analise_turma, name='analise_turma'),
+    path('ranking-turmas/', views.ranking_turmas, name='ranking_turmas'),
+    path('metricas-turmas/', views.metricas_turmas, name='metricas_turmas'),
     path('gerar-codigo-turma/', views.gerar_codigo_turma, name='gerar_codigo_turma'),
 ]

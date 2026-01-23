@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% load custom_filters %}
+
+{% block title %}Ranking de Turmas - Venture Gotchi{% endblock %}
+
+{% block content %}
+<main class="dashboard-main">
+    <!-- Seção de Boas-vindas -->
+    <div class="welcome-section">
+        <div class="welcome-text">
+            <h1>Ranking de Turmas</h1>
+            <p>Acompanhe o desempenho de todas as turmas do sistema.</p>
+            <div class="profile-info" style="margin-top: 12px;">
+                <a href="{% url 'educador_dashboard' %}" class="btn-outline" style="padding: 8px 16px; text-decoration: none; border: 1px solid var(--border); font-size: 0.9rem;">← Voltar</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela de Turmas -->
+    <section style="margin-top: 20px;">
+        <div class="info-card">
+            <h3 style="margin-bottom: 20px;">Todas as Turmas do Sistema</h3>
+            <p class="hint">Clique no nome da turma para ver análise detalhada.</p>
+            
+            {% if turmas_dados %}
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Turma</th>
+                            <th>Alunos</th>
+                            <th>Startups Ativas</th>
+                            <th>Média Valuation</th>
+                            <th>Top Recorde</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for turma_info in turmas_dados %}
+                        <tr>
+                            <td style="font-weight: bold; color: var(--primary); text-align: center;">{{ turma_info.turma.codigo }}</td>
+                            <td style="text-align: left; padding: 15px;">
+                                <div style="display: flex; flex-direction: column; gap: 5px;">
+                                    <strong style="font-size: 0.95rem;">{{ turma_info.turma.nome }}</strong>
+                                    {% if turma_info.turma.descricao %}
+                                    <span style="font-size: 0.85rem; color: var(--text-muted);">{{ turma_info.turma.descricao|truncatewords:5 }}</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td style="text-align: center; font-weight: 600; padding: 15px;">{{ turma_info.total_alunos }}</td>
+                            <td style="text-align: center; font-weight: 600; padding: 15px;">{{ turma_info.startups_ativas }}</td>
+                            <td style="text-align: center; font-weight: bold; color: var(--primary); padding: 15px;">{{ turma_info.media_valuation|moeda_br }}</td>
+                            <td style="text-align: center; color: #28a745; font-weight: bold; padding: 15px;">{{ turma_info.maior_valuation|moeda_br }}</td>
+                            <td style="text-align: center; padding: 15px;">
+                                <a href="{% url 'analise_turma' turma_info.turma.codigo %}" class="btn-play-small" style="font-size: 0.9rem;">Analisar</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state-container">
+                <span class="empty-state">Nenhuma turma encontrada no sistema.</span>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</main>
+{% endblock %}

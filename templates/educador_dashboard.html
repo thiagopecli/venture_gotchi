@@ -1,94 +1,188 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+
+{% block title %}Painel do Educador - Venture Gotchi{% endblock %}
+
+{% block content %}
 <main class="dashboard-main">
-    
-    <div class="header-container">
-        <div>
-            <h1 class="header-title">Painel do Educador</h1>
-            <p style="color: var(--text-muted);">Acompanhamento de desempenho e ranking das turmas.</p>
-        </div>
-        <div class="cta-container">
-            <a href="{% url 'ranking' %}" class="btn-primary-dash" style="background-color: #4D4D4D !important;">Ver Ranking Global</a>
+    <!-- Seção de Boas-vindas -->
+    <div class="welcome-section">
+        <div class="welcome-text">
+            <h1>Olá, {{ user.first_name|default:user.username }}!</h1>
+            <p>Gerencie suas turmas e acompanhe o desempenho dos estudantes.</p>
+            <div class="profile-info">
+                <strong>Perfil:</strong> <span>{{ user.get_categoria_display }}</span>
+            </div>
         </div>
     </div>
 
-    <div class="info-card" style="margin-bottom: 30px; padding: 20px;">
-        <form method="GET" style="display: flex; gap: 15px; align-items: flex-end;">
-            <div style="flex: 1;">
-                <label for="codigo_turma" style="font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; display:block;">Filtrar por Código da Turma:</label>
-                <input type="text" name="codigo_turma" id="codigo_turma" value="{{ filtro_atual }}" 
-                       placeholder="Ex: TURMA-2024-A" style="margin-bottom: 0;">
+    <!-- Grid de colunas principais -->
+    <div class="dashboard-grid">
+        <!-- Coluna 1: Minhas Turmas -->
+        <section class="dash-column">
+            <div class="info-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3>Minhas Turmas</h3>
+                    <button type="button" class="btn-primary" onclick="document.getElementById('modalCriarTurma').style.display='flex'" style="width: auto; padding: 8px 16px; font-size: 0.85rem;">
+                        + Criar
+                    </button>
+                </div>
+                <p class="hint">Gerencie suas turmas e acompanhe o desempenho.</p>
+                
+                {% if turmas_educador %}
+                <div class="turmas-list">
+                    {% for turma in turmas_educador %}
+                    <div class="turma-entry">
+                        <div class="turma-info">
+                            <span class="turma-code" style="color: var(--primary); font-weight: bold;">{{ turma.codigo }}</span>
+                            <span class="turma-name">{{ turma.nome }}</span>
+                            {% if turma.descricao %}
+                            <span class="turma-desc" style="font-size: 0.85rem; color: var(--text-muted);">{{ turma.descricao|truncatewords:10 }}</span>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'analise_turma' turma.codigo %}" class="btn-play-small" style="font-size: 0.9rem;">Analisar</a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state-container">
+                    <p class="empty-state">Nenhuma turma criada ainda.</p>
+                    <small>Clique em "Criar" para começar a gerenciar suas turmas.</small>
+                </div>
+                {% endif %}
             </div>
-            <button type="submit" class="btn-primary" style="width: auto; margin-top: 0; padding: 10px 24px;">Filtrar</button>
-            {% if filtro_atual %}
-                <a href="{% url 'educador_dashboard' %}" class="btn-outline" style="padding: 10px 24px; text-decoration: none; border: 1px solid var(--border);">Limpar</a>
-            {% endif %}
+        </section>
+
+        <!-- Coluna 2: Atalhos Rápidos -->
+        <section class="dash-column">
+            <div class="info-card">
+                <h3>Atalhos Rápidos</h3>
+                <p class="hint">Acesse funcionalidades principais.</p>
+                
+                <div class="cta-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                    <a href="{% url 'ranking_turmas' %}" class="btn-primary-dash" style="background-color: #ff9500 !important;">
+                        <strong>Ranking de Turmas</strong>
+                        <span style="display: block; font-size: 0.85rem; font-weight: normal; margin-top: 4px;">Veja o desempenho de todas as turmas</span>
+                    </a>
+                    <a href="{% url 'metricas_turmas' %}" class="btn-primary-dash" style="background-color: #ff9500 !important;">
+                        <strong>Análise Geral</strong>
+                        <span style="display: block; font-size: 0.85rem; font-weight: normal; margin-top: 4px;">KPIs agregados de todas as turmas</span>
+                    </a>
+                    <a href="{% url 'ranking' %}" class="btn-primary-dash" style="background-color: #ff9500 !important;">
+                        <strong>Ranking Global</strong>
+                        <span style="display: block; font-size: 0.85rem; font-weight: normal; margin-top: 4px;">Todas as startups da plataforma</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- Modal para Criar Turma -->
+<div id="modalCriarTurma" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: var(--bg-main); padding: 30px; border-radius: 8px; max-width: 500px; width: 90%;">
+        <h3 style="margin-bottom: 20px; color: var(--text-main);">Criar Nova Turma</h3>
+        <form method="POST" action="{% url 'criar_turma' %}">
+            {% csrf_token %}
+            <div style="margin-bottom: 20px;">
+                <label for="nome_turma" style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-main);">Nome da Turma *</label>
+                <input type="text" id="nome_turma" name="nome_turma" required 
+                       placeholder="Ex: Empreendedorismo 2026.1" 
+                       style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-secondary); color: var(--text-main);">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label for="descricao_turma" style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-main);">Descrição (opcional)</label>
+                <textarea id="descricao_turma" name="descricao_turma" rows="3"
+                          placeholder="Adicione detalhes sobre a turma..." 
+                          style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-secondary); color: var(--text-main);"></textarea>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" class="btn-outline" onclick="document.getElementById('modalCriarTurma').style.display='none'" style="padding: 10px 24px;">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn-primary" style="width: auto; padding: 10px 24px;">
+                    Criar Turma
+                </button>
+            </div>
         </form>
     </div>
+</div>
 
-    <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); gap: 20px;">
-        
-        <div class="info-card" style="text-align: center;">
-            <h3>Média Valuation</h3>
-            <p style="font-size: 1.4rem; font-weight: 800; color: var(--primary);">
-                R$ {{ kpis.media_valuation|floatformat:2|default:"0,00" }}
-            </p>
-        </div>
+<style>
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
 
-        <div class="info-card" style="text-align: center;">
-            <h3>Caixa Médio</h3>
-            <p style="font-size: 1.4rem; font-weight: 800; color: var(--text-main);">
-                R$ {{ kpis.media_caixa|floatformat:2|default:"0,00" }}
-            </p>
-        </div>
+    .dash-column {
+        display: flex;
+        flex-direction: column;
+    }
 
-        <div class="info-card" style="text-align: center;">
-            <h3>Top Recorde</h3>
-            <p style="font-size: 1.4rem; font-weight: 800; color: #28a745;">
-                R$ {{ kpis.maior_valuation|floatformat:2|default:"0,00" }}
-            </p>
-        </div>
+    .info-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
 
-        <div class="info-card" style="text-align: center;">
-            <h3>Startups Ativas</h3>
-            <p style="font-size: 1.4rem; font-weight: 800; color: var(--text-muted);">
-                {{ kpis.total_startups|default:"0" }}
-            </p>
-        </div>
-    </div>
+    .cta-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        flex: 1;
+    }
 
-    <div class="info-card" style="margin-top: 30px;">
-        <h3 style="margin-bottom: 20px; color: var(--text-main);">Ranking da Turma {{ filtro_atual }}</h3>
-        
-        {% if ranking %}
-        <div class="table-responsive">
-            <table class="custom-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Estudante</th>
-                        <th>Empresa</th>
-                        <th>Turno</th>
-                        <th>Valuation</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for startup in ranking %}
-                    <tr>
-                        <td style="font-weight: bold;">{{ forloop.counter }}º</td>
-                        <td>{{ startup.partida.usuario.username }}</td> <td>{{ startup.partida.nome_empresa }}</td>
-                        <td>{{ startup.turno_atual }}</td>
-                        <td style="font-weight: bold; color: var(--primary);">R$ {{ startup.valuation|floatformat:2 }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-            <div class="empty-state-container">
-                <span class="empty-state">Nenhum dado encontrado para esta seleção.</span>
-            </div>
-        {% endif %}
-    </div>
+    .cta-container .btn-primary-dash {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
 
-</main>
+    .turmas-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .turma-entry {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        background: var(--bg-secondary);
+        border-radius: 6px;
+        border-left: 3px solid var(--primary);
+    }
+
+    .turma-info {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        flex: 1;
+    }
+
+    .turma-code {
+        font-size: 0.9rem;
+    }
+
+    .turma-name {
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .turma-desc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
 {% endblock %}

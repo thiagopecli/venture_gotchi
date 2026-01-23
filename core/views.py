@@ -15,6 +15,30 @@ from .forms import EditarPerfilForm
 from django.db.models import Avg, Max, Count, Sum
 from django.core.exceptions import PermissionDenied
 
+def formatar_moeda_br(valor):
+    """
+    Formata um valor numérico para o padrão monetário brasileiro: R$ 1.234.567,89
+    """
+    try:
+        if valor is None:
+            return 'R$ 0,00'
+        
+        # Converter para Decimal se necessário
+        if isinstance(valor, (int, float)):
+            valor = Decimal(str(valor))
+        elif not isinstance(valor, Decimal):
+            valor = Decimal(str(valor))
+        
+        # Formatar com 2 casas decimais
+        formatted = f'{valor:,.2f}'
+        
+        # Substituir separadores: vírgula por ponto (milhar) e ponto por vírgula (decimal)
+        formatted = formatted.replace(',', 'X').replace('.', ',').replace('X', '.')
+        
+        return f'R$ {formatted}'
+    except (ValueError, TypeError, AttributeError):
+        return 'R$ 0,00'
+
 class PaginaLogin(LoginView):
     template_name = 'login.html'
 
@@ -54,7 +78,16 @@ def dashboard(request):
         .filter(usuario=request.user)
         .order_by('-data_inicio')
     )
-    context = {'partidas': partidas}
+    
+    # Garantir que os valores booleanos sejam passados corretamente
+    context = {
+        'partidas': partidas,
+        'pode_salvar_carregar': request.user.pode_salvar_carregar_partida(),
+        'is_estudante': request.user.is_estudante(),
+        'is_educador': request.user.is_educador(),
+        'is_aspirante': request.user.is_aspirante(),
+        'is_profissional': request.user.is_profissional(),
+    }
     
     return render(request, 'dashboard.html', context) 
 
@@ -66,16 +99,8 @@ def nova_partida(request):
     """
     if request.method == 'POST':
         nome_empresa = request.POST.get('nome_empresa', 'Nova Startup')
-        saldo_inicial = request.POST.get('saldo_inicial', '50000')
-        
-        try:
-            saldo_inicial = Decimal(saldo_inicial)
-            if saldo_inicial < Decimal('0.01'):
-                messages.error(request, 'O saldo inicial deve ser de pelo menos R$ 0,01')
-                return render(request, 'nova_partida.html')
-        except (ValueError, TypeError):
-            messages.error(request, 'Saldo inicial inválido. Use apenas números.')
-            return render(request, 'nova_partida.html')
+        # Saldo inicial fixo: R$ 30.000,00
+        saldo_inicial = Decimal('30000.00')
         
         partida = Partida.objects.create(
             usuario=request.user,
@@ -132,7 +157,7 @@ def salvar_jogo(request, partida_id):
             if saldo_atual < custo:
                 messages.error(
                     request, 
-                    f'Saldo insuficiente. Disponível: R$ {saldo_atual:.2f} | Necessário: R$ {custo:.2f}'
+                    f'Saldo insuficiente. Disponível: {formatar_moeda_br(saldo_atual)} | Necessário: {formatar_moeda_br(custo)}'
                 )
                 return redirect('carregar_jogo', partida_id=partida.id)
             
@@ -167,7 +192,15 @@ def salvar_jogo(request, partida_id):
 
             # Sistema de Conquistas
             verificar_conquistas_partida(partida)
-            verificar_conquistas_progesso(request.user)
+            novas_conquistas = verificar_conquistas_progesso(request.user, partida_especifica=partida)
+            
+            # Adicionar conquistas desbloqueadas às mensagens
+            for conquista in novas_conquistas:
+                messages.success(
+                    request, 
+                    f'🏆 Conquista Desbloqueada: {conquista.titulo}! +{conquista.pontos} pontos',
+                    extra_tags='conquista'
+                )
             
         except Startup.DoesNotExist:
             messages.error(request, 'Erro técnico: Startup não vinculada a esta partida.')
@@ -269,15 +302,21 @@ def metricas(request, partida_id):
 
 @login_required
 def conquistas(request):
+    """
+    Lista as conquistas desbloqueadas do usuário.
+    Apenas garante que as conquistas existem, sem reprocessar tudo.
+    """
+    from core.services.conquistas import _garantir_conquistas_existem
     
-    for partida in Partida.objects.filter(usuario=request.user):
-        verificar_conquistas_partida(partida)
-        verificar_conquistas_progesso(request.user)
-
+    # Apenas garante que as conquistas base existem no sistema
+    _garantir_conquistas_existem()
+    
+    # Busca as conquistas já desbloqueadas
     conquistas = (
         ConquistaDesbloqueada.objects
         .select_related('conquista', 'partida', 'partida__startup')
         .filter(partida__usuario=request.user)
+        .order_by('-conquista__pontos', 'conquista__titulo')
     )
     return render(request, 'conquistas.html', {'conquistas': conquistas})
 

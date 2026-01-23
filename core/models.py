@@ -62,7 +62,7 @@ class User(AbstractUser):
         return self.is_estudante() or self.is_aspirante()
     
     def pode_acessar_relatorios_agregados(self):
-        """Educadores podem acessar relatórios agregados"""
+        """Apenas Educadores podem acessar relatórios agregados"""
         return self.is_educador()
     
     def pode_acessar_ranking(self):

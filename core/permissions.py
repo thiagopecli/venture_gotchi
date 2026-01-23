@@ -8,8 +8,8 @@ from functools import wraps
 
 def estudante_required(view_func):
     """
-    Decorator que permite acesso apenas para Estudantes/Aspirantes
-    (Aluno, Startup PF/PJ)
+    Decorator que permite acesso para Estudantes/Aspirantes/Profissionais Corporativos
+    (Aluno, Startup PF/PJ, Profissional)
     """
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
@@ -19,7 +19,7 @@ def estudante_required(view_func):
         if not (request.user.is_estudante() or request.user.is_aspirante()):
             messages.error(
                 request, 
-                'Acesso negado. Esta funcionalidade está disponível apenas para Estudantes/Aspirantes.'
+                'Acesso negado. Esta funcionalidade está disponível apenas para Estudantes/Aspirantes/Profissionais.'
             )
             return redirect('dashboard')
         

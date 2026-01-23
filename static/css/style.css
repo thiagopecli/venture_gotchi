@@ -596,11 +596,6 @@ main.dashboard-main {
    ALERTAS E MENSAGENS DE CONFIRMAÇÃO (SISTEMA)
    ========================================================================== */
 
-.messages-container {
-    margin: 20px 5%;
-    max-width: 1200px;
-}
-
 .inline-messages {
     margin-bottom: 25px;
     width: 100%;
@@ -654,6 +649,66 @@ main.dashboard-main {
     content: '!';
     /* ... mesmo estilo do círculo acima, mas vermelho ... */
     background: #ef4444;
+}
+
+/* Estilo para Conquistas Desbloqueadas */
+.alert-conquista {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #92400e;
+    border-color: #fcd34d;
+    box-shadow: 0 8px 20px rgba(252, 211, 77, 0.3);
+    animation: conquistaEntrada 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
+    overflow: hidden;
+}
+
+.alert-conquista::before {
+    content: '🏆';
+    font-size: 1.2rem;
+    margin-right: 12px;
+    animation: trofeoPulse 1.5s infinite;
+}
+
+.alert-conquista::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300%;
+    height: 300%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+    transform: translate(-50%, -50%) scale(0);
+    animation: conquistaBrilho 0.8s ease-out;
+}
+
+@keyframes conquistaEntrada {
+    0% {
+        transform: translateY(-100px) scale(0.8);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(10px) scale(1.05);
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes trofeoPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+@keyframes conquistaBrilho {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+    }
 }
 
 /* ==========================================================================
@@ -1208,102 +1263,4 @@ body {
     border-radius: 4px;
     margin-left: 8px;
     vertical-align: middle;
-}
-
-/* Utilitários da Tabela */
-.text-right { text-align: right !important; }
-.text-center { text-align: center !important; }
-.font-bold { font-weight: 700; }
-.color-primary { color: var(--primary); }
-.color-success { color: #1f8b24; }
-
-.ranking-footer {
-    margin-top: 20px;
-    padding: 10px;
-}
-
-.educator-note {
-    font-size: 0.85rem;
-    color: var(--primary);
-    font-style: italic;
-    display: block;
-    margin-top: 5px;
-}
-
-/* --- RODAPÉ PADRONIZADO (GLOBAL) --- */
-footer, .footer-simple, .main-footer {
-    width: 100%;
-    padding: 25px 0;
-    text-align: center;
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    background-color: transparent; /* Mantém o padrão clean */
-    border-top: 1px solid var(--border);
-    margin-top: auto; /* Truque fundamental para empurrar o rodapé para o fim */
-}
-
-/* Ajuste no Body para permitir que o 'margin-top: auto' do footer funcione */
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* Garante que o corpo ocupe a tela toda */
-    margin: 0;
-    font-family: 'Inter', 'Segoe UI', sans-serif;
-    background-color: var(--bg-light);
-    color: var(--text-main);
-}
-
-/* Ajuste no Main para não "prender" o rodapé no meio da tela */
-main {
-    flex: 1 0 auto; /* Faz o conteúdo crescer e empurrar o rodapé */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 40px 20px;
-    width: 100%;
-}
-
-/* Estilo para o link de cadastro abaixo do card de login */
-.login-footer-text {
-    margin-top: 20px;
-    font-size: 0.95rem;
-}
-
-/* ==========================================================================
-   TABELAS (Dashboard Educador & Ranking)
-   ========================================================================== */
-.table-responsive {
-    overflow-x: auto;
-}
-
-.custom-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.95rem;
-}
-
-.custom-table th {
-    text-align: left;
-    padding: 12px 15px;
-    background-color: var(--bg-light);
-    color: var(--text-muted);
-    font-weight: 700;
-    border-bottom: 2px solid var(--border);
-    text-transform: uppercase;
-    font-size: 0.8rem;
-}
-
-.custom-table td {
-    padding: 14px 15px;
-    border-bottom: 1px solid var(--border);
-    color: var(--text-main);
-}
-
-.custom-table tr:last-child td {
-    border-bottom: none;
-}
-
-.custom-table tr:hover {
-    background-color: #fff9f5; /* Leve tom laranja no hover */
 }

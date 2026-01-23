@@ -31,16 +31,6 @@
         </div>
     </header>
 
-    {% if messages %}
-    <div class="messages-container">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-            {{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-
     <main class="dashboard-main">
         <div class="welcome-section">
             <div class="welcome-text">
@@ -97,21 +87,6 @@
                     </div>
                 </div>
             </section>
-            {% elif user.is_educador %}
-            <section class="dash-column">
-                <div class="info-card">
-                    <h3>Gerar Código da Turma</h3>
-                    <p class="hint">Crie um código único para sua turma acessar o sistema.</p>
-                    <div class="cta-container">
-                        <form method="post" action="{% url 'gerar_codigo_turma' %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn-primary-dash">Gerar Código</button>
-                        </form>
-                        <span class="cta-desc">Compartilhe com seus alunos</span>
-                    </div>
-                </div>
-            </section>
-            {% endif %}
         </div>
     </main>
 

@@ -1,8 +1,43 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Painel do Educador - Venture Gotchi{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="dashboard-body">
+    <header class="main-header">
+        <div class="header-container">
+            <a href="{% url 'educador_dashboard' %}" class="header-logo">Venture Gotchi</a>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="{% url 'educador_dashboard' %}" class="nav-item active">Dashboard</a></li>
+                    <li><a href="{% url 'educador_perfil' %}" class="nav-item">Perfil</a></li>
+                    <li><a href="{% url 'ranking_turmas' %}" class="nav-item">Ranking</a></li>
+                    <li><a href="{% url 'metricas_turmas' %}" class="nav-item">Análise</a></li>
+                    {% if user.is_authenticated %}
+                    <li>
+                        <form method="post" action="{% url 'logout' %}" id="logout-form">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-item logout-btn-clean">Sair</button>
+                        </form>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-{% block title %}Painel do Educador - Venture Gotchi{% endblock %}
+    <div id="top-messages" class="top-messages">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
 
-{% block content %}
 <main class="dashboard-main">
     <div class="welcome-section">
         <div class="welcome-text">
@@ -238,4 +273,22 @@
         }
     }
 </style>
-{% endblock %}
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        const alerts = document.querySelectorAll('#top-messages .alert');
+        alerts.forEach((el) => {
+            setTimeout(()=>{
+                el.classList.add('hide');
+                setTimeout(()=> el.remove(), 600);
+            }, 5000);
+        });
+    });
+</script>
+
+<footer class="footer-simple">
+    <p>© 2026 VentureGotchi. Desenvolvido por Intranet Panthe On Ltda.</p>
+</footer>
+</body>
+</html>

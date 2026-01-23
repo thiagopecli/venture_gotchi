@@ -249,8 +249,19 @@ def carregar_jogo(request, partida_id):
     return render(request, 'jogo.html', context)
 
 @login_required
-@estudante_required
 def perfil(request):
+    """
+    Exibe o perfil do usuário com estatísticas.
+    Todos os usuários podem acessar, exceto educadores.
+    """
+    # Bloquear acesso de educadores
+    if request.user.is_educador():
+        messages.error(
+            request, 
+            'Acesso negado. Esta funcionalidade não está disponível para Educadores.'
+        )
+        return redirect('dashboard')
+    
     from django.db.models import Count, Sum, Max
     
     partidas = Partida.objects.filter(usuario=request.user)
@@ -280,17 +291,42 @@ def perfil(request):
     })
 
 @login_required
-@estudante_required
 def historico(request):
+    """
+    Lista o histórico de decisões do usuário, agrupadas por empresa.
+    Todos os usuários podem acessar, exceto educadores.
+    """
+    # Bloquear acesso de educadores
+    if request.user.is_educador():
+        messages.error(
+            request, 
+            'Acesso negado. Esta funcionalidade não está disponível para Educadores.'
+        )
+        return redirect('dashboard')
+    
+    from itertools import groupby
+    
     decisoes = (
         HistoricoDecisao.objects
         .select_related('partida')
         .filter(partida__usuario=request.user)
-        .order_by('-data_decisao')
+        .order_by('partida__nome_empresa', '-turno')
     )
-
+    
+    # Agrupar por empresa
+    decisoes_por_empresa = []
+    decisoes_list = list(decisoes)
+    
+    for empresa_nome, grupo in groupby(decisoes_list, key=lambda x: x.partida.nome_empresa):
+        grupo_list = list(grupo)
+        decisoes_por_empresa.append({
+            'empresa': empresa_nome,
+            'decisoes': grupo_list,
+            'total_decisoes': len(grupo_list)
+        })
+    
     return render(request, 'historico.html',{
-        'decisoes': decisoes
+        'decisoes_por_empresa': decisoes_por_empresa
     })
 
 @estudante_required
@@ -308,14 +344,20 @@ def metricas(request, partida_id):
         'partida': partida,
         'startup': startup
     })
-@estudante_required
-
 @login_required
 def conquistas(request):
     """
-    Lista as conquistas desbloqueadas do usuário.
-    Apenas garante que as conquistas existem, sem reprocessar tudo.
+    Lista as conquistas desbloqueadas do usuário, agrupadas por empresa.
+    Todos os usuários podem acessar, exceto educadores.
     """
+    # Bloquear acesso de educadores
+    if request.user.is_educador():
+        messages.error(
+            request, 
+            'Acesso negado. Esta funcionalidade não está disponível para Educadores.'
+        )
+        return redirect('dashboard')
+    
     from core.services.conquistas import _garantir_conquistas_existem
     from itertools import groupby
     

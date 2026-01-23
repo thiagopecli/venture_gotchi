@@ -1,50 +1,10 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Venture Gotchi</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body class="dashboard-body">
-    <div id="top-messages" class="top-messages">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    </div>
 
-    <header class="main-header">
-        <div class="header-container">
-            <a href="{% url 'dashboard' %}" class="header-logo">Venture Gotchi</a>
-            <button class="hamburger-menu" id="hamburger-btn" aria-label="Menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <nav class="nav-wrapper" id="nav-menu">
-                <ul class="nav-menu">
-                    <li><a href="{% url 'dashboard' %}" class="nav-item active">Dashboard</a></li>
-                    <li><a href="{% url 'perfil' %}" class="nav-item">Perfil</a></li>
-                    <li><a href="{% url 'historico' %}" class="nav-item">Histórico</a></li>
-                    <li><a href="{% url 'conquistas' %}" class="nav-item">Conquistas</a></li>
-                    <li><a href="{% url 'ranking' %}" class="nav-item">Ranking</a></li>
-                    {% if user.is_authenticated %}
-                    <li>
-                        <form method="post" action="{% url 'logout' %}" id="logout-form">
-                            {% csrf_token %}
-                            <button type="submit" class="nav-item logout-btn-clean">Sair</button>
-                        </form>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-        </div>
-    </header>
+{% block title %}Dashboard - Venture Gotchi{% endblock %}
 
-    <main class="dashboard-main">
+{% block content %}
+<main class="dashboard-main">
         <div class="welcome-section">
             <div class="welcome-text">
                 <h1>Olá, {{ user.first_name|default:user.username }}! </h1>
@@ -100,50 +60,5 @@
             </section>
         </div>
         {% endif %}
-    </main>
-
-    <footer class="footer-simple">
-        <p>© 2026 VentureGotchi. Desenvolvido por Intranet Panthe On Ltda.</p>
-    </footer>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function(){
-            const alerts = document.querySelectorAll('#top-messages .alert');
-            alerts.forEach((el) => {
-                setTimeout(()=>{
-                    el.classList.add('hide');
-                    setTimeout(()=> el.remove(), 600);
-                }, 5000);
-            });
-        });
-
-        // Menu Hambúrguer
-        const hamburgerBtn = document.getElementById('hamburger-btn');
-        const navMenu = document.getElementById('nav-menu');
-
-        if (hamburgerBtn && navMenu) {
-            hamburgerBtn.addEventListener('click', function() {
-                this.classList.toggle('active');
-                navMenu.classList.toggle('active');
-            });
-
-            // Fecha o menu ao clicar em um link
-            const navLinks = navMenu.querySelectorAll('.nav-item');
-            navLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    hamburgerBtn.classList.remove('active');
-                    navMenu.classList.remove('active');
-                });
-            });
-
-            // Fecha o menu ao clicar fora dele
-            document.addEventListener('click', function(event) {
-                if (!hamburgerBtn.contains(event.target) && !navMenu.contains(event.target)) {
-                    hamburgerBtn.classList.remove('active');
-                    navMenu.classList.remove('active');
-                }
-            });
-        }
-    </script>
-</body>
-</html>
+</main>
+{% endblock %}

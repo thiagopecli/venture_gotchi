@@ -367,10 +367,11 @@ def ranking(request):
         .filter(partida__ativa=True)
     )
     
-    # 3. Filtro por categoria do usuário (cada perfil visualiza apenas startups do mesmo tipo)
-    # COMENTADO: Permitir que educadores vejam todas as startups
-    # if request.user.categoria:
-    #     startups = startups.filter(partida__usuario__categoria=request.user.categoria)
+    # 3. Filtro por categoria do usuário
+    # Estudantes veem apenas startups de outros estudantes
+    # Educadores veem todas as startups
+    if request.user.categoria == User.Categorias.ESTUDANTE_UNIVERSITARIO:
+        startups = startups.filter(partida__usuario__categoria=User.Categorias.ESTUDANTE_UNIVERSITARIO)
     
     # 4. Lógica de Filtro por Turma (Exclusivo Educador/Admin)
     # Verifica se é educador para permitir o filtro

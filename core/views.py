@@ -209,6 +209,7 @@ def salvar_jogo(request, partida_id):
     return redirect('carregar_jogo', partida_id=partida_id)
 
 @login_required
+@estudante_required
 def carregar_jogo(request, partida_id):
     partida = get_object_or_404(
         Partida.objects.select_related('startup').prefetch_related(
@@ -243,6 +244,7 @@ def carregar_jogo(request, partida_id):
     return render(request, 'jogo.html', context)
 
 @login_required
+@estudante_required
 def perfil(request):
     from django.db.models import Count, Sum, Max
     
@@ -273,6 +275,7 @@ def perfil(request):
     })
 
 @login_required
+@estudante_required
 def historico(request):
     decisoes = (
         HistoricoDecisao.objects
@@ -285,6 +288,7 @@ def historico(request):
         'decisoes': decisoes
     })
 
+@estudante_required
 @login_required
 def metricas(request, partida_id):
     partida = get_object_or_404(
@@ -299,6 +303,7 @@ def metricas(request, partida_id):
         'partida': partida,
         'startup': startup
     })
+@estudante_required
 
 @login_required
 def conquistas(request):

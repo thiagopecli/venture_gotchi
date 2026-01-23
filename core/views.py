@@ -300,7 +300,13 @@ def ranking(request):
         .filter(partida__ativa=True)
     )
     
-    # 3. Lógica de Filtro por Turma (Exclusivo Educador/Admin)
+    # 3. Filtro por categoria do usuário (estudantes/aspirantes só veem seus pares)
+    if request.user.is_estudante():
+        startups = startups.filter(partida__usuario__categoria=User.Categorias.ESTUDANTE_UNIVERSITARIO)
+    elif request.user.is_aspirante():
+        startups = startups.filter(partida__usuario__categoria=User.Categorias.ASPIRANTE_EMPREENDEDOR)
+    
+    # 4. Lógica de Filtro por Turma (Exclusivo Educador/Admin)
     # Verifica se é educador para permitir o filtro
     is_educador = request.user.categoria == User.Categorias.EDUCADOR_NEGOCIOS or request.user.is_superuser
     
@@ -308,12 +314,12 @@ def ranking(request):
         # Filtra pelo campo codigo_turma do Usuário dono da partida
         startups = startups.filter(partida__usuario__codigo_turma__iexact=codigo_turma)
 
-    # 4. Anotações
+    # 5. Anotações
     startups = startups.annotate(
         total_conquistas=Count('partida__conquistas')
     )
     
-    # 5. Ordenação
+    # 6. Ordenação
     if criterio == 'valuation':
         startups = startups.order_by('-valuation', '-saldo_caixa')
         titulo = 'Ranking por Valuation'

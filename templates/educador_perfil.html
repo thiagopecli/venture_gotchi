@@ -1,50 +1,10 @@
+{% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil do Educador - Venture Gotchi</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body class="dashboard-body">
-    <header class="main-header">
-        <div class="header-container">
-            <a href="{% url 'educador_dashboard' %}" class="header-logo">Venture Gotchi</a>
-            <button class="hamburger-menu" id="hamburger-btn" aria-label="Menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <nav class="nav-wrapper" id="nav-menu">
-                <ul class="nav-menu">
-                    <li><a href="{% url 'educador_dashboard' %}" class="nav-item">Dashboard</a></li>
-                    <li><a href="{% url 'educador_perfil' %}" class="nav-item active">Perfil</a></li>
-                    <li><a href="{% url 'ranking_turmas' %}" class="nav-item">Ranking Turmas</a></li>
-                    <li><a href="{% url 'ranking' %}" class="nav-item">Ranking Global</a></li>
-                    <li><a href="{% url 'metricas_turmas' %}" class="nav-item">Análise</a></li>
-                    {% if user.is_authenticated %}
-                    <li>
-                        <form method="post" action="{% url 'logout' %}" id="logout-form">
-                            {% csrf_token %}
-                            <button type="submit" class="nav-item logout-btn-clean">Sair</button>
-                        </form>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-        </div>
-    </header>
 
-    <div id="top-messages" class="top-messages">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    </div>
+{% block title %}Perfil do Educador - Venture Gotchi{% endblock %}
 
+{% block content %}
 <main class="dashboard-main">
     <div class="header-container">
         <h2 class="profile-title">Perfil do Educador</h2>
@@ -107,47 +67,4 @@
         </div>
     </div>
 </main>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function(){
-        const alerts = document.querySelectorAll('#top-messages .alert');
-        alerts.forEach((el) => {
-            setTimeout(()=>{
-                el.classList.add('hide');
-                setTimeout(()=> el.remove(), 600);
-            }, 5000);
-        });
-
-        // Menu Hambúrguer
-        const hamburgerBtn = document.getElementById('hamburger-btn');
-        const navMenu = document.getElementById('nav-menu');
-
-        if (hamburgerBtn && navMenu) {
-            hamburgerBtn.addEventListener('click', function() {
-                this.classList.toggle('active');
-                navMenu.classList.toggle('active');
-            });
-
-            const navLinks = navMenu.querySelectorAll('.nav-item');
-            navLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    hamburgerBtn.classList.remove('active');
-                    navMenu.classList.remove('active');
-                });
-            });
-
-            document.addEventListener('click', function(event) {
-                if (!hamburgerBtn.contains(event.target) && !navMenu.contains(event.target)) {
-                    hamburgerBtn.classList.remove('active');
-                    navMenu.classList.remove('active');
-                }
-            });
-        }
-    });
-</script>
-
-<footer class="footer-simple">
-    <p>© 2026 VentureGotchi. Desenvolvido por Intranet Panthe On Ltda.</p>
-</footer>
-</body>
-</html>
+{% endblock %}

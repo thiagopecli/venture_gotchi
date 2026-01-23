@@ -597,6 +597,10 @@ def analise_turma(request, codigo_turma):
     """
     turma = get_object_or_404(Turma, codigo__iexact=codigo_turma)
     
+    # Verificar se o educador logado é o dono da turma (ou se é superuser)
+    if not request.user.is_superuser and turma.educador != request.user:
+        raise PermissionDenied("Você não tem permissão para acessar esta turma.")
+    
     # Buscar partidas e alunos dessa turma (case-insensitive)
     partidas = Partida.objects.filter(ativa=True, usuario__codigo_turma__iexact=turma.codigo)
     users_alunos = User.objects.filter(categoria=User.Categorias.ESTUDANTE_UNIVERSITARIO, codigo_turma__iexact=turma.codigo)
@@ -632,10 +636,10 @@ def analise_turma(request, codigo_turma):
 @educador_only
 def ranking_turmas(request):
     """
-    Exibe ranking com dados agregados de TODAS as turmas do sistema.
+    Exibe ranking com dados agregados das turmas criadas pelo educador logado.
     """
-    # Buscar TODAS as turmas que têm alunos ativos
-    turmas = Turma.objects.filter(ativa=True).order_by('-data_criacao')
+    # Buscar apenas as turmas criadas pelo educador logado
+    turmas = Turma.objects.filter(ativa=True, educador=request.user).order_by('-data_criacao')
     
     turmas_dados = []
     for turma in turmas:
@@ -666,10 +670,10 @@ def ranking_turmas(request):
 @educador_only
 def metricas_turmas(request):
     """
-    Exibe análise geral agregada de TODAS as turmas do sistema.
+    Exibe análise geral agregada das turmas criadas pelo educador logado.
     """
-    # Buscar TODAS as turmas ativas
-    turmas = Turma.objects.filter(ativa=True).order_by('-data_criacao')
+    # Buscar apenas as turmas criadas pelo educador logado
+    turmas = Turma.objects.filter(ativa=True, educador=request.user).order_by('-data_criacao')
     
     # Buscar todos os dados das turmas
     turmas_dados = []

@@ -16,7 +16,8 @@
                 <ul class="nav-menu">
                     <li><a href="{% url 'educador_dashboard' %}" class="nav-item">Dashboard</a></li>
                     <li><a href="{% url 'educador_perfil' %}" class="nav-item active">Perfil</a></li>
-                    <li><a href="{% url 'ranking_turmas' %}" class="nav-item">Ranking</a></li>
+                    <li><a href="{% url 'ranking_turmas' %}" class="nav-item">Ranking Turmas</a></li>
+                    <li><a href="{% url 'ranking' %}" class="nav-item">Ranking Global</a></li>
                     <li><a href="{% url 'metricas_turmas' %}" class="nav-item">Análise</a></li>
                     {% if user.is_authenticated %}
                     <li>

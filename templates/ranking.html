@@ -1,9 +1,12 @@
-{% extends 'base.html' %}
+{% load static %}
 {% load custom_filters %}
-
-{% block title %} Ranking - Venture Gotchi {% endblock %}
-
-{% block extra_css %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking - Venture Gotchi</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 <style>
     /* Estilos para o Ranking de Negócios */
     .modern-table tbody tr.highlight-row {
@@ -46,9 +49,39 @@
         margin-left: 5px;
     }
 </style>
-{% endblock %}
+</head>
+<body class="dashboard-body">
+    <header class="main-header">
+        <div class="header-container">
+            <a href="{% url 'educador_dashboard' %}" class="header-logo">Venture Gotchi</a>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="{% url 'educador_dashboard' %}" class="nav-item">Dashboard</a></li>
+                    <li><a href="{% url 'educador_perfil' %}" class="nav-item">Perfil</a></li>
+                    <li><a href="{% url 'ranking_turmas' %}" class="nav-item">Ranking Turmas</a></li>
+                    <li><a href="{% url 'ranking' %}" class="nav-item active">Ranking Global</a></li>
+                    <li><a href="{% url 'metricas_turmas' %}" class="nav-item">Análise</a></li>
+                    {% if user.is_authenticated %}
+                    <li>
+                        <form method="post" action="{% url 'logout' %}" id="logout-form">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-item logout-btn-clean">Sair</button>
+                        </form>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-{% block content %}
+    <div id="top-messages" class="top-messages">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
 <main class="dashboard-main">
     <div class="header-container">
         <h2 class="profile-title"> {{ titulo }}</h2>
@@ -192,4 +225,5 @@
     </div>
     {% endif %}
 </main>
-{% endblock %}
+</body>
+</html>

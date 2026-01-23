@@ -467,6 +467,70 @@ def educador_dashboard(request):
     return render(request, 'educador_dashboard.html', context)
 
 @login_required
+@educador_required
+def educador_perfil(request):
+    """
+    Exibe o perfil do educador com estatísticas de suas turmas e alunos.
+    """
+    # Buscar todas as turmas do educador
+    turmas = Turma.objects.filter(educador=request.user, ativa=True)
+    turmas_ativas = turmas.count()
+    turmas_total = turmas.count()
+    
+    # Contar alunos únicos em todas as turmas
+    alunos = User.objects.filter(
+        categoria=User.Categorias.ESTUDANTE_UNIVERSITARIO,
+        codigo_turma__in=turmas.values('codigo')
+    ).distinct()
+    total_alunos = alunos.count()
+    
+    # Buscar partidas ativas dos alunos
+    partidas = Partida.objects.filter(
+        usuario__in=alunos,
+        ativa=True
+    )
+    partidas_ativas = partidas.count()
+    
+    # Estatísticas agregadas das startups dos alunos
+    stats = Startup.objects.filter(partida__usuario__in=alunos).aggregate(
+        media_valuation=Avg('valuation'),
+        media_saldo=Avg('saldo_caixa'),
+        maior_valuation=Max('valuation'),
+        maior_saldo=Max('saldo_caixa')
+    )
+    
+    return render(request, 'educador_perfil.html', {
+        'usuario': request.user,
+        'total_turmas': turmas_total,
+        'turmas_ativas': turmas_ativas,
+        'total_alunos': total_alunos,
+        'partidas_ativas': partidas_ativas,
+        'media_valuation': stats['media_valuation'] or 0,
+        'media_saldo': stats['media_saldo'] or 0,
+        'maior_valuation': stats['maior_valuation'] or 0,
+        'maior_saldo': stats['maior_saldo'] or 0,
+    })
+
+@login_required
+@educador_required
+def educador_editar_perfil(request):
+    """
+    Permite que o educador edite seu perfil.
+    """
+    if request.method == 'POST':
+        form = EditarPerfilForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Perfil atualizado com sucesso!')
+            return redirect('educador_perfil')
+        else:
+            messages.error(request, 'Erro ao atualizar perfil. Verifique os campos.')
+    else:
+        form = EditarPerfilForm(instance=request.user)
+    
+    return render(request, 'editar_perfil.html', {'form': form})
+
+@login_required
 @educador_only
 def criar_turma(request):
     """

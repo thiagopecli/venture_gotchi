@@ -1,0 +1,121 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil do Educador - Venture Gotchi</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="dashboard-body">
+    <header class="main-header">
+        <div class="header-container">
+            <a href="{% url 'educador_dashboard' %}" class="header-logo">Venture Gotchi</a>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="{% url 'educador_dashboard' %}" class="nav-item">Dashboard</a></li>
+                    <li><a href="{% url 'educador_perfil' %}" class="nav-item active">Perfil</a></li>
+                    <li><a href="{% url 'ranking_turmas' %}" class="nav-item">Ranking</a></li>
+                    <li><a href="{% url 'metricas_turmas' %}" class="nav-item">Análise</a></li>
+                    {% if user.is_authenticated %}
+                    <li>
+                        <form method="post" action="{% url 'logout' %}" id="logout-form">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-item logout-btn-clean">Sair</button>
+                        </form>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div id="top-messages" class="top-messages">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+<main class="dashboard-main">
+    <div class="header-container">
+        <h2 class="profile-title">Perfil do Educador</h2>
+        <a href="{% url 'educador_dashboard' %}" class="btn-back-orange">← Voltar ao Painel</a>
+    </div>
+
+    <div style="display: flex; gap: 10px; margin-bottom: 30px;">
+        <a href="{% url 'educador_editar_perfil' %}" class="btn-back-orange">✏️ Editar Perfil</a>
+    </div>
+
+    <div class="info-card profile-card-main">
+        <h3 class="section-subtitle">Dados Cadastrais</h3>
+        <div class="profile-data-grid">
+            <div class="data-group">
+                <p><span>Usuário:</span> {{ usuario.username }}</p>
+                <p><span>Email:</span> {{ usuario.email }}</p>
+                <p><span>Nome:</span> {{ usuario.first_name }}</p>
+            </div>
+            <div class="data-group">
+                <p><span>Documento:</span> {{ usuario.documento }} ({{ usuario.tipo_documento }})</p>
+                <p><span>Categoria:</span> {{ usuario.get_categoria_display }}</p>
+                <p><span>Membro desde:</span> {{ usuario.date_joined|date:"d/m/Y" }}</p>
+            </div>
+            {% if usuario.cnpj %}
+            <div class="data-group">
+                <p><span>CNPJ:</span> {{ usuario.cnpj }}</p>
+                <p><span>Área de Atuação:</span> {{ usuario.area_atuacao|default:"Não informada" }}</p>
+            </div>
+            {% endif %}
+            <div class="data-group">
+                {% if usuario.municipio %}
+                <p><span>Localização:</span> {{ usuario.municipio }} / {{ usuario.estado }}</p>
+                <p><span>País:</span> {{ usuario.pais|default:"Brasil" }}</p>
+                {% else %}
+                <p><span>Localização:</span> Não informada</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="info-card stats-card">
+            <h3>Estatísticas de Ensino</h3>
+            <div class="simple-list">
+                <p><strong>Total de Turmas:</strong> {{ total_turmas }}</p>
+                <p><strong>Turmas Ativas:</strong> {{ turmas_ativas }}</p>
+                <p><strong>Total de Alunos:</strong> {{ total_alunos }}</p>
+                <p><strong>Partidas em Andamento:</strong> {{ partidas_ativas }}</p>
+            </div>
+        </div>
+
+        <div class="info-card stats-card">
+            <h3>Desempenho das Turmas</h3>
+            <div class="simple-list">
+                <p><strong>Média de Valuation:</strong> {{ media_valuation|moeda_br }}</p>
+                <p><strong>Média de Saldo:</strong> {{ media_saldo|moeda_br }}</p>
+                <p><strong>Maior Valuation Registrado:</strong> {{ maior_valuation|moeda_br }}</p>
+                <p><strong>Maior Saldo Registrado:</strong> {{ maior_saldo|moeda_br }}</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        const alerts = document.querySelectorAll('#top-messages .alert');
+        alerts.forEach((el) => {
+            setTimeout(()=>{
+                el.classList.add('hide');
+                setTimeout(()=> el.remove(), 600);
+            }, 5000);
+        });
+    });
+</script>
+
+<footer class="footer-simple">
+    <p>© 2026 VentureGotchi. Desenvolvido por Intranet Panthe On Ltda.</p>
+</footer>
+</body>
+</html>

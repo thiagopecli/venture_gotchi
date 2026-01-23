@@ -349,13 +349,16 @@ def conquistas(request):
 @pode_acessar_ranking
 def ranking(request):
     """
-    Exibe ranking das startups com filtro de turma para Educadores.
+    Exibe ranking das startups com filtro de turma para Educadores e filtros regionais.
     """
     from django.db.models import Max, Count, Q, Sum
     
     # 1. Captura parâmetros
     criterio = request.GET.get('criterio', 'valuation')
-    codigo_turma = request.GET.get('codigo_turma', '').strip() # Novo
+    codigo_turma = request.GET.get('codigo_turma', '').strip()
+    filtro_pais = request.GET.get('pais', '').strip()
+    filtro_estado = request.GET.get('estado', '').strip()
+    filtro_municipio = request.GET.get('municipio', '').strip()
     
     # 2. Queryset Base (Apenas startups ativas)
     startups = (
@@ -376,6 +379,14 @@ def ranking(request):
     if is_educador and codigo_turma:
         # Filtra pelo campo codigo_turma do Usuário dono da partida
         startups = startups.filter(partida__usuario__codigo_turma__iexact=codigo_turma)
+    
+    # 4.5. Filtros Regionais
+    if filtro_pais:
+        startups = startups.filter(partida__usuario__pais__iexact=filtro_pais)
+    if filtro_estado:
+        startups = startups.filter(partida__usuario__estado__iexact=filtro_estado)
+    if filtro_municipio:
+        startups = startups.filter(partida__usuario__municipio__icontains=filtro_municipio)
 
     # 5. Anotações
     startups = startups.annotate(
@@ -403,12 +414,21 @@ def ranking(request):
     # Limitar aos top 50
     startups = startups[:50]
     
+    # Obter listas únicas para os filtros
+    paises_disponiveis = User.objects.filter(partidas__ativa=True).values_list('pais', flat=True).distinct().order_by('pais')
+    estados_disponiveis = User.objects.filter(partidas__ativa=True).values_list('estado', flat=True).distinct().order_by('estado')
+    
     context = {
         'startups': startups,
         'criterio': criterio,
         'titulo': titulo,
         'is_educador': is_educador, 
-        'filtro_turma': codigo_turma
+        'filtro_turma': codigo_turma,
+        'filtro_pais': filtro_pais,
+        'filtro_estado': filtro_estado,
+        'filtro_municipio': filtro_municipio,
+        'paises_disponiveis': [p for p in paises_disponiveis if p],
+        'estados_disponiveis': [e for e in estados_disponiveis if e],
     }
     
     return render(request, 'ranking.html', context)

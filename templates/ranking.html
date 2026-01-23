@@ -93,14 +93,69 @@
         <a href="{% url 'dashboard' %}" class="btn-back-orange">← Voltar ao Dashboard</a>
     </div>
 
+    <!-- Filtro Regional (Disponível para todos) -->
+    <section class="info-card" style="margin-bottom: 20px; border: 1px solid #2196F3;">
+        <h3 style="margin-bottom: 15px; color: var(--text-main);">🌍 Filtro por Região</h3>
+        <form method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <input type="hidden" name="criterio" value="{{ criterio }}">
+            {% if is_educador and filtro_turma %}
+                <input type="hidden" name="codigo_turma" value="{{ filtro_turma }}">
+            {% endif %}
+            
+            <div>
+                <label for="pais" style="font-weight: 700; color: var(--text-main); display: block; margin-bottom: 5px;">País:</label>
+                <select name="pais" id="pais" style="width: 100%; padding: 8px; margin-bottom: 0;">
+                    <option value="">Todos os países</option>
+                    {% for pais in paises_disponiveis %}
+                        <option value="{{ pais }}" {% if filtro_pais == pais %}selected{% endif %}>{{ pais }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <label for="estado" style="font-weight: 700; color: var(--text-main); display: block; margin-bottom: 5px;">Estado:</label>
+                <select name="estado" id="estado" style="width: 100%; padding: 8px; margin-bottom: 0;">
+                    <option value="">Todos os estados</option>
+                    {% for estado in estados_disponiveis %}
+                        <option value="{{ estado }}" {% if filtro_estado == estado %}selected{% endif %}>{{ estado }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <label for="municipio" style="font-weight: 700; color: var(--text-main); display: block; margin-bottom: 5px;">Município:</label>
+                <input type="text" name="municipio" id="municipio" 
+                       value="{{ filtro_municipio }}" placeholder="Digite o município" 
+                       style="width: 100%; padding: 8px; margin-bottom: 0;">
+            </div>
+            
+            <div style="display: flex; gap: 10px; align-items: flex-end;">
+                <button type="submit" class="btn-primary" style="width: auto; margin-top: 0; padding: 8px 20px;">
+                    Buscar
+                </button>
+                
+                {% if filtro_pais or filtro_estado or filtro_municipio %}
+                    <a href="{% url 'ranking' %}?criterio={{ criterio }}{% if is_educador and filtro_turma %}&codigo_turma={{ filtro_turma }}{% endif %}" 
+                       class="btn-secondary" style="padding: 8px 15px; text-decoration: none; display: inline-block;">
+                        🗑️ Limpar
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+    </section>
+
     {% if is_educador %}
     <section class="info-card" style="margin-bottom: 20px; border: 1px solid var(--primary);">
+        <h3 style="margin-bottom: 15px; color: var(--text-main);">👨‍🏫 Filtro por Turma (Educadores)</h3>
         <form method="GET" style="display: flex; gap: 10px; align-items: center;">
             <input type="hidden" name="criterio" value="{{ criterio }}">
+            {% if filtro_pais %}<input type="hidden" name="pais" value="{{ filtro_pais }}">{% endif %}
+            {% if filtro_estado %}<input type="hidden" name="estado" value="{{ filtro_estado }}">{% endif %}
+            {% if filtro_municipio %}<input type="hidden" name="municipio" value="{{ filtro_municipio }}">{% endif %}
             
-            <label for="codigo_turma" style="font-weight: 700; color: var(--text-main);">Filtrar por Turma:</label>
+            <label for="codigo_turma" style="font-weight: 700; color: var(--text-main);">Código da Turma:</label>
             <input type="text" name="codigo_turma" id="codigo_turma" 
-                   value="{{ filtro_turma }}" placeholder="Ex: TURMA_A" 
+                   value="{{ filtro_turma }}" placeholder="Ex: ABC-123" 
                    style="margin-bottom: 0; flex: 1; padding: 8px;">
             
             <button type="submit" class="btn-primary" style="width: auto; margin-top: 0; padding: 8px 20px;">
@@ -108,25 +163,26 @@
             </button>
             
             {% if filtro_turma %}
-                <a href="{% url 'ranking' %}?criterio={{ criterio }}" style="font-size: 0.8rem; color: var(--text-muted);">Limpar Filtro</a>
+                <a href="{% url 'ranking' %}?criterio={{ criterio }}{% if filtro_pais %}&pais={{ filtro_pais }}{% endif %}{% if filtro_estado %}&estado={{ filtro_estado }}{% endif %}{% if filtro_municipio %}&municipio={{ filtro_municipio }}{% endif %}" 
+                   style="font-size: 0.8rem; color: var(--text-muted);">Limpar Turma</a>
             {% endif %}
         </form>
     </section>
     {% endif %}
 
     <section class="ranking-filter-section">
-        <h3>Filtrar por:</h3>
+        <h3>Ordenar por:</h3>
         <div class="filter-group">
-            <a href="{% url 'ranking' %}?criterio=valuation{% if filtro_turma %}&codigo_turma={{ filtro_turma }}{% endif %}" 
+            <a href="{% url 'ranking' %}?criterio=valuation{% if filtro_turma %}&codigo_turma={{ filtro_turma }}{% endif %}{% if filtro_pais %}&pais={{ filtro_pais }}{% endif %}{% if filtro_estado %}&estado={{ filtro_estado }}{% endif %}{% if filtro_municipio %}&municipio={{ filtro_municipio }}{% endif %}" 
                class="filter-btn {% if criterio == 'valuation' %}active{% endif %}">Valuation</a>
             
-            <a href="{% url 'ranking' %}?criterio=saldo{% if filtro_turma %}&codigo_turma={{ filtro_turma }}{% endif %}" 
+            <a href="{% url 'ranking' %}?criterio=saldo{% if filtro_turma %}&codigo_turma={{ filtro_turma }}{% endif %}{% if filtro_pais %}&pais={{ filtro_pais }}{% endif %}{% if filtro_estado %}&estado={{ filtro_estado }}{% endif %}{% if filtro_municipio %}&municipio={{ filtro_municipio }}{% endif %}" 
                class="filter-btn {% if criterio == 'saldo' %}active{% endif %}">Saldo em Caixa</a>
             
-            <a href="{% url 'ranking' %}?criterio=turno{% if filtro_turma %}&codigo_turma={{ filtro_turma }}{% endif %}" 
+            <a href="{% url 'ranking' %}?criterio=turno{% if filtro_turma %}&codigo_turma={{ filtro_turma }}{% endif %}{% if filtro_pais %}&pais={{ filtro_pais }}{% endif %}{% if filtro_estado %}&estado={{ filtro_estado }}{% endif %}{% if filtro_municipio %}&municipio={{ filtro_municipio }}{% endif %}" 
                class="filter-btn {% if criterio == 'turno' %}active{% endif %}">Turno Alcançado</a>
             
-            <a href="{% url 'ranking' %}?criterio=conquistas{% if filtro_turma %}&codigo_turma={{ filtro_turma }}{% endif %}" 
+            <a href="{% url 'ranking' %}?criterio=conquistas{% if filtro_turma %}&codigo_turma={{ filtro_turma }}{% endif %}{% if filtro_pais %}&pais={{ filtro_pais }}{% endif %}{% if filtro_estado %}&estado={{ filtro_estado }}{% endif %}{% if filtro_municipio %}&municipio={{ filtro_municipio }}{% endif %}" 
                class="filter-btn {% if criterio == 'conquistas' %}active{% endif %}">Conquistas</a>
         </div>
     </section>

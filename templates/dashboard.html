@@ -46,7 +46,7 @@
             <div class="welcome-text">
                 <h1>Olá, {{ user.first_name|default:user.username }}! </h1>
                 <p>
-                    {% if user.is_estudante %}
+                    {% if user.is_estudante or user.is_aspirante %}
                         Gerencie sua startup, tome decisões estratégicas e acompanhe o crescimento.
                     {% elif user.is_educador %}
                         Acesse relatórios agregados e acompanhe o desempenho dos estudantes.
@@ -59,7 +59,7 @@
         </div>
 
         <div class="dashboard-grid">
-            {% if user.is_estudante %}
+            {% if user.is_estudante or user.is_aspirante %}
             <section class="dash-column">
                 <div class="info-card">
                     <h3>Minhas Simulações</h3>

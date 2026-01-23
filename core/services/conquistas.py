@@ -140,14 +140,17 @@ def verificar_conquistas_partida(partida):
             turno_atual = getattr(partida.startup, 'turno_atual', 1)
         ConquistaDesbloqueada.objects.create(partida=partida, conquista=conquista, turno=turno_atual)
 
-def verificar_conquistas_progesso(usuario, partida_especifica=None):
+def _garantir_conquistas_existem():
     """
-    Verifica e desbloqueia conquistas de progresso.
-    Retorna lista de novas conquistas desbloqueadas.
+    Garante que todas as conquistas do sistema existem no banco.
+    Usa bulk_create para otimização.
     """
-    novas_conquistas = []
+    # Verificar se já existem conquistas criadas
+    if Conquista.objects.filter(titulo='Bilionário! Você Zerou o Game!').exists():
+        return  # Conquistas já criadas
     
-    conquista, _ = Conquista.objects.get_or_create(
+    # Criar conquista de persistência
+    Conquista.objects.get_or_create(
         titulo='Persistente!',
         defaults={
             'descricao': 'Você jogou 5 turnos.',
@@ -157,21 +160,42 @@ def verificar_conquistas_progesso(usuario, partida_especifica=None):
             'ativo': True,
         }
     )
-
-    # Criar todas as conquistas de saldo (apenas se não existirem)
+    
+    # Coletar títulos existentes
+    titulos_existentes = set(Conquista.objects.filter(
+        titulo__in=[info['titulo'] for info in CONQUISTAS_SALDO]
+    ).values_list('titulo', flat=True))
+    
+    # Criar apenas conquistas que não existem
+    conquistas_para_criar = []
     for conquista_info in CONQUISTAS_SALDO:
-        Conquista.objects.get_or_create(
-            titulo=conquista_info['titulo'],
-            defaults={
-                'descricao': conquista_info['descricao'],
-                'tipo': 'progresso',
-                'valor_objetivo': conquista_info['valor'],
-                'pontos': conquista_info['pontos'],
-                'ativo': True,
-            }
-        )
+        if conquista_info['titulo'] not in titulos_existentes:
+            conquistas_para_criar.append(Conquista(
+                titulo=conquista_info['titulo'],
+                descricao=conquista_info['descricao'],
+                tipo='progresso',
+                valor_objetivo=conquista_info['valor'],
+                pontos=conquista_info['pontos'],
+                ativo=True,
+            ))
+    
+    # Criar todas de uma vez
+    if conquistas_para_criar:
+        Conquista.objects.bulk_create(conquistas_para_criar, ignore_conflicts=True)
 
-    # Buscar todas as conquistas de saldo de uma vez para evitar múltiplas queries
+
+def verificar_conquistas_progesso(usuario, partida_especifica=None):
+    """
+    Verifica e desbloqueia conquistas de progresso.
+    Retorna lista de novas conquistas desbloqueadas.
+    """
+    novas_conquistas = []
+    
+    # Garantir que conquistas existem (otimizado)
+    _garantir_conquistas_existem()
+    
+    # Buscar conquistas necessárias
+    conquista_persistente = Conquista.objects.get(titulo='Persistente!')
     conquistas_saldo_map = {
         c.valor_objetivo: c 
         for c in Conquista.objects.filter(
@@ -192,11 +216,11 @@ def verificar_conquistas_progesso(usuario, partida_especifica=None):
         if turno_atual >= 5:
             obj, created = ConquistaDesbloqueada.objects.get_or_create(
                 partida=partida,
-                conquista=conquista,
+                conquista=conquista_persistente,
                 defaults={'turno': turno_atual}
             )
             if created:
-                novas_conquistas.append(conquista)
+                novas_conquistas.append(conquista_persistente)
         
         # Verificar conquistas de saldo
         if hasattr(partida, 'startup') and partida.startup is not None:

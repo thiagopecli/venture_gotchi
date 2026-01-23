@@ -78,7 +78,16 @@ def dashboard(request):
         .filter(usuario=request.user)
         .order_by('-data_inicio')
     )
-    context = {'partidas': partidas}
+    
+    # Garantir que os valores booleanos sejam passados corretamente
+    context = {
+        'partidas': partidas,
+        'pode_salvar_carregar': request.user.pode_salvar_carregar_partida(),
+        'is_estudante': request.user.is_estudante(),
+        'is_educador': request.user.is_educador(),
+        'is_aspirante': request.user.is_aspirante(),
+        'is_profissional': request.user.is_profissional(),
+    }
     
     return render(request, 'dashboard.html', context) 
 
@@ -293,15 +302,21 @@ def metricas(request, partida_id):
 
 @login_required
 def conquistas(request):
+    """
+    Lista as conquistas desbloqueadas do usuário.
+    Apenas garante que as conquistas existem, sem reprocessar tudo.
+    """
+    from core.services.conquistas import _garantir_conquistas_existem
     
-    for partida in Partida.objects.filter(usuario=request.user):
-        verificar_conquistas_partida(partida)
-        verificar_conquistas_progesso(request.user)
-
+    # Apenas garante que as conquistas base existem no sistema
+    _garantir_conquistas_existem()
+    
+    # Busca as conquistas já desbloqueadas
     conquistas = (
         ConquistaDesbloqueada.objects
         .select_related('conquista', 'partida', 'partida__startup')
         .filter(partida__usuario=request.user)
+        .order_by('-conquista__pontos', 'conquista__titulo')
     )
     return render(request, 'conquistas.html', {'conquistas': conquistas})
 

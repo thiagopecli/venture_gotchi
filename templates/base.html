@@ -63,6 +63,32 @@
             </nav>
         </div>
     </header>
+    {% elif user.is_authenticated and user.is_profissional %}
+    <header class="main-header">
+        <div class="header-container">
+            <a href="{% url 'dashboard' %}" class="header-logo">Venture Gotchi</a>
+            <button class="hamburger-menu" id="hamburger-btn" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav-wrapper" id="nav-menu">
+                <ul class="nav-menu">
+                    <li><a href="{% url 'dashboard' %}" class="nav-item">Dashboard</a></li>
+                    <li><a href="{% url 'perfil' %}" class="nav-item">Perfil</a></li>
+                    <li><a href="{% url 'historico' %}" class="nav-item">Histórico</a></li>
+                    <li><a href="{% url 'conquistas' %}" class="nav-item">Conquistas</a></li>
+                    <li><a href="{% url 'ranking' %}" class="nav-item">Ranking</a></li>
+                    <li>
+                        <form method="post" action="{% url 'logout' %}" id="logout-form">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-item logout-btn-clean">Sair</button>
+                        </form>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
     {% elif user.is_authenticated and user.is_educador %}
     <header class="main-header">
         <div class="header-container">

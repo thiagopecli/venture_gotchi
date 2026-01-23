@@ -178,7 +178,8 @@ main.dashboard-main {
     border-radius: 15px;
     box-shadow: var(--shadow);
     border: 1px solid var(--border);
-    text-align: left; 
+    text-align: left;
+    word-break: break-word; /* evita texto escapando em telas estreitas */
 }
 
 /* Espaçamentos internos do card de simulação */
@@ -1263,4 +1264,106 @@ body {
     border-radius: 4px;
     margin-left: 8px;
     vertical-align: middle;
+}
+
+/* ========================================================================== 
+   TABELAS / RANKING
+   ========================================================================== */
+
+.ranking-table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.modern-table {
+    min-width: 960px; /* garante que colunas não comprimam demais em mobile */
+}
+
+.modern-table th, .modern-table td {
+    white-space: nowrap;
+}
+
+.modern-table td {
+    word-break: break-word;
+}
+
+.filter-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-group .filter-btn {
+    white-space: nowrap;
+}
+
+/* ========================================================================== 
+   RESPONSIVIDADE GERAL (BREAKPOINTS)
+   ========================================================================== */
+
+/* Tablets e telas médias */
+@media (max-width: 768px) {
+    /* Espaçamento geral */
+    main { padding: 16px; }
+
+    /* Dashboard: 2 colunas -> 1 coluna */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .header-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .nav-menu {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    /* Ranking: scroll horizontal com recuo igual ao padding */
+    .ranking-table-container {
+        margin: 0 -16px;
+        padding: 0 16px;
+    }
+
+    /* Jogo: Sidebar acima e conteúdo abaixo */
+    .game-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin: 20px auto;
+        padding: 0 16px;
+    }
+
+    .btn-primary-lg {
+        padding: 14px;
+        font-size: 0.95rem;
+    }
+}
+
+/* Smartphones e telas pequenas */
+@media (max-width: 480px) {
+    .header-title, .header-logo { font-size: 1.3em; }
+
+    .auth-card { padding: 24px; }
+
+    /* Perfil: força 1 coluna */
+    .profile-data-grid { grid-template-columns: 1fr; }
+
+    /* Modal de fim de jogo ajustado */
+    .endgame-stats { grid-template-columns: 1fr; gap: 12px; }
+    .modal-endgame { padding: 24px; width: 95%; }
+
+    /* Cards de decisão mais compactos */
+    .card-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 1.4rem;
+        margin-right: 12px;
+    }
+
+    .card-content { padding: 12px; }
 }

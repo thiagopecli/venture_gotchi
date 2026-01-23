@@ -59,36 +59,38 @@
             <p class="hint">Clique no nome da turma para ver análise detalhada.</p>
             
             {% if turmas_dados %}
-            <div class="table-responsive">
-                <table class="custom-table">
+            <div class="ranking-table-container">
+                <table class="modern-table">
                     <thead>
                         <tr>
-                            <th style="padding: 15px 20px;">Código</th>
-                            <th style="padding: 15px 20px;">Turma</th>
-                            <th style="padding: 15px 20px;">Alunos</th>
-                            <th style="padding: 15px 20px;">Startups Ativas</th>
-                            <th style="padding: 15px 20px;">Média Valuation</th>
-                            <th style="padding: 15px 20px;">Top Recorde</th>
-                            <th style="padding: 15px 20px;">Ação</th>
+                            <th>#</th>
+                            <th>Código</th>
+                            <th>Turma</th>
+                            <th>Alunos</th>
+                            <th>Startups Ativas</th>
+                            <th>Média Valuation</th>
+                            <th>Top Recorde</th>
+                            <th class="text-center">Ação</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for turma_info in turmas_dados %}
                         <tr>
-                            <td style="font-weight: bold; color: var(--primary); text-align: center; padding: 15px 20px;">{{ turma_info.turma.codigo }}</td>
-                            <td style="text-align: left; padding: 15px 20px;">
-                                <div style="display: flex; flex-direction: column; gap: 5px;">
-                                    <strong style="font-size: 0.95rem;">{{ turma_info.turma.nome }}</strong>
+                            <td class="rank-number">{{ forloop.counter }}º</td>
+                            <td class="text-center" style="font-weight: 800; color: var(--primary);">{{ turma_info.turma.codigo }}</td>
+                            <td>
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <strong class="company-name">{{ turma_info.turma.nome }}</strong>
                                     {% if turma_info.turma.descricao %}
-                                    <span style="font-size: 0.85rem; color: var(--text-muted);">{{ turma_info.turma.descricao|truncatewords:5 }}</span>
+                                    <span style="font-size: 0.85rem; color: var(--text-muted);">{{ turma_info.turma.descricao|truncatewords:7 }}</span>
                                     {% endif %}
                                 </div>
                             </td>
-                            <td style="text-align: center; font-weight: 600; padding: 15px 20px;">{{ turma_info.total_alunos }}</td>
-                            <td style="text-align: center; font-weight: 600; padding: 15px 20px;">{{ turma_info.startups_ativas }}</td>
-                            <td style="text-align: center; color: var(--primary); padding: 15px 20px;">{{ turma_info.media_valuation|moeda_br }}</td>
-                            <td style="text-align: center; color: #28a745; padding: 15px 20px;">{{ turma_info.maior_valuation|moeda_br }}</td>
-                            <td style="text-align: center; padding: 15px 20px;">
+                            <td class="text-center" style="font-weight: 700;">{{ turma_info.total_alunos }}</td>
+                            <td class="text-center" style="font-weight: 700;">{{ turma_info.startups_ativas }}</td>
+                            <td class="text-right" style="color: var(--primary); font-weight: 700;">{{ turma_info.media_valuation|moeda_br }}</td>
+                            <td class="text-right" style="color: #28a745; font-weight: 700;">{{ turma_info.maior_valuation|moeda_br }}</td>
+                            <td class="text-center">
                                 <a href="{% url 'analise_turma' turma_info.turma.codigo %}" class="btn-play-small" style="font-size: 0.9rem;">Analisar</a>
                             </td>
                         </tr>

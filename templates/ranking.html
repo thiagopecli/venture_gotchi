@@ -101,6 +101,7 @@
                     <th>#</th>
                     <th>Empresa</th>
                     <th>Fundador (Tipo)</th>
+                    <th>Turma</th>
                     <th class="text-right">Pontuação</th>
                     <th class="text-right">Valuation Final</th>
                     <th class="text-right">Saldo</th>
@@ -140,6 +141,14 @@
                             <span class="badge-tipo badge-pj">Profissional Corporativo</span>
                         {% else %}
                             <span class="badge-tipo badge-pf">{{ startup.partida.usuario.get_categoria_display }}</span>
+                        {% endif %}
+                    </td>
+                    
+                    <td>
+                        {% if startup.partida.usuario.codigo_turma %}
+                            <strong style="color: var(--primary);">{{ startup.partida.usuario.codigo_turma }}</strong>
+                        {% else %}
+                            <span style="color: var(--text-muted);">-</span>
                         {% endif %}
                     </td>
                     

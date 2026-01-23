@@ -3,6 +3,46 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from decimal import Decimal
 from django.conf import settings
+import random
+import string
+
+class Turma(models.Model):
+    """Modelo para turmas criadas por educadores"""
+    codigo = models.CharField(
+        max_length=7, 
+        unique=True,
+        validators=[RegexValidator(r'^[A-Z]{3}-[0-9]{3}$', 'Código deve estar no formato AAA-999.')],
+        verbose_name='Código da Turma'
+    )
+    nome = models.CharField(max_length=100, verbose_name='Nome da Turma')
+    descricao = models.TextField(blank=True, null=True, verbose_name='Descrição')
+    educador = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='turmas_criadas',
+        limit_choices_to={'categoria': 'EDUCADOR_NEGOCIOS'}
+    )
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    ativa = models.BooleanField(default=True, verbose_name='Turma Ativa')
+    
+    class Meta:
+        ordering = ['-data_criacao']
+        verbose_name = 'Turma'
+        verbose_name_plural = 'Turmas'
+    
+    def __str__(self):
+        return f"{self.codigo} - {self.nome}"
+    
+    @staticmethod
+    def gerar_codigo_unico():
+        """Gera um código único no formato AAA-999"""
+        while True:
+            letras = ''.join(random.choices(string.ascii_uppercase, k=3))
+            numeros = ''.join(random.choices(string.digits, k=3))
+            codigo = f"{letras}-{numeros}"
+            
+            if not Turma.objects.filter(codigo=codigo).exists():
+                return codigo
 
 class User(AbstractUser):
     class Categorias(models.TextChoices):

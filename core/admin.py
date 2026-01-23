@@ -9,7 +9,17 @@ from .models import (
     HistoricoDecisao,
     Partida,
     Startup,
+    Turma,
 )
+
+
+@admin.register(Turma)
+class TurmaAdmin(admin.ModelAdmin):
+    list_display = ("codigo", "nome", "educador", "ativa", "data_criacao")
+    list_filter = ("ativa", "data_criacao")
+    search_fields = ("codigo", "nome", "educador__username")
+    list_select_related = ("educador",)
+    readonly_fields = ("data_criacao",)
 
 
 @admin.register(Partida)

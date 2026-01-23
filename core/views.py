@@ -341,7 +341,7 @@ def ranking(request):
     """
     Exibe ranking das startups com filtro de turma para Educadores.
     """
-    from django.db.models import Max, Count, Q
+    from django.db.models import Max, Count, Q, Sum
     
     # 1. Captura parâmetros
     criterio = request.GET.get('criterio', 'valuation')
@@ -372,7 +372,8 @@ def ranking(request):
 
     # 5. Anotações
     startups = startups.annotate(
-        total_conquistas=Count('partida__conquistas')
+        total_conquistas=Count('partida__conquistas'),
+        pontuacao_conquistas=Sum('partida__conquistas__conquista__pontos')
     )
     
     # 6. Ordenação

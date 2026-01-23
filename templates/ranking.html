@@ -20,6 +20,8 @@
     .rank-1 { color: #FFD700; font-size: 1.2rem; } /* Ouro */
     .rank-2 { color: #C0C0C0; font-size: 1.1rem; } /* Prata */
     .rank-3 { color: #CD7F32; font-size: 1.05rem; } /* Bronze */
+    
+    .trophy { font-size: 1.3rem; margin-right: 5px; }
 
     .badge-tipo {
         font-size: 0.65rem;
@@ -99,6 +101,7 @@
                     <th>#</th>
                     <th>Empresa</th>
                     <th>Fundador (Tipo)</th>
+                    <th class="text-right">Pontuação</th>
                     <th class="text-right">Valuation Final</th>
                     <th class="text-right">Saldo</th>
                     <th class="text-center">Turno</th>
@@ -111,11 +114,11 @@
                 <tr class="{% if startup.partida.usuario == user %}highlight-row{% endif %}">
                     <td class="rank-number">
                         {% if forloop.counter == 1 %}
-                            <span class="rank-1">1º</span>
+                            <span class="trophy">🥇</span><span class="rank-1">1º</span>
                         {% elif forloop.counter == 2 %}
-                            <span class="rank-2">2º</span>
+                            <span class="trophy">🥈</span><span class="rank-2">2º</span>
                         {% elif forloop.counter == 3 %}
-                            <span class="rank-3">3º</span>
+                            <span class="trophy">🥉</span><span class="rank-3">3º</span>
                         {% else %}
                             {{ forloop.counter }}º
                         {% endif %}
@@ -127,11 +130,21 @@
                     <td>
                         {{ startup.partida.usuario.get_full_name|default:startup.partida.usuario.username }}
                         <br>
-                        {% if startup.partida.usuario.is_pj %} 
-                            <span class="badge-tipo badge-pj">Pessoa Jurídica</span>
+                        {% if startup.partida.usuario.categoria == 'ESTUDANTE_UNIVERSITARIO' %}
+                            <span class="badge-tipo badge-pf">Estudante Universitário</span>
+                        {% elif startup.partida.usuario.categoria == 'ASPIRANTE_EMPREENDEDOR' %}
+                            <span class="badge-tipo badge-pj">Aspirante a Empreendedor</span>
+                        {% elif startup.partida.usuario.categoria == 'EDUCADOR_NEGOCIOS' %}
+                            <span class="badge-tipo badge-pj">Educador de Negócios</span>
+                        {% elif startup.partida.usuario.categoria == 'PROFISSIONAL_CORPORATIVO' %}
+                            <span class="badge-tipo badge-pj">Profissional Corporativo</span>
                         {% else %}
-                            <span class="badge-tipo badge-pf">Pessoa Física</span>
+                            <span class="badge-tipo badge-pf">{{ startup.partida.usuario.get_categoria_display }}</span>
                         {% endif %}
+                    </td>
+                    
+                    <td class="text-right font-bold" style="color: #ff9800; font-size: 1.05rem;">
+                        {{ startup.pontuacao_conquistas|default:0 }} ponto{{ startup.pontuacao_conquistas|default:0|pluralize:"s" }}
                     </td>
                     
                     <td class="text-right color-primary {% if criterio == 'valuation' %}font-bold{% endif %}">

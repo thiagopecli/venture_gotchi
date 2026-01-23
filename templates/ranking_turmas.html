@@ -12,7 +12,12 @@
     <header class="main-header">
         <div class="header-container">
             <a href="{% url 'educador_dashboard' %}" class="header-logo">Venture Gotchi</a>
-            <nav>
+            <button class="hamburger-menu" id="hamburger-btn" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav-wrapper" id="nav-menu">
                 <ul class="nav-menu">
                     <li><a href="{% url 'educador_dashboard' %}" class="nav-item">Dashboard</a></li>
                     <li><a href="{% url 'educador_perfil' %}" class="nav-item">Perfil</a></li>
@@ -106,5 +111,33 @@
         </div>
     </section>
 </main>
+
+<script>
+    // Menu Hambúrguer
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const navMenu = document.getElementById('nav-menu');
+
+    if (hamburgerBtn && navMenu) {
+        hamburgerBtn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+
+        const navLinks = navMenu.querySelectorAll('.nav-item');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                hamburgerBtn.classList.remove('active');
+                navMenu.classList.remove('active');
+            });
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!hamburgerBtn.contains(event.target) && !navMenu.contains(event.target)) {
+                hamburgerBtn.classList.remove('active');
+                navMenu.classList.remove('active');
+            }
+        });
+    }
+</script>
 </body>
 </html>

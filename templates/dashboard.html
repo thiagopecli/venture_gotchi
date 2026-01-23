@@ -11,7 +11,12 @@
     <header class="main-header">
         <div class="header-container">
             <a href="{% url 'dashboard' %}" class="header-logo">Venture Gotchi</a>
-            <nav>
+            <button class="hamburger-menu" id="hamburger-btn" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav-wrapper" id="nav-menu">
                 <ul class="nav-menu">
                     <li><a href="{% url 'dashboard' %}" class="nav-item active">Dashboard</a></li>
                     <li><a href="{% url 'perfil' %}" class="nav-item">Perfil</a></li>
@@ -92,5 +97,35 @@
     <footer class="footer-simple">
         <p>© 2026 VentureGotchi. Desenvolvido por Intranet Panthe On Ltda.</p>
     </footer>
+
+    <script>
+        // Menu Hambúrguer
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const navMenu = document.getElementById('nav-menu');
+
+        if (hamburgerBtn && navMenu) {
+            hamburgerBtn.addEventListener('click', function() {
+                this.classList.toggle('active');
+                navMenu.classList.toggle('active');
+            });
+
+            // Fecha o menu ao clicar em um link
+            const navLinks = navMenu.querySelectorAll('.nav-item');
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburgerBtn.classList.remove('active');
+                    navMenu.classList.remove('active');
+                });
+            });
+
+            // Fecha o menu ao clicar fora dele
+            document.addEventListener('click', function(event) {
+                if (!hamburgerBtn.contains(event.target) && !navMenu.contains(event.target)) {
+                    hamburgerBtn.classList.remove('active');
+                    navMenu.classList.remove('active');
+                }
+            });
+        }
+    </script>
 </body>
 </html>

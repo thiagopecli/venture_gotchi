@@ -15,7 +15,8 @@
                 <ul class="nav-menu">
                     <li><a href="{% url 'educador_dashboard' %}" class="nav-item active">Dashboard</a></li>
                     <li><a href="{% url 'educador_perfil' %}" class="nav-item">Perfil</a></li>
-                    <li><a href="{% url 'ranking_turmas' %}" class="nav-item">Ranking</a></li>
+                    <li><a href="{% url 'ranking_turmas' %}" class="nav-item">Ranking Turmas</a></li>
+                    <li><a href="{% url 'ranking' %}" class="nav-item">Ranking Global</a></li>
                     <li><a href="{% url 'metricas_turmas' %}" class="nav-item">Análise</a></li>
                     {% if user.is_authenticated %}
                     <li>
@@ -49,8 +50,8 @@
         </div>
     </div>
 
-    <div class="dashboard-grid">
-        <section class="dash-column">
+    <div class="dashboard-grid" style="display: flex; justify-content: center;">
+        <section class="dash-column" style="max-width: 900px; width: 100%;">
             <div class="info-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px;">
                     <h3 style="margin: 0;">Minhas Turmas</h3>
@@ -80,40 +81,6 @@
                     <small>Crie sua primeira turma para começar.</small>
                 </div>
                 {% endif %}
-            </div>
-        </section>
-
-        <section class="dash-column">
-            <div class="info-card">
-                <div style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px;">
-                    <h3 style="margin: 0;">Atalhos Rápidos</h3>
-                </div>
-                
-                <div class="cta-container">
-                    <a href="{% url 'ranking_turmas' %}" class="btn-primary-dash shortcut-btn">
-                        <span class="icon">🏆</span>
-                        <div class="text-content">
-                            <strong>Ranking de Turmas</strong>
-                            <span>Comparativo de desempenho entre salas</span>
-                        </div>
-                    </a>
-                    
-                    <a href="{% url 'metricas_turmas' %}" class="btn-primary-dash shortcut-btn">
-                        <span class="icon">📊</span>
-                        <div class="text-content">
-                            <strong>Análise Geral</strong>
-                            <span>KPIs agregados de todo o sistema</span>
-                        </div>
-                    </a>
-                    
-                    <a href="{% url 'ranking' %}" class="btn-primary-dash shortcut-btn">
-                        <span class="icon">🌍</span>
-                        <div class="text-content">
-                            <strong>Ranking Global</strong>
-                            <span>Listagem geral de todas as startups</span>
-                        </div>
-                    </a>
-                </div>
             </div>
         </section>
     </div>

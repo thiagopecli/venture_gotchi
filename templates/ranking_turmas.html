@@ -1,10 +1,45 @@
-{% extends 'base.html' %}
-
+{% load static %}
 {% load custom_filters %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking de Turmas - Venture Gotchi</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="dashboard-body">
+    <header class="main-header">
+        <div class="header-container">
+            <a href="{% url 'educador_dashboard' %}" class="header-logo">Venture Gotchi</a>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="{% url 'educador_dashboard' %}" class="nav-item">Dashboard</a></li>
+                    <li><a href="{% url 'educador_perfil' %}" class="nav-item">Perfil</a></li>
+                    <li><a href="{% url 'ranking_turmas' %}" class="nav-item active">Ranking Turmas</a></li>
+                    <li><a href="{% url 'ranking' %}" class="nav-item">Ranking Global</a></li>
+                    <li><a href="{% url 'metricas_turmas' %}" class="nav-item">Análise</a></li>
+                    {% if user.is_authenticated %}
+                    <li>
+                        <form method="post" action="{% url 'logout' %}" id="logout-form">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-item logout-btn-clean">Sair</button>
+                        </form>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-{% block title %}Ranking de Turmas - Venture Gotchi{% endblock %}
+    <div id="top-messages" class="top-messages">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
 
-{% block content %}
 <main class="dashboard-main">
     <!-- Seção de Boas-vindas -->
     <div class="welcome-section">
@@ -28,20 +63,20 @@
                 <table class="custom-table">
                     <thead>
                         <tr>
-                            <th>Código</th>
-                            <th>Turma</th>
-                            <th>Alunos</th>
-                            <th>Startups Ativas</th>
-                            <th>Média Valuation</th>
-                            <th>Top Recorde</th>
-                            <th>Ação</th>
+                            <th style="padding: 15px 20px;">Código</th>
+                            <th style="padding: 15px 20px;">Turma</th>
+                            <th style="padding: 15px 20px;">Alunos</th>
+                            <th style="padding: 15px 20px;">Startups Ativas</th>
+                            <th style="padding: 15px 20px;">Média Valuation</th>
+                            <th style="padding: 15px 20px;">Top Recorde</th>
+                            <th style="padding: 15px 20px;">Ação</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for turma_info in turmas_dados %}
                         <tr>
-                            <td style="font-weight: bold; color: var(--primary); text-align: center;">{{ turma_info.turma.codigo }}</td>
-                            <td style="text-align: left; padding: 15px;">
+                            <td style="font-weight: bold; color: var(--primary); text-align: center; padding: 15px 20px;">{{ turma_info.turma.codigo }}</td>
+                            <td style="text-align: left; padding: 15px 20px;">
                                 <div style="display: flex; flex-direction: column; gap: 5px;">
                                     <strong style="font-size: 0.95rem;">{{ turma_info.turma.nome }}</strong>
                                     {% if turma_info.turma.descricao %}
@@ -49,11 +84,11 @@
                                     {% endif %}
                                 </div>
                             </td>
-                            <td style="text-align: center; font-weight: 600; padding: 15px;">{{ turma_info.total_alunos }}</td>
-                            <td style="text-align: center; font-weight: 600; padding: 15px;">{{ turma_info.startups_ativas }}</td>
-                            <td style="text-align: center; font-weight: bold; color: var(--primary); padding: 15px;">{{ turma_info.media_valuation|moeda_br }}</td>
-                            <td style="text-align: center; color: #28a745; font-weight: bold; padding: 15px;">{{ turma_info.maior_valuation|moeda_br }}</td>
-                            <td style="text-align: center; padding: 15px;">
+                            <td style="text-align: center; font-weight: 600; padding: 15px 20px;">{{ turma_info.total_alunos }}</td>
+                            <td style="text-align: center; font-weight: 600; padding: 15px 20px;">{{ turma_info.startups_ativas }}</td>
+                            <td style="text-align: center; color: var(--primary); padding: 15px 20px;">{{ turma_info.media_valuation|moeda_br }}</td>
+                            <td style="text-align: center; color: #28a745; padding: 15px 20px;">{{ turma_info.maior_valuation|moeda_br }}</td>
+                            <td style="text-align: center; padding: 15px 20px;">
                                 <a href="{% url 'analise_turma' turma_info.turma.codigo %}" class="btn-play-small" style="font-size: 0.9rem;">Analisar</a>
                             </td>
                         </tr>
@@ -69,4 +104,5 @@
         </div>
     </section>
 </main>
-{% endblock %}
+</body>
+</html>

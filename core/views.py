@@ -277,6 +277,11 @@ def perfil(request):
         maior_turno=Max('turno_atual')
     )
     
+    # Turma do estudante (se houver código vinculado)
+    turma = None
+    if request.user.codigo_turma:
+        turma = Turma.objects.filter(codigo__iexact=request.user.codigo_turma).first()
+
     return render(request, 'perfil.html',{
         'usuario': request.user,
         'total_partidas': partidas_count,
@@ -286,6 +291,7 @@ def perfil(request):
         'maior_saldo': stats['maior_saldo'] or 0,
         'maior_valuation': stats['maior_valuation'] or 0,
         'maior_turno': stats['maior_turno'] or 0,
+        'turma': turma,
     })
 
 @login_required

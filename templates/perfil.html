@@ -26,6 +26,15 @@
             <div class="data-group">
                 {% if usuario.is_estudante %}
                     <p><span>Matrícula:</span> {{ usuario.matricula_aluno }}</p>
+                    <p><span>Turma:</span>
+                        {% if turma %}
+                            {{ turma.codigo }} — {{ turma.nome }}
+                        {% elif usuario.codigo_turma %}
+                            {{ usuario.codigo_turma }}
+                        {% else %}
+                            Não vinculada
+                        {% endif %}
+                    </p>
                 {% else %}
                     <p><span>Documento:</span> {{ usuario.documento }} ({{ usuario.tipo_documento }})</p>
                 {% endif %}

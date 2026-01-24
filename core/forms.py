@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.validators import RegexValidator
-from .models import User
+from .models import User, Turma
 
 class CadastroUsuarioForm(UserCreationForm):
     username = forms.CharField(
@@ -32,8 +32,14 @@ class CadastroUsuarioForm(UserCreationForm):
         categoria = cleaned_data.get('categoria')
         
         if categoria == User.Categorias.ESTUDANTE_UNIVERSITARIO:
-            if not cleaned_data.get('codigo_turma'):
+            codigo_turma = cleaned_data.get('codigo_turma')
+            if not codigo_turma:
                 raise forms.ValidationError({'codigo_turma': 'Este campo é obrigatório para Estudante Universitário.'})
+            # Normaliza para maiúsculas e garante que a turma existe e está ativa
+            codigo_turma = codigo_turma.upper()
+            cleaned_data['codigo_turma'] = codigo_turma
+            if not Turma.objects.filter(codigo=codigo_turma, ativa=True).exists():
+                raise forms.ValidationError({'codigo_turma': 'Código de turma não encontrado. Solicite um código válido ao seu educador.'})
             if not cleaned_data.get('matricula_aluno'):
                 raise forms.ValidationError({'matricula_aluno': 'Este campo é obrigatório para Estudante Universitário.'})
             # Para estudante, documento deve ser None

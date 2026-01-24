@@ -59,7 +59,12 @@ def registro_view(request):
             
             return redirect('redirect_handler') 
         else:
-            messages.error(request, 'Erro no formulário. Verifique os dados.')
+            # Superfície específica quando a turma não existe
+            codigo_errors = form.errors.get('codigo_turma')
+            if codigo_errors:
+                messages.error(request, codigo_errors.as_text().replace('* ', ''))
+            else:
+                messages.error(request, 'Erro no formulário. Verifique os dados.')
     else:
         form = CadastroUsuarioForm()
     

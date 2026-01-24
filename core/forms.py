@@ -4,6 +4,11 @@ from django.core.validators import RegexValidator
 from .models import User
 
 class CadastroUsuarioForm(UserCreationForm):
+    username = forms.CharField(
+        label="Nome de usuário",
+        max_length=150,
+        help_text="Obrigatório. Até 150 caracteres."
+    )
     # Declaramos os campos explicitamente para forçar a renderização
     first_name = forms.CharField(label="Nome Completo", required=True) # Campo para o nome real
     email = forms.EmailField(label="E-mail", required=True)

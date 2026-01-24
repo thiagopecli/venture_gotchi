@@ -37,7 +37,16 @@ class CadastroUsuarioForm(UserCreationForm):
         max_length=100,
         help_text="Obrigatório para educadores. Máximo: 100 caracteres."
     )
-    area_atuacao = forms.CharField(label="Área de Atuação", required=False, max_length=100)
+    area_atuacao = forms.CharField(
+        label="Área de Atuação", 
+        required=False, 
+        max_length=100,
+        help_text="Obrigatório para aspirantes a empreendedor. Máximo: 100 caracteres.",
+        widget=forms.TextInput(attrs={
+            'maxlength': '100',
+            'placeholder': 'Ex: Tecnologia, Saúde, Educação'
+        })
+    )
     cnpj = forms.CharField(
         label="CNPJ",
         required=False,
@@ -55,6 +64,25 @@ class CadastroUsuarioForm(UserCreationForm):
         required=False,
         max_length=100,
         help_text="Obrigatório para profissionais corporativos. Máximo: 100 caracteres."
+    )
+    municipio = forms.CharField(
+        label="Município",
+        required=True,
+        max_length=100,
+        help_text="Obrigatório. Nome do município onde você reside."
+    )
+    estado = forms.ChoiceField(
+        label="Estado",
+        required=True,
+        choices=User.Estados.choices,
+        help_text="Obrigatório. Selecione seu estado."
+    )
+    pais = forms.ChoiceField(
+        label="País",
+        required=True,
+        choices=User.Paises.choices,
+        initial='Brasil',
+        help_text="Obrigatório. Selecione seu país."
     )
 
     class Meta(UserCreationForm.Meta):
@@ -164,6 +192,47 @@ class CadastroUsuarioForm(UserCreationForm):
         
         return first_name
 
+    def clean_municipio(self):
+        """Valida o município"""
+        municipio = self.cleaned_data.get('municipio')
+        
+        if not municipio:
+            raise forms.ValidationError("Município é obrigatório.")
+        
+        if len(municipio) > 100:
+            raise forms.ValidationError(f"Nome do município não pode ter mais de 100 caracteres (você digitou {len(municipio)}).")
+        
+        if len(municipio) < 2:
+            raise forms.ValidationError("Nome do município deve ter no mínimo 2 caracteres.")
+        
+        return municipio
+
+    def clean_estado(self):
+        """Valida o estado"""
+        estado = self.cleaned_data.get('estado')
+        
+        if not estado:
+            raise forms.ValidationError("Estado é obrigatório.")
+        
+        # Verifica se é uma sigla válida
+        if estado not in dict(User.Estados.choices).keys():
+            raise forms.ValidationError("Selecione um estado válido.")
+        
+        return estado
+
+    def clean_pais(self):
+        """Valida o país"""
+        pais = self.cleaned_data.get('pais')
+        
+        if not pais:
+            raise forms.ValidationError("País é obrigatório.")
+        
+        # Verifica se é um país válido
+        if pais not in dict(User.Paises.choices).keys():
+            raise forms.ValidationError("Selecione um país válido.")
+        
+        return pais
+
     def clean(self):
         cleaned_data = super().clean()
         categoria = cleaned_data.get('categoria')
@@ -217,23 +286,23 @@ class CadastroUsuarioForm(UserCreationForm):
             cleaned_data['documento'] = cpf
         
         elif categoria == User.Categorias.ASPIRANTE_EMPREENDEDOR:
+            errors = {}
             cpf = cleaned_data.get('cpf')
             if not cpf:
-                raise forms.ValidationError({'cpf': 'CPF é obrigatório para aspirantes a empreendedor.'})
-            
-            if not re.match(r'^\d{11}$', cpf):
-                raise forms.ValidationError({
-                    'cpf': f"CPF inválido. Deve conter exatamente 11 dígitos numéricos. Você digitou: '{cpf}'"
-                })
+                errors['cpf'] = 'CPF é obrigatório para aspirantes a empreendedor.'
+            elif not re.match(r'^\d{11}$', cpf):
+                errors['cpf'] = f"CPF inválido. Deve conter exatamente 11 dígitos numéricos. Você digitou: '{cpf}'"
             
             area = cleaned_data.get('area_atuacao')
-            if not area:
-                raise forms.ValidationError({'area_atuacao': 'Área de atuação é obrigatória para aspirantes a empreendedor.'})
+            if not area or not area.strip():
+                errors['area_atuacao'] = 'Área de atuação é obrigatória para aspirantes a empreendedor. Por favor, informe sua área de atuação.'
+            elif len(area) > 100:
+                errors['area_atuacao'] = f"Área de atuação muito longa ({len(area)} caracteres, máximo é 100)."
+            elif len(area.strip()) < 2:
+                errors['area_atuacao'] = 'Área de atuação deve ter no mínimo 2 caracteres.'
             
-            if len(area) > 100:
-                raise forms.ValidationError({
-                    'area_atuacao': f"Área de atuação muito longa ({len(area)} caracteres, máximo é 100)."
-                })
+            if errors:
+                raise forms.ValidationError(errors)
             
             # Definir tipo_documento e documento
             cleaned_data['tipo_documento'] = 'CPF'
@@ -292,6 +361,9 @@ class CadastroUsuarioForm(UserCreationForm):
 class EditarPerfilForm(forms.ModelForm):
     first_name = forms.CharField(label="Nome Completo", required=True)
     email = forms.EmailField(label="E-mail", required=True)
+    municipio = forms.CharField(label="Município", required=True, max_length=100)
+    estado = forms.ChoiceField(label="Estado", required=True, choices=User.Estados.choices)
+    pais = forms.ChoiceField(label="País", required=True, choices=User.Paises.choices)
     codigo_turma = forms.CharField(label="Código de Turma", required=False, max_length=100, validators=[RegexValidator(r'^[A-Z]{3}-[0-9]{3}$', 'Formato AAA-999.')])
     matricula_aluno = forms.CharField(label="Matrícula", required=False, max_length=10)
     cpf = forms.CharField(

@@ -27,3 +27,11 @@ def moeda_br(value):
         return f'R$ {formatted}'
     except (ValueError, TypeError, AttributeError):
         return 'R$ 0,00'
+@register.filter(name='get_field_label')
+def get_field_label(form_fields, field_name):
+    """
+    Obtém o label de um campo do formulário
+    """
+    if field_name in form_fields:
+        return form_fields[field_name].label
+    return field_name.replace('_', ' ').title()

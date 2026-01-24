@@ -4,7 +4,11 @@
 {% if messages %}
     <div class="messages">
         {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% if 'success' in message.tags %}
+                <div class="alert alert-success">
+                    ✅ {{ message }}
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
 {% endif %}
@@ -13,110 +17,150 @@
         
         {% for field in form %}
             {% if field.name == 'tipo_documento' %}
-                <div class="field-group" id="tipo_documento_group" style="display: none;">
+                <div class="field-group {% if field.errors %}field-error{% endif %}" id="tipo_documento_group" style="display: none;">
                     <label>{{ field.label }}</label>
                     {{ field }}
                     {% if field.errors %}
-                        <div class="error">{{ field.errors }}</div>
+                        <div class="error-messages">
+                            {% for error in field.errors %}
+                                <div class="error-item">❌ {{ error }}</div>
+                            {% endfor %}
+                        </div>
                     {% endif %}
                     {% if field.help_text %}
                         <small class="help-text">{{ field.help_text }}</small>
                     {% endif %}
                 </div>
             {% elif field.name == 'documento' %}
-                <div class="field-group" id="documento_group" style="display: none;">
+                <div class="field-group {% if field.errors %}field-error{% endif %}" id="documento_group" style="display: none;">
                     <label>{{ field.label }}</label>
                     {{ field }}
                     {% if field.errors %}
-                        <div class="error">{{ field.errors }}</div>
+                        <div class="error-messages">
+                            {% for error in field.errors %}
+                                <div class="error-item">❌ {{ error }}</div>
+                            {% endfor %}
+                        </div>
                     {% endif %}
                     {% if field.help_text %}
                         <small class="help-text">{{ field.help_text }}</small>
                     {% endif %}
                 </div>
             {% elif field.name == 'codigo_turma' %}
-                <div class="field-group" id="codigo_turma_group" style="display: none;">
+                <div class="field-group {% if field.errors %}field-error{% endif %}" id="codigo_turma_group" style="display: none;">
                     <label>{{ field.label }}</label>
                     {{ field }}
                     {% if field.errors %}
-                        <div class="error">{{ field.errors }}</div>
+                        <div class="error-messages">
+                            {% for error in field.errors %}
+                                <div class="error-item">❌ {{ error }}</div>
+                            {% endfor %}
+                        </div>
                     {% endif %}
                     {% if field.help_text %}
                         <small class="help-text">{{ field.help_text }}</small>
                     {% endif %}
                 </div>
             {% elif field.name == 'matricula_aluno' %}
-                <div class="field-group" id="matricula_aluno_group" style="display: none;">
+                <div class="field-group {% if field.errors %}field-error{% endif %}" id="matricula_aluno_group">
                     <label>{{ field.label }}</label>
                     {{ field }}
                     {% if field.errors %}
-                        <div class="error">{{ field.errors }}</div>
+                        <div class="error-messages">
+                            {% for error in field.errors %}
+                                <div class="error-item">❌ {{ error }}</div>
+                            {% endfor %}
+                        </div>
                     {% endif %}
                     {% if field.help_text %}
                         <small class="help-text">{{ field.help_text }}</small>
                     {% endif %}
                 </div>
             {% elif field.name == 'cpf' %}
-                <div class="field-group" id="cpf_group" style="display: none;">
+                <div class="field-group {% if field.errors %}field-error{% endif %}" id="cpf_group" style="display: none;">
                     <label>{{ field.label }}</label>
                     {{ field }}
                     {% if field.errors %}
-                        <div class="error">{{ field.errors }}</div>
+                        <div class="error-messages">
+                            {% for error in field.errors %}
+                                <div class="error-item">❌ {{ error }}</div>
+                            {% endfor %}
+                        </div>
                     {% endif %}
                     {% if field.help_text %}
                         <small class="help-text">{{ field.help_text }}</small>
                     {% endif %}
                 </div>
             {% elif field.name == 'nome_instituicao' %}
-                <div class="field-group" id="nome_instituicao_group" style="display: none;">
+                <div class="field-group {% if field.errors %}field-error{% endif %}" id="nome_instituicao_group" style="display: {% if field.errors %}block{% else %}none{% endif %};">
                     <label>{{ field.label }}</label>
                     {{ field }}
                     {% if field.errors %}
-                        <div class="error">{{ field.errors }}</div>
+                        <div class="error-messages">
+                            {% for error in field.errors %}
+                                <div class="error-item">❌ {{ error }}</div>
+                            {% endfor %}
+                        </div>
                     {% endif %}
                     {% if field.help_text %}
                         <small class="help-text">{{ field.help_text }}</small>
                     {% endif %}
                 </div>
             {% elif field.name == 'area_atuacao' %}
-                <div class="field-group" id="area_atuacao_group" style="display: none;">
+                <div class="field-group {% if field.errors %}field-error{% endif %}" id="area_atuacao_group" style="display: none;">
                     <label>{{ field.label }}</label>
                     {{ field }}
                     {% if field.errors %}
-                        <div class="error">{{ field.errors }}</div>
+                        <div class="error-messages">
+                            {% for error in field.errors %}
+                                <div class="error-item">❌ {{ error }}</div>
+                            {% endfor %}
+                        </div>
                     {% endif %}
                     {% if field.help_text %}
                         <small class="help-text">{{ field.help_text }}</small>
                     {% endif %}
                 </div>
             {% elif field.name == 'cnpj' %}
-                <div class="field-group" id="cnpj_group" style="display: none;">
+                <div class="field-group {% if field.errors %}field-error{% endif %}" id="cnpj_group" style="display: none;">
                     <label>{{ field.label }}</label>
                     {{ field }}
                     {% if field.errors %}
-                        <div class="error">{{ field.errors }}</div>
+                        <div class="error-messages">
+                            {% for error in field.errors %}
+                                <div class="error-item">❌ {{ error }}</div>
+                            {% endfor %}
+                        </div>
                     {% endif %}
                     {% if field.help_text %}
                         <small class="help-text">{{ field.help_text }}</small>
                     {% endif %}
                 </div>
             {% elif field.name == 'nome_empresa' %}
-                <div class="field-group" id="nome_empresa_group" style="display: none;">
+                <div class="field-group {% if field.errors %}field-error{% endif %}" id="nome_empresa_group" style="display: none;">
                     <label>{{ field.label }}</label>
                     {{ field }}
                     {% if field.errors %}
-                        <div class="error">{{ field.errors }}</div>
+                        <div class="error-messages">
+                            {% for error in field.errors %}
+                                <div class="error-item">❌ {{ error }}</div>
+                            {% endfor %}
+                        </div>
                     {% endif %}
                     {% if field.help_text %}
                         <small class="help-text">{{ field.help_text }}</small>
                     {% endif %}
                 </div>
             {% else %}
-                <div class="field-group">
+                <div class="field-group {% if field.errors %}field-error{% endif %}">
                     <label>{{ field.label }}</label>
                     {{ field }}
                     {% if field.errors %}
-                        <div class="error">{{ field.errors }}</div>
+                        <div class="error-messages">
+                            {% for error in field.errors %}
+                                <div class="error-item">❌ {{ error }}</div>
+                            {% endfor %}
+                        </div>
                     {% endif %}
                     {% if field.help_text %}
                         <small class="help-text">{{ field.help_text }}</small>
@@ -137,8 +181,7 @@
     </form>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
+<script>document.addEventListener('DOMContentLoaded', function() {
     const categoriaSelect = document.querySelector('select[name="categoria"]');
     const codigoTurmaGroup = document.getElementById('codigo_turma_group');
     const matriculaAlunoGroup = document.getElementById('matricula_aluno_group');
@@ -150,14 +193,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function toggleFields() {
         const categoria = categoriaSelect.value;
-        // Hide all
-        codigoTurmaGroup.style.display = 'none';
-        matriculaAlunoGroup.style.display = 'none';
-        cpfGroup.style.display = 'none';
-        nomeInstituicaoGroup.style.display = 'none';
-        areaAtuacaoGroup.style.display = 'none';
-        cnpjGroup.style.display = 'none';
-        nomeEmpresaGroup.style.display = 'none';
+        // Hide all except those already showing errors
+        [
+            codigoTurmaGroup,
+            matriculaAlunoGroup,
+            cpfGroup,
+            nomeInstituicaoGroup,
+            areaAtuacaoGroup,
+            cnpjGroup,
+            nomeEmpresaGroup
+        ].forEach(group => {
+            if (!group.classList.contains('field-error')) {
+                group.style.display = 'none';
+            }
+        });
 
         // Make fields not required
         document.querySelector('input[name="codigo_turma"]').required = false;
@@ -190,9 +239,44 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('input[name="cnpj"]').required = true;
             document.querySelector('input[name="nome_empresa"]').required = true;
         }
+
+        // Ensure groups with server-side errors stay visible even if category is unset
+        [codigoTurmaGroup, matriculaAlunoGroup, cpfGroup, nomeInstituicaoGroup, areaAtuacaoGroup, cnpjGroup, nomeEmpresaGroup]
+            .forEach(group => {
+                if (group.classList.contains('field-error')) {
+                    group.style.display = 'block';
+                }
+            });
     }
 
     categoriaSelect.addEventListener('change', toggleFields);
+    
+    // Validação em tempo real para campo CPF - apenas 11 dígitos numéricos
+    const cpfInput = document.querySelector('input[name="cpf"]');
+    if (cpfInput) {
+        cpfInput.addEventListener('input', function(e) {
+            // Remove qualquer caractere não-numérico
+            e.target.value = e.target.value.replace(/[^\d]/g, '');
+            // Limita a 11 dígitos
+            if (e.target.value.length > 11) {
+                e.target.value = e.target.value.slice(0, 11);
+            }
+        });
+    }
+    
+    // Validação em tempo real para campo CNPJ - apenas 14 dígitos numéricos
+    const cnpjInput = document.querySelector('input[name="cnpj"]');
+    if (cnpjInput) {
+        cnpjInput.addEventListener('input', function(e) {
+            // Remove qualquer caractere não-numérico
+            e.target.value = e.target.value.replace(/[^\d]/g, '');
+            // Limita a 14 dígitos
+            if (e.target.value.length > 14) {
+                e.target.value = e.target.value.slice(0, 14);
+            }
+        });
+    }
+    
     // Initial check
     toggleFields();
 });

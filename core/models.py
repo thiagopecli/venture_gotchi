@@ -50,6 +50,38 @@ class User(AbstractUser):
         ASPIRANTE_EMPREENDEDOR = "ASPIRANTE_EMPREENDEDOR", "Aspirante a Empreendedor"
         EDUCADOR_NEGOCIOS = "EDUCADOR_NEGOCIOS", "Educador de Negócios"
         PROFISSIONAL_CORPORATIVO = "PROFISSIONAL_CORPORATIVO", "Profissional Corporativo"
+    
+    class Estados(models.TextChoices):
+        AC = 'AC', 'Acre'
+        AL = 'AL', 'Alagoas'
+        AP = 'AP', 'Amapá'
+        AM = 'AM', 'Amazonas'
+        BA = 'BA', 'Bahia'
+        CE = 'CE', 'Ceará'
+        DF = 'DF', 'Distrito Federal'
+        ES = 'ES', 'Espírito Santo'
+        GO = 'GO', 'Goiás'
+        MA = 'MA', 'Maranhão'
+        MT = 'MT', 'Mato Grosso'
+        MS = 'MS', 'Mato Grosso do Sul'
+        MG = 'MG', 'Minas Gerais'
+        PA = 'PA', 'Pará'
+        PB = 'PB', 'Paraíba'
+        PR = 'PR', 'Paraná'
+        PE = 'PE', 'Pernambuco'
+        PI = 'PI', 'Piauí'
+        RJ = 'RJ', 'Rio de Janeiro'
+        RN = 'RN', 'Rio Grande do Norte'
+        RS = 'RS', 'Rio Grande do Sul'
+        RO = 'RO', 'Rondônia'
+        RR = 'RR', 'Roraima'
+        SC = 'SC', 'Santa Catarina'
+        SP = 'SP', 'São Paulo'
+        SE = 'SE', 'Sergipe'
+        TO = 'TO', 'Tocantins'
+    
+    class Paises(models.TextChoices):
+        BRASIL = 'Brasil', 'Brasil'
 
     tipo_documento = models.CharField(
         max_length=4, 
@@ -58,9 +90,9 @@ class User(AbstractUser):
     )
     documento = models.CharField(max_length=18, unique=True, blank=True, null=True, help_text="CPF ou CNPJ")
     categoria = models.CharField(max_length=30, choices=Categorias.choices)
-    municipio = models.CharField(max_length=100, verbose_name="Município", blank=True, null=True)
-    estado = models.CharField(max_length=100, verbose_name="Estado", blank=True, null=True)
-    pais = models.CharField(max_length=100, verbose_name="País", default="Brasil", blank=True, null=True)
+    municipio = models.CharField(max_length=100, verbose_name="Município")
+    estado = models.CharField(max_length=2, verbose_name="Estado", choices=Estados.choices)
+    pais = models.CharField(max_length=100, verbose_name="País", choices=Paises.choices, default='Brasil')
     codigo_turma = models.CharField(max_length=100, verbose_name="Código de Turma", blank=True, null=True, validators=[RegexValidator(r'^[A-Z]{3}-[0-9]{3}$', 'Código de Turma deve estar no formato AAA-999.')])
     matricula_aluno = models.CharField(max_length=10, verbose_name="Matrícula do Aluno", blank=True, null=True, validators=[RegexValidator(r'^\d{1,10}$', 'Matrícula deve ter até 10 dígitos numéricos.')])
     nome_instituicao = models.CharField(max_length=100, verbose_name="Nome da Instituição", blank=True, null=True)

@@ -1,0 +1,469 @@
+Documento  do  Projeto  
+ 
+Intranet  Panthe  On  Ltda/  Venture  Gotchi  
+Campo  Detalhe  
+Título  do  Sistema  Venture  Gotchi  -  Da  Ideia  ao  Sucesso:  Aprendendo  Empreendedorismo  na  Prática  
+Versão  1.0  
+Data  17/11/2025  
+Responsável  A  definir  (Ex.:  Equipe  Venture  Gotchi  /  Instituição  Educacional)  
+ 
+1.  Introdução  
+ 
+ 
+1.1  Contexto  
+ 
+O  Venture  Gotchi  é  uma  simulação  de  empreendedorismo  que  ensina  conceitos  de  negócios  
+na
+ 
+prática.
+ 
+Atualmente,
+ 
+o
+ 
+projeto
+ 
+não
+ 
+possui
+ 
+um
+ 
+banco
+ 
+de
+ 
+dados
+ 
+estruturado
+,
+ 
+o
+ 
+que
+ 
+impede
+ 
+o
+ 
+registro
+ 
+do
+ 
+progresso
+ 
+das
+ 
+partidas
+ 
+e
+ 
+a
+ 
+criação
+ 
+de
+ 
+relatórios
+ 
+comparativos
+ 
+essenciais
+ 
+entre
+ 
+usuários.
+ 
+A
+ 
+ausência
+ 
+de
+ 
+persistência
+ 
+de
+ 
+dados
+ 
+limita
+ 
+o
+ 
+potencial
+ 
+educacional,
+ 
+impede
+ 
+a
+ 
+continuidade
+ 
+da
+ 
+jogabilidade
+ 
+e
+ 
+inviabiliza
+ 
+recursos
+ 
+de
+ 
+gamificação
+ 
+como
+ 
+rankings
+ 
+e
+ 
+conquistas.
+ 
+ 
+  
+1.2  Objetivo  Geral  
+ 
+Projetar  e  implementar  uma  plataforma  web,  utilizando  Django  com  Templates ,  com  foco  na  
+criação
+ 
+de
+ 
+um
+ 
+Banco
+ 
+de
+ 
+Dados
+ 
+Relacional
+ 
+(BDR)
+ 
+robusto,
+ 
+capaz
+ 
+de
+ 
+gerenciar
+ 
+e
+ 
+persistir
+ 
+os
+ 
+dados
+ 
+do
+ 
+jogo,
+ 
+permitindo:
+ ●  O  armazenamento  de  usuários,  startups  virtuais,  métricas  de  desempenho  e  histórico  de  
+decisões.
+ ●  A  continuidade  e  o  registro  do  progresso  das  partidas.  ●  A  criação  de  rankings,  competições  e  um  sistema  de  conquistas.  ●  A  geração  de  relatórios  detalhados  para  uso  educacional  e  análise  comparativa.   
+2.  Justificativa  
+ 
+Esta  iniciativa  busca  solucionar  a  falta  de  gestão  de  dados  do  jogo,  transformando  o  Venture  
+Gotchi
+ 
+em
+ 
+uma
+ 
+ferramenta
+ 
+escalável
+ 
+e
+ 
+eficaz
+ 
+de
+ 
+aprendizado
+.
+ 
+Os  principais  benefícios  são:  ●  Continuidade  de  Partidas:  Usuários  poderão  salvar  e  carregar  seu  progresso,  
+aumentando
+ 
+o
+ 
+engajamento.
+ ●  Relatórios  Educacionais:  O  BDR  permitirá  a  coleta  de  dados  para  relatórios  
+detalhados
+ 
+e
+ 
+análise
+ 
+comparativa,
+ 
+um
+ 
+recurso
+ 
+valioso
+ 
+para
+ 
+Educadores.
+ ●  Gamificação:  Possibilidade  de  competições  entre  usuários  e  a  criação  de  rankings  
+globais
+ 
+e
+ 
+regionais
+.
+ ●  Escalabilidade:  A  implementação  correta  da  modelagem  de  dados  garantirá  que  o  
+sistema
+ 
+suporte
+ 
+múltiplos
+ 
+jogadores
+ 
+simultâneos
+ 
+e
+ 
+futura
+ 
+integração
+ 
+com
+ 
+sistemas
+ 
+LMS.
+ ●  Governança  de  Dados:  Padronização  e  centralização  de  todas  as  informações  de  
+jogabilidade
+ 
+e
+ 
+métricas
+ 
+de
+ 
+aprendizado.
+  
+   
+3.  Público-Alvo  e  Usuários  
+ 
+Tipo  de  Usuário  Descrição  
+Estudantes  Universitários  Idade:  18–25  anos.  Utilizam  o  jogo  como  complemento  prático  ao  aprendizado  de  empreendedorismo.  
+Aspirantes  a  Empreendedores  Idade:  25–35  anos.  Buscam  simulação  prática  de  desafios  de  negócios.  
+Educadores  de  Negócios  Idade:  30–50  anos.  Utilizam  a  plataforma  para  monitorar  o  desempenho  e  gerar  relatórios  de  avaliação  de  grupos.  
+Profissionais  Corporativos  Idade:  30–45  anos.  Usam  para  simular  cenários  de  inovação  e  insights  de  gestão.  
+ 
+4.  Funcionalidades  Principais  (Foco  em  Persistência  de  
+Dados)
+ 
+ 
+ 
+4.1.  Autenticação  e  Perfis  
+ ●  Login  e  Cadastro:  Registro  de  usuários  (e-mail,  senha)  e  armazenamento  de  perfis.  ●  Perfil  de  Usuário:  Visualização  do  histórico  de  partidas,  métricas  consolidadas  e  
+conquistas
+ 
+desbloqueadas.
+ 
+ 
+4.2.  Gestão  de  Partidas  
+ ●  Cadastro  de  Partidas:  Início  de  novas  simulações  vinculadas  ao  usuário.  
+●  Salvamento  de  Progresso:  Registro  do  estado  atual  da  startup  virtual  e  de  todas  as  
+métricas
+ 
+de
+ 
+desempenho
+ 
+no
+ 
+BDR.
+ ●  Histórico  de  Decisões:  Armazenamento  sequencial  de  cada  escolha  feita  pelo  jogador,  
+permitindo
+ 
+a
+ 
+análise
+ 
+post-mortem
+.
+ 
+ 
+4.3.  Modelagem  de  Dados  Relacional  (BDR)  
+ 
+Implementação  de  um  modelo  de  dados  para  suportar  as  funcionalidades:  ●  Tabelas  Principais:  Usuários,  Partidas,  Métricas  da  Startup,  Fundador,  Eventos  e  
+Conquistas.
+ ●  Requisitos  do  BDR:  Garantir  relacionamentos  corretos,  constraints  e  índices  para  
+otimizar
+ 
+a
+ 
+performance,
+ 
+especialmente
+ 
+em
+ 
+consultas
+ 
+de
+ 
+ranking.
+ 
+ 
+4.4.  Relatórios  e  Gamificação  
+ ●  Rankings:  Geração  de  classificações  globais  e  regionais  com  base  em  métricas  de  
+desempenho
+ 
+da
+ 
+startup
+ 
+(ex.:
+ 
+valor
+ 
+de
+ 
+mercado,
+ 
+receita).
+ ●  Relatórios  Comparativos:  Geração  de  dados  agregados  para  Educadores,  comparando  
+o
+ 
+desempenho
+ 
+de
+ 
+grupos
+ 
+de
+ 
+usuários.
+ ●  Sistema  de  Conquistas:  Registro  das  conquistas  desbloqueadas  (troféus)  por  usuário.   
+       
+5.  Arquitetura  de  Acesso  e  Permissões  
+ 
+As  permissões  serão  definidas  pelo  tipo  de  usuário,  garantindo  a  privacidade  das  partidas  
+individuais
+ 
+e
+ 
+o
+ 
+acesso
+ 
+a
+ 
+dados
+ 
+agregados
+ 
+para
+ 
+Educadores:
+ 
+Ação  Estudante/Aspirante  Educador  de  Negócios  
+Salvar  e  Carregar  Partida  Sim  Não  (Somente  leitura  dos  dados)  
+Visualizar  Dados  de  Partida  (Própria)  
+Sim  Não  
+Acessar/Gerar  Relatórios  Agregados  
+Não  Sim  
+Acessar  Ranking  Sim  Sim  
+Gerenciar  Conquistas  Sim  (Desbloquear)  Não  (Apenas  visualizar)  
+ 
+7.  Tecnologia  
+ ●  Framework  Web:  Django .  ●  Frontend:  Templates  (Django  Templates).  ●  Banco  de  Dados:  Banco  de  Dados  Relacional  (Ex:  PostgreSQL/MySQL).   
+    
+8.  Próximos  Passos  
+ 1.  Modelagem  de  Dados  Detalhada:  Definição  final  das  colunas,  tipos  e  relacionamentos  
+(ORM
+ 
+Django).
+ 2.  Implementação  do  MVP  de  Persistência:  Criação  dos  models  e  migrações  do  Django.  3.  Desenvolvimento  das  Views/Templates:  Criação  das  telas  de  ranking,  perfil  e  
+relatórios.
+ 4.  Integração  do  Jogo:  Conexão  da  lógica  de  decisão  do  jogo  com  o  salvamento  e  
+recuperação
+ 
+do
+ 
+BDR.
+  
+9.  Conclusão  
+ 
+A  implementação  do  Banco  de  Dados  Relacional  no  Venture  Gotchi  é  o  requisito  mais  crítico  
+para
+ 
+sua
+ 
+evolução.
+ 
+Ao
+ 
+solucionar
+ 
+a
+ 
+ausência
+ 
+de
+ 
+persistência
+ 
+de
+ 
+dados,
+ 
+o
+ 
+projeto
+ 
+se
+ 
+tornará
+ 
+uma
+ 
+ferramenta
+ 
+educacional
+ 
+completa
+,
+ 
+capaz
+ 
+de
+ 
+oferecer
+ 
+continuidade,
+ 
+competitividade
+ 
+e
+ 
+análises
+ 
+aprofundadas
+,
+ 
+beneficiando
+ 
+todos
+ 
+os
+ 
+seus
+ 
+usuários.
+ 
+ 

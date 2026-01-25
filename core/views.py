@@ -417,13 +417,17 @@ def ranking(request):
     # Estudantes veem apenas startups de outros estudantes
     # Aspirantes veem apenas startups de outros aspirantes
     # Profissionais Corporativos veem apenas startups de outros corporativos
-    # Educadores veem todas as startups
+    # Educadores veem apenas startups de alunos das turmas criadas por eles
     if request.user.categoria == User.Categorias.ESTUDANTE_UNIVERSITARIO:
         startups = startups.filter(partida__usuario__categoria=User.Categorias.ESTUDANTE_UNIVERSITARIO)
     elif request.user.categoria == User.Categorias.ASPIRANTE_EMPREENDEDOR:
         startups = startups.filter(partida__usuario__categoria=User.Categorias.ASPIRANTE_EMPREENDEDOR)
     elif request.user.categoria == User.Categorias.PROFISSIONAL_CORPORATIVO:
         startups = startups.filter(partida__usuario__categoria=User.Categorias.PROFISSIONAL_CORPORATIVO)
+    elif request.user.categoria == User.Categorias.EDUCADOR_NEGOCIOS:
+        # Educadores veem apenas alunos das turmas que criaram
+        codigos_turmas = request.user.turmas_criadas.filter(ativa=True).values_list('codigo', flat=True)
+        startups = startups.filter(partida__usuario__codigo_turma__in=codigos_turmas)
     
     # 4. Lógica de Filtro por Turma (Exclusivo Educador/Admin)
     # Verifica se é educador para permitir o filtro

@@ -2,7 +2,7 @@
 Testes adicionais para alcançar 100% de cobertura
 Cobre lacunas em forms.py, permissions.py, models.py e custom_filters.py
 """
-from django.test import TestCase, Client
+from django.test import TestCase, Client, RequestFactory
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from decimal import Decimal

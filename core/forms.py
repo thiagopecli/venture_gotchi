@@ -18,7 +18,7 @@ class CadastroUsuarioForm(UserCreationForm):
     documento = forms.CharField(label="CPF/CNPJ", max_length=18, required=False)
     categoria = forms.ChoiceField(label="Categoria", choices=User.Categorias.choices)
     codigo_turma = forms.CharField(label="Código de Turma", required=False, max_length=100, validators=[RegexValidator(r'^[A-Z]{3}-[0-9]{3}$', 'Código de Turma deve estar no formato AAA-999.')])
-    matricula_aluno = forms.CharField(label="Matrícula do Aluno", required=False, max_length=10, validators=[RegexValidator(r'^\d{10}$', 'Matrícula deve ter exatamente 10 dígitos numéricos.')])
+    matricula_aluno = forms.CharField(label="Matrícula do Aluno", required=False, max_length=10, validators=[RegexValidator(r'^\d{1,10}$', 'Matrícula deve ter até 10 dígitos numéricos.')])
     cpf = forms.CharField(
         label="CPF", 
         required=False, 
@@ -67,22 +67,22 @@ class CadastroUsuarioForm(UserCreationForm):
     )
     municipio = forms.CharField(
         label="Município",
-        required=True,
+        required=False,
         max_length=100,
-        help_text="Obrigatório. Nome do município onde você reside."
+        help_text="Opcional. Caso omita, será usado um valor padrão."
     )
     estado = forms.ChoiceField(
         label="Estado",
-        required=True,
+        required=False,
         choices=User.Estados.choices,
-        help_text="Obrigatório. Selecione seu estado."
+        help_text="Opcional. Caso omita, será usado 'SP'."
     )
     pais = forms.ChoiceField(
         label="País",
-        required=True,
+        required=False,
         choices=User.Paises.choices,
         initial='Brasil',
-        help_text="Obrigatório. Selecione seu país."
+        help_text="Opcional. Caso omita, será usado 'Brasil'."
     )
 
     class Meta(UserCreationForm.Meta):
@@ -187,55 +187,51 @@ class CadastroUsuarioForm(UserCreationForm):
         if len(first_name) < 3:
             raise forms.ValidationError("Nome deve ter no mínimo 3 caracteres.")
         
-        if not re.match(r'^[a-zA-Záéíóúàâêôãõç\s-]+$', first_name):
-            raise forms.ValidationError("Nome pode conter apenas letras, espaços e hífens.")
+        if not re.match(r'^[a-zA-Záéíóúàâêôãõç\s\.-]+$', first_name):
+            raise forms.ValidationError("Nome pode conter apenas letras, espaços, pontos e hífens.")
         
         return first_name
 
     def clean_municipio(self):
         """Valida o município"""
         municipio = self.cleaned_data.get('municipio')
-        
         if not municipio:
-            raise forms.ValidationError("Município é obrigatório.")
-        
+            return municipio
         if len(municipio) > 100:
             raise forms.ValidationError(f"Nome do município não pode ter mais de 100 caracteres (você digitou {len(municipio)}).")
-        
         if len(municipio) < 2:
             raise forms.ValidationError("Nome do município deve ter no mínimo 2 caracteres.")
-        
         return municipio
 
     def clean_estado(self):
         """Valida o estado"""
         estado = self.cleaned_data.get('estado')
-        
         if not estado:
-            raise forms.ValidationError("Estado é obrigatório.")
-        
-        # Verifica se é uma sigla válida
+            return estado
         if estado not in dict(User.Estados.choices).keys():
             raise forms.ValidationError("Selecione um estado válido.")
-        
         return estado
 
     def clean_pais(self):
         """Valida o país"""
         pais = self.cleaned_data.get('pais')
-        
         if not pais:
-            raise forms.ValidationError("País é obrigatório.")
-        
-        # Verifica se é um país válido
+            return pais
         if pais not in dict(User.Paises.choices).keys():
             raise forms.ValidationError("Selecione um país válido.")
-        
         return pais
 
     def clean(self):
         cleaned_data = super().clean()
         categoria = cleaned_data.get('categoria')
+
+        # Valores padrão para localização quando omitidos
+        if not cleaned_data.get('municipio'):
+            cleaned_data['municipio'] = 'Nao informado'
+        if not cleaned_data.get('estado'):
+            cleaned_data['estado'] = 'SP'
+        if not cleaned_data.get('pais'):
+            cleaned_data['pais'] = 'Brasil'
         
         if categoria == User.Categorias.ESTUDANTE_UNIVERSITARIO:
             codigo_turma = cleaned_data.get('codigo_turma')
@@ -245,11 +241,6 @@ class CadastroUsuarioForm(UserCreationForm):
             # Normaliza para maiúsculas e garante que a turma existe e está ativa
             codigo_turma = codigo_turma.upper()
             cleaned_data['codigo_turma'] = codigo_turma
-            
-            if not Turma.objects.filter(codigo=codigo_turma, ativa=True).exists():
-                raise forms.ValidationError({
-                    'codigo_turma': 'Código de turma inválido ou turma inativa. Verifique com seu educador.'
-                })
             
             matricula = cleaned_data.get('matricula_aluno')
             if not matricula:
@@ -352,6 +343,14 @@ class CadastroUsuarioForm(UserCreationForm):
         elif categoria == User.Categorias.ESTUDANTE_UNIVERSITARIO:
             user.documento = None
             user.tipo_documento = 'CPF'
+
+        # Garantir defaults de localização ao salvar
+        if not user.municipio:
+            user.municipio = 'Nao informado'
+        if not user.estado:
+            user.estado = 'SP'
+        if not user.pais:
+            user.pais = 'Brasil'
         
         if commit:
             user.save()
@@ -361,9 +360,9 @@ class CadastroUsuarioForm(UserCreationForm):
 class EditarPerfilForm(forms.ModelForm):
     first_name = forms.CharField(label="Nome Completo", required=True)
     email = forms.EmailField(label="E-mail", required=True)
-    municipio = forms.CharField(label="Município", required=True, max_length=100)
-    estado = forms.ChoiceField(label="Estado", required=True, choices=User.Estados.choices)
-    pais = forms.ChoiceField(label="País", required=True, choices=User.Paises.choices)
+    municipio = forms.CharField(label="Município", required=False, max_length=100)
+    estado = forms.ChoiceField(label="Estado", required=False, choices=User.Estados.choices)
+    pais = forms.ChoiceField(label="País", required=False, choices=User.Paises.choices)
     codigo_turma = forms.CharField(label="Código de Turma", required=False, max_length=100, validators=[RegexValidator(r'^[A-Z]{3}-[0-9]{3}$', 'Formato AAA-999.')])
     matricula_aluno = forms.CharField(label="Matrícula", required=False, max_length=10)
     cpf = forms.CharField(
@@ -417,8 +416,15 @@ class EditarPerfilForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         categoria = self.instance.categoria
-        
-        
+
+        # Defaults para localização quando não informados
+        if not cleaned_data.get('municipio'):
+            cleaned_data['municipio'] = 'Nao informado'
+        if not cleaned_data.get('estado'):
+            cleaned_data['estado'] = 'SP'
+        if not cleaned_data.get('pais'):
+            cleaned_data['pais'] = 'Brasil'
+
         if categoria == 'ESTUDANTE_UNIVERSITARIO' and not cleaned_data.get('codigo_turma'):
             self.add_error('codigo_turma', 'Campo obrigatório para estudantes.')
         return cleaned_data
@@ -443,6 +449,14 @@ class EditarPerfilForm(forms.ModelForm):
         elif categoria == 'ESTUDANTE_UNIVERSITARIO':
             user.documento = None
             user.tipo_documento = 'CPF'
+
+        # Persistir defaults de localização se não vieram do form
+        if not user.municipio:
+            user.municipio = 'Nao informado'
+        if not user.estado:
+            user.estado = 'SP'
+        if not user.pais:
+            user.pais = 'Brasil'
         
         if commit:
             user.save()

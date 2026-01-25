@@ -120,10 +120,6 @@ class User(AbstractUser):
         """Verifica se é Profissional Corporativo"""
         return self.categoria == self.Categorias.PROFISSIONAL_CORPORATIVO
     
-    def is_empresa(self):
-        """Verifica se é Empresa"""
-        return self.categoria == self.Categorias.EMPRESA
-    
     # Permissões específicas
     def pode_salvar_carregar_partida(self):
         """Estudantes, Aspirantes e Profissionais Corporativos podem salvar/carregar partidas"""

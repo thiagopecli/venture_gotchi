@@ -1,5 +1,5 @@
 from django import template
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 register = template.Library()
 
@@ -25,7 +25,7 @@ def moeda_br(value):
         formatted = formatted.replace(',', 'X').replace('.', ',').replace('X', '.')
         
         return f'R$ {formatted}'
-    except (ValueError, TypeError, AttributeError):
+    except (ValueError, TypeError, AttributeError, InvalidOperation):
         return 'R$ 0,00'
 @register.filter(name='get_field_label')
 def get_field_label(form_fields, field_name):

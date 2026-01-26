@@ -7,7 +7,7 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth import login
 from django.contrib import messages
 from django.contrib.messages import get_messages
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from core.services.conquistas import verificar_conquistas_partida, verificar_conquistas_progesso
 from .models import User, Partida, Startup, HistoricoDecisao, Turma
 from django.db.models import Prefetch
@@ -36,7 +36,7 @@ def formatar_moeda_br(valor):
         formatted = formatted.replace(',', 'X').replace('.', ',').replace('X', '.')
         
         return f'R$ {formatted}'
-    except (ValueError, TypeError, AttributeError):
+    except (ValueError, TypeError, AttributeError, InvalidOperation):
         return 'R$ 0,00'
 
 class PaginaLogin(LoginView):

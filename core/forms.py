@@ -234,22 +234,28 @@ class CadastroUsuarioForm(UserCreationForm):
             cleaned_data['pais'] = 'Brasil'
         
         if categoria == User.Categorias.ESTUDANTE_UNIVERSITARIO:
+            errors = {}
             codigo_turma = cleaned_data.get('codigo_turma')
             if not codigo_turma:
-                raise forms.ValidationError({'codigo_turma': 'Código de turma é obrigatório para estudantes universitários.'})
-            
-            # Normaliza para maiúsculas e garante que a turma existe e está ativa
-            codigo_turma = codigo_turma.upper()
-            cleaned_data['codigo_turma'] = codigo_turma
+                errors['codigo_turma'] = 'Código de turma é obrigatório para estudantes universitários.'
+            else:
+                # Normaliza para maiúsculas
+                codigo_turma = codigo_turma.upper()
+                cleaned_data['codigo_turma'] = codigo_turma
+                
+                # Valida se a turma existe e está ativa no banco de dados
+                turma = Turma.objects.filter(codigo__iexact=codigo_turma, ativa=True).first()
+                if not turma:
+                    errors['codigo_turma'] = f"A turma com código '{codigo_turma}' não existe ou está inativa no banco de dados. Verifique o código e tente novamente."
             
             matricula = cleaned_data.get('matricula_aluno')
             if not matricula:
-                raise forms.ValidationError({'matricula_aluno': 'Matrícula do aluno é obrigatória para estudantes universitários.'})
+                errors['matricula_aluno'] = 'Matrícula do aluno é obrigatória para estudantes universitários.'
+            elif not re.match(r'^\d{1,10}$', matricula):
+                errors['matricula_aluno'] = f"Matrícula inválida. Deve conter apenas números (máximo 10 dígitos). Você digitou: '{matricula}'"
             
-            if not re.match(r'^\d{1,10}$', matricula):
-                raise forms.ValidationError({
-                    'matricula_aluno': f"Matrícula inválida. Deve conter apenas números (máximo 10 dígitos). Você digitou: '{matricula}'"
-                })
+            if errors:
+                raise forms.ValidationError(errors)
             
             # Para estudante, documento deve ser None
             cleaned_data['documento'] = None

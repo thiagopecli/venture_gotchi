@@ -246,7 +246,7 @@ class CadastroUsuarioForm(UserCreationForm):
                 # Valida se a turma existe e está ativa no banco de dados
                 turma = Turma.objects.filter(codigo__iexact=codigo_turma, ativa=True).first()
                 if not turma:
-                    errors['codigo_turma'] = f"A turma com código '{codigo_turma}' não existe ou está inativa no banco de dados. Verifique o código e tente novamente."
+                    errors['codigo_turma'] = f"A turma '{codigo_turma}' não existe. Verifique o código e tente novamente."
             
             matricula = cleaned_data.get('matricula_aluno')
             if not matricula:

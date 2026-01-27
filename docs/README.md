@@ -458,4 +458,6 @@ python manage.py runserver
 
 ---
 
+Link para Acessar o Sistema: https://venture-gotchi.onrender.com/login/
+
 **Última atualização:** 25 de janeiro de 2026
